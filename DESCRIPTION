@@ -1,0 +1,14 @@
+Package: gtrendR
+Title: An R Complement to the gtrends Python package
+Version: 0.0.0.9000
+Authors@R:
+    person(given = "Theodore",
+           family = "Caputi",
+           role = c("aut", "cre"),
+           email = "tcaputi@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: This package uses data pulled from the gtrends Python package to create meaningful reports.
+License: No license. Unauthorized use is strictly prohibited.
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2
