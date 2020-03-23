@@ -18,7 +18,7 @@ run_arima <- function(
 ){
 
 
-  tmpdf <- tmpdf[, c("timestamp", geo)]
+  tmpdf <- df[, c("timestamp", geo)]
   names(tmpdf) <- c("timestamp", "geo")
 
   ## SET PARAMETERS
