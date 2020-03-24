@@ -247,10 +247,10 @@ state_arima_spaghetti = function(
 ){
 
   if(class(state_arima_list)=="list"){
-    arima_summary_df <- state_arima_list[[2]]
+    arima_spaghetti_df <- state_arima_list[[2]]
   } else{
     if(class(state_arima_list) %in% c("data.frame", "tibble")){
-      arima_summary_df <- state_arima_list[[2]]
+      arima_spaghetti_df <- state_arima_list
     }
   }
 
@@ -260,7 +260,7 @@ state_arima_spaghetti = function(
   endplot <- ymd(endplot)
   interrupt <- ymd(interrupt)
 
-  arima_spaghetti_df <- state_arima_list[[1]] %>% filter(timestamp %within% interval(beginplot, endplot))
+  arima_spaghetti_df <- arima_spaghetti_df %>% filter(timestamp %within% interval(beginplot, endplot))
   arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)
   freq <- min(as.numeric(diff.Date(arima_spaghetti_df$timestamp)), na.rm = T)
   states_in_dataset <- names(arima_spaghetti_df)[names(arima_spaghetti_df) %in% state.abb]
@@ -362,10 +362,10 @@ state_arima_pctdiff = function(
 ){
 
     if(class(state_arima_list)=="list"){
-      arima_summary_df <- state_arima_list[[2]]
+      arima_summary_df <- state_arima_list[[1]]
     } else{
       if(class(state_arima_list) %in% c("data.frame", "tibble")){
-        arima_summary_df <- state_arima_list[[2]]
+        arima_summary_df <- state_arima_list
       }
     }
 
