@@ -71,7 +71,7 @@ save_plot("./output/Fig1.png", fig, base_width=6, base_height=6)
 
 
 
-
+library("gtrendR")
 setwd("C:/Users/tcapu/Google Drive/PublicHealthStudies/buyguns")
 
 panC <- pct_change_state(

@@ -7,6 +7,7 @@ difference between the actual and expected searches for a single geography.}
 \usage{
 arima_plot(
   df,
+  geo = "US",
   title = NULL,
   xlab = "Date",
   ylab = "Query Fraction\\n(Per 10 Million Searches)",
@@ -24,6 +25,8 @@ arima_plot(
 }
 \arguments{
 \item{df}{The dataframe as outputted by \code{run_arima}.}
+
+\item{geo}{The column name of the geography of searches that you want.}
 
 \item{title}{The title of the figure. The default is no title.}
 

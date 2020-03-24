@@ -6,6 +6,7 @@
 \usage{
 line_plot(
   df,
+  geo = "US",
   beginplot = T,
   endplot = T,
   interrupt,
@@ -23,6 +24,8 @@ line_plot(
 }
 \arguments{
 \item{df}{The dataframe as outputted by \code{run_arima}.}
+
+\item{geo}{The column name of the geography of searches that you want.}
 
 \item{beginplot}{The date you want the plot to start. Default is beginning of the time series.}
 
