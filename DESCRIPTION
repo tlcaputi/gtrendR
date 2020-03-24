@@ -11,4 +11,8 @@ Description: This package uses data pulled from the gtrends Python package to cr
 License: No license. Unauthorized use is strictly prohibited.
 Encoding: UTF-8
 LazyData: true
+Imports:
+    lubridate,
+    dplyr,
+    ggplot2,
 RoxygenNote: 7.0.2
