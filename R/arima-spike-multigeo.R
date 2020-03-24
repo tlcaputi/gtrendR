@@ -246,6 +246,14 @@ state_arima_spaghetti = function(
   outfn = "./output/fig.png"
 ){
 
+  if(class(state_arima_list)=="list"){
+    arima_summary_df <- state_arima_list[[2]]
+  } else{
+    if(class(state_arima_list) %in% c("data.frame", "tibble")){
+      arima_summary_df <- state_arima_list[[2]]
+    }
+  }
+
   if(is.na(interrupt)) interrupt <- state_arima_list[[3]]
 
   beginplot <- ymd(beginplot)
@@ -353,7 +361,14 @@ state_arima_pctdiff = function(
   outfn = "./output/fig.png"
 ){
 
-    arima_summary_df <- state_arima_list[[2]]
+    if(class(state_arima_list)=="list"){
+      arima_summary_df <- state_arima_list[[2]]
+    } else{
+      if(class(state_arima_list) %in% c("data.frame", "tibble")){
+        arima_summary_df <- state_arima_list[[2]]
+      }
+    }
+
     ## Uses the summary DF from the previous for loop
     arima_summary_df <- arima_summary_df %>% mutate(pctdiff = actual / fitted - 1)
     p <- plot_usmap(data = arima_summary_df, values = "pctdiff", color = linecol) +
