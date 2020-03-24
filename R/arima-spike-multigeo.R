@@ -169,7 +169,12 @@ state_arima = function(
     arima_summary_df$actual <- ifelse(arima_summary_df$state == st, mean(ts_test, na.rm = T), arima_summary_df$actual)
     arima_summary_df$fitted <- ifelse(arima_summary_df$state == st, mean(fitted_values$mean, na.rm = T) , arima_summary_df$fitted)
 
+
   }
+
+  arima_summary_df$timestamp <- as.character(ymd(arima_summary_df$timestamp))
+  arima_spaghetti_df$timestamp <- as.character(ymd(arima_spaghetti_df$timestamp))
+
 
   out <- list("spaghetti" = arima_spaghetti_df, "summary" = arima_summary_df, "interrupt"=interrupt)
   return(out)
