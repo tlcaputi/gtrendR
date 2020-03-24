@@ -1,16 +1,5 @@
-pacman::p_load(
-  lubridate,
-  dplyr,
-  ggplot2,
-  forecast,
-  scales,
-  cowplot,
-  reshape2,
-  usmap
-)
 
 library("gtrendR")
-
 setwd("C:/Users/tcapu/Google Drive/PublicHealthStudies/tob21searches")
 
 US_df <- run_arima(
@@ -80,7 +69,7 @@ panC <- pct_change_state(
   beginperiod = NA,
   preperiod = 90,
   endperiod = "2020-03-23",
-  scaletitle = "Pct. Increase\nin Searches",
+  scaletitle = "% Increase\nin Searches",
   linecol = "gray",
   lowcol = "red",
   midcol = "white",
@@ -90,6 +79,7 @@ panC <- pct_change_state(
   height = 3,
   outfn = './output/panC.pdf'
 )
+
 
 state_df <- state_arima(
   data = read.csv("./temp/data.csv", header = T, stringsAsFactor = F),
@@ -102,14 +92,13 @@ panD <- state_arima_spaghetti(
   title = NULL,
   xlab = "Date",
   ylab = "Actual Versus Model-Fitted\nSearch Queries (% Diff.)",
-  data = read.csv("./temp/data.csv", header = T, stringsAsFactor = F),
   linelabel = "COVID-19\nOutbreak",
   lbreak = "1 week",
   lwd = 0.4,
   beginplot = ymd("2020-03-01")-(7*1),
-  endplot = ymd("2020-03-22"),
+  endplot = ymd("2020-03-16"),
   xfmt = date_format("%d %b"),
-  states_with_labels = c("CA", "NY", "US", "IA"),
+  states_with_labels = c("CA", "NY", "US"),
   states_to_exclude = c("IA"),
   save = T,
   width = 6,
@@ -120,10 +109,10 @@ panD <- state_arima_spaghetti(
 
 panE <- state_arima_pctdiff(
   state_df,
-  save = T
+  save = T,
   width = 6,
   height = 3,
-  outfn = './output/panE.pdf',
+  outfn = './output/panE.pdf'
 )
 
 
@@ -136,7 +125,6 @@ title <- ggdraw() +
   theme(
     plot.margin = margin(0, 0, 0, 7)
   )
-
 fig <- plot_grid(panC, panD, panE, labels=c(LETTERS[3:5]), ncol=1, nrow=3, rel_heights=c(1.1, 1, 1.1))
-fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.1, 1))
-save_plot("./output/Fig2.png", fig, base_width=6, base_height=9)
+fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.05, 1))
+save_plot("./output/Fig2.png", fig, base_width=7, base_height=12)

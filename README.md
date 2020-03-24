@@ -95,24 +95,26 @@ save_plot("./output/Fig1.png", fig, base_width=6, base_height=6)
 
 ### ARIMA Spike with Multiple Geographies
 
-If you are interested in visualising changes by US state, you may want to create a figure showing the percentage change before versus after the interruption.
+If you are interested in visualising changes by US state, you may want to create a figure showing the percentage change before versus after the interruption using `pct_change_state`.
 
 
 ```r
-
 panC <- pct_change_state(
   df = read.csv("./temp/data.csv", header = T, stringsAsFactor = F),
   interrupt = "2020-03-01",
   beginperiod = NA,
   preperiod = 90,
   endperiod = "2020-03-23",
-  scaletitle = "Pct. Increase\nin Searches",
+  scaletitle = "% Increase\nin Searches",
   linecol = "gray",
   lowcol = "red",
   midcol = "white",
-  highcol = "dodgerblue4"
+  highcol = "dodgerblue4",
+  save = T,
+  width = 6,
+  height = 3,
+  outfn = './output/panC.pdf'
 )
-
 ```
 
 
@@ -121,34 +123,33 @@ To show how states differ from their individual ARIMA estimates, start with `sta
 ```r
 state_df <- state_arima(
   data = read.csv("./temp/data.csv", header = T, stringsAsFactor = F),
-  interrupt = "2019-03-01"
+  interrupt = "2020-03-01"
 )
 ```
 
 
-Using the output from this, you can create a spaghetti plot showing the percent difference between the ARIMA-fitted values and the actual values.
+Using the output from this, you can create a spaghetti plot showing the percent difference between the ARIMA-fitted values and the actual values with `state_arima_spaghetti`.
 
 
 ```r
 panD <- state_arima_spaghetti(
   state_df,
-  interrupt = "2019-03-01",
+  interrupt = "2020-03-01",
   title = NULL,
   xlab = "Date",
   ylab = "Actual Versus Model-Fitted\nSearch Queries (% Diff.)",
-  data = read.csv("./temp/data.csv", header = T, stringsAsFactor = F),
   linelabel = "COVID-19\nOutbreak",
   lbreak = "1 week",
   lwd = 0.4,
-  beginplot = ymd("2019-03-01")-(7*1),
-  endplot = ymd("2019-03-18"),
+  beginplot = ymd("2020-03-01")-(7*1),
+  endplot = ymd("2020-03-16"),
   xfmt = date_format("%d %b"),
-  states_with_labels = c("CA", "NY", "US", "IA"),
+  states_with_labels = c("CA", "NY", "US"),
   states_to_exclude = c("IA"),
   save = T,
   width = 6,
   height = 4,
-  outfn = "./output/panB.png"
+  outfn = "./output/panD.png"
 )
 ```
 
@@ -158,7 +159,10 @@ You can also visualize the state-specific differences between ARIMA-fitted value
 ```r
 panE <- state_arima_pctdiff(
   state_df,
-  outfn = "./output/panC.png"
+  save = T,
+  width = 6,
+  height = 3,
+  outfn = './output/panE.pdf'
 )
 ```
 
@@ -166,8 +170,18 @@ Finally, combine the plots.
 
 
 ```r
+title <- ggdraw() +
+  draw_label(
+    "Google Searches for Purchasing Guns",
+    fontface = 'bold',
+    hjust = 0.5
+  ) +
+  theme(
+    plot.margin = margin(0, 0, 0, 7)
+  )
 fig <- plot_grid(panC, panD, panE, labels=c(LETTERS[3:5]), ncol=1, nrow=3, rel_heights=c(1.1, 1, 1.1))
-save_plot("./output/Fig2.png", fig, base_width=6, base_height=9)
+fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.05, 1))
+save_plot("./output/Fig2.png", fig, base_width=7, base_height=12)
 ```
 
 ![arima-spike-multigeo](images/Fig2.png)
