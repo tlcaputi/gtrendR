@@ -28,7 +28,7 @@ run_arima <- function(
   end <- max(ymd(tmpdf$timestamp))
 
   ## RUN ARIMA ON THE TIME SERIES
-  ts <- ts(df$geo, freq = 365.25, start = decimal_date(begin))
+  ts <- ts(tmpdf$geo, freq = 365.25, start = decimal_date(begin))
   ts_training <- window(ts, end = decimal_date(interrupt-1))
   ts_test <- window(ts, start = decimal_date(interrupt))
   mod <- auto.arima(ts_training)
@@ -37,7 +37,7 @@ run_arima <- function(
   fitted_values <- forecast(mod, length(ts_test))
 
   ## ADD THE FITTED VALUES TO THE DATA FRAME
-  tmp1 <- data.frame(matrix(NA, nrow=nrow(df) - length(fitted_values$mean), ncol=5))
+  tmp1 <- data.frame(matrix(NA, nrow=nrow(tmpdf) - length(fitted_values$mean), ncol=5))
   tmp2 <- data.frame(fitted=fitted_values$mean, lo=fitted_values$lower, hi=fitted_values$upper)
   names(tmp1) <- names(tmp2)
   df_to_cbind <- rbind.data.frame(tmp1, tmp2)

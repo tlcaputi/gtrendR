@@ -15,4 +15,6 @@ Imports:
     lubridate,
     dplyr,
     ggplot2,
+    ts,
+    forecast
 RoxygenNote: 7.0.2
