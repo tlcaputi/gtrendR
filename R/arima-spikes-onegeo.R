@@ -22,12 +22,12 @@ run_arima <- function(
   names(tmpdf) <- c("timestamp", "geo")
 
   ## SET PARAMETERS
-  tmpdf$timestamp <- as.Date(tmpdf$timestamp)
+  tmpdf$timestamp <- ymd(tmpdf$timestamp)
   begin <- min(ymd(tmpdf$timestamp))
   interrupt <- ymd(interrupt) - 1
   end <- max(ymd(tmpdf$timestamp))
 
-  freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
+  freq <- min(as.numeric(diff.Date(tmpdf$timestamp)), na.rm = T)
 
   ## RUN ARIMA ON THE TIME SERIES
   ts <- ts(tmpdf$geo, freq = 365.25/freq, start = decimal_date(begin))
