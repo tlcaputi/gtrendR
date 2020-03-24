@@ -111,6 +111,9 @@ arima_plot <- function(
   ){
 
 
+  names(df) <- gsub(geo, "geo", names(df))
+
+
   maxval <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(geo)
   maxtime <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
 
@@ -142,6 +145,9 @@ arima_plot <- function(
   p <- p + theme(plot.title = element_text(hjust = 0.5))
 
   if(save) ggsave(p, width=width, height=height, dpi=300, filename=outfn)
+
+  names(df) <- gsub("geo", geo, names(df))
+
 
   return(p)
 
