@@ -55,8 +55,8 @@ title <- ggdraw() +
 
 fig <- plot_grid(panA, panB, labels=c(LETTERS[1:2]), ncol=1, nrow=2, rel_heights=c(1,1))
 fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.1, 1))
-save_plot("./output/Fig1.png", fig, base_width=6, base_height=6)
-
+save_plot("C:/Users/tcapu/Google Drive/modules/gtrendR/output/Fig1.png", fig, base_width=6, base_height=6, dpi=600)
+print("Fig 1 printed.")
 
 
 
@@ -127,4 +127,5 @@ title <- ggdraw() +
   )
 fig <- plot_grid(panC, panD, panE, labels=c(LETTERS[3:5]), ncol=1, nrow=3, rel_heights=c(1.1, 1, 1.1))
 fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.05, 1))
-save_plot("./output/Fig2.png", fig, base_width=7, base_height=12)
+save_plot("C:/Users/tcapu/Google Drive/modules/gtrendR/output/Fig2.png", fig, base_width=7, base_height=12, dpi=600)
+print("Fig 2 printed.")
