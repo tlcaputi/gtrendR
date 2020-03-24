@@ -27,8 +27,10 @@ run_arima <- function(
   interrupt <- ymd(interrupt) - 1
   end <- max(ymd(tmpdf$timestamp))
 
+  freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
+
   ## RUN ARIMA ON THE TIME SERIES
-  ts <- ts(tmpdf$geo, freq = 365.25, start = decimal_date(begin))
+  ts <- ts(tmpdf$geo, freq = 365.25/freq, start = decimal_date(begin))
   ts_training <- window(ts, end = decimal_date(interrupt-1))
   ts_test <- window(ts, start = decimal_date(interrupt))
   mod <- auto.arima(ts_training)

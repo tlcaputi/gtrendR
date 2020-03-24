@@ -127,8 +127,6 @@ state_arima = function(
   end <- ymd(end)
   interrupt <- ymd(interrupt)
 
-  print(begin)
-  print(end)
 
   df <- data %>% filter(timestamp %within% interval(begin, end))
   freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
@@ -139,7 +137,7 @@ state_arima = function(
   ## Spaghetti plot dataset (each state for each time point)
   arima_spaghetti_df <- data.frame(matrix(NA, nrow = nrow(df), ncol = (length(states_in_dataset)*2) + 1))
   names(arima_spaghetti_df) <- c("timestamp", states_in_dataset, paste0(states_in_dataset, "_fitted"))
-  arima_spaghetti_df$timestamp <- df$timestamp
+  arima_spaghetti_df$timestamp <- ymd(df$timestamp)
 
   ## Summary (one data point for each state)
   arima_summary_df <- data.frame(state = states_in_dataset, actual = NA, fitted = NA)
@@ -174,7 +172,6 @@ state_arima = function(
 
   arima_summary_df$timestamp <- as.character(ymd(arima_summary_df$timestamp))
   arima_spaghetti_df$timestamp <- as.character(ymd(arima_spaghetti_df$timestamp))
-
 
   out <- list("spaghetti" = arima_spaghetti_df, "summary" = arima_summary_df, "interrupt"=interrupt)
   return(out)
