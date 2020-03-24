@@ -8,11 +8,11 @@ Before you begin using this package, pull the Google Trends data using the gtren
 
 ```r
 
-##Only run this once
+# Only run this once
 library(devtools)
 devtools::install_github("tlcaputi/gtrendR", force = T)
 
-## Run this every time
+# Run this every time
 library("gtrendR")
 
 ```
@@ -95,11 +95,11 @@ save_plot("./output/Fig1.png", fig, base_width=6, base_height=6)
 
 ### ARIMA Spike with Multiple Geographies
 
-If you are interested in visualising changes by US state, you may want to create a figure showing the percentage change before versus after the interruption using `pct_change_state`.
+If you are interested in visualising changes by US state, you may want to create a figure showing the percentage change before versus after the interruption using `state_pct_change`.
 
 
 ```r
-panC <- pct_change_state(
+panC <- state_pct_change(
   df = read.csv("./temp/data.csv", header = T, stringsAsFactor = F),
   interrupt = "2020-03-01",
   beginperiod = NA,

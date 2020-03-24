@@ -29,7 +29,7 @@ panB <- arima_plot(
   US_df,
   title = NULL,
   xlab = "Date",
-  ylab = "Query Fraction",
+  ylab = "Query Fraction\n(Per 10 Million Searches)",
   beginplot = "2019-09-01",
   endplot = "2020-01-15",
   lbreak = "1 month",
@@ -63,7 +63,7 @@ save_plot("./output/Fig1.png", fig, base_width=6, base_height=6)
 library("gtrendR")
 setwd("C:/Users/tcapu/Google Drive/PublicHealthStudies/buyguns")
 
-panC <- pct_change_state(
+panC <- state_pct_change(
   df = read.csv("./temp/data.csv", header = T, stringsAsFactor = F),
   interrupt = "2020-03-01",
   beginperiod = NA,

@@ -32,13 +32,13 @@
 #' )
 
 
-pct_change_state = function(
+state_pct_change = function(
   df,
   interrupt,
   beginperiod = NA,
   preperiod,
   endperiod,
-  scaletitle = "Pct. Increase\nin Searches",
+  scaletitle = "% Increase\nin Searches",
   scalelimits = NULL,
   linecol = "gray",
   lowcol = "red",

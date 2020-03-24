@@ -2,8 +2,8 @@
 
 export(arima_plot)
 export(line_plot)
-export(pct_change_state)
 export(run_arima)
 export(state_arima)
 export(state_arima_pctdiff)
 export(state_arima_spaghetti)
+export(state_pct_change)
