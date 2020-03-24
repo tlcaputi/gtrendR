@@ -249,9 +249,7 @@ state_arima_spaghetti = function(
   if(class(state_arima_list)=="list"){
     arima_spaghetti_df <- state_arima_list[[2]]
   } else{
-    if(class(state_arima_list) %in% c("data.frame", "tibble")){
-      arima_spaghetti_df <- state_arima_list
-    }
+    arima_spaghetti_df <- state_arima_list
   }
 
   if(is.na(interrupt)) interrupt <- state_arima_list[[3]]
@@ -365,9 +363,7 @@ state_arima_pctdiff = function(
     if(class(state_arima_list)=="list"){
       arima_summary_df <- state_arima_list[[1]]
     } else{
-      if(class(state_arima_list) %in% c("data.frame", "tibble")){
-        arima_summary_df <- state_arima_list
-      }
+      arima_summary_df <- state_arima_list
     }
 
     ## Uses the summary DF from the previous for loop
