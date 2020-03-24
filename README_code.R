@@ -81,13 +81,13 @@ panC <- state_pct_change(
 )
 
 
-state_df <- state_arima(
+state_list <- state_arima(
   data = read.csv("./temp/data.csv", header = T, stringsAsFactor = F),
   interrupt = "2020-03-01"
 )
 
 panD <- state_arima_spaghetti(
-  state_df,
+  state_list,
   interrupt = "2020-03-01",
   title = NULL,
   xlab = "Date",
@@ -108,7 +108,7 @@ panD <- state_arima_spaghetti(
 
 
 panE <- state_arima_pctdiff(
-  state_df,
+  state_list,
   save = T,
   width = 6,
   height = 3,

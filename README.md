@@ -121,7 +121,7 @@ panC <- state_pct_change(
 To show how states differ from their individual ARIMA estimates, start with `state_arima`.
 
 ```r
-state_df <- state_arima(
+state_list <- state_arima(
   data = read.csv("./temp/data.csv", header = T, stringsAsFactor = F),
   interrupt = "2020-03-01"
 )
@@ -133,7 +133,7 @@ Using the output from this, you can create a spaghetti plot showing the percent 
 
 ```r
 panD <- state_arima_spaghetti(
-  state_df,
+  state_list,
   interrupt = "2020-03-01",
   title = NULL,
   xlab = "Date",
@@ -158,7 +158,7 @@ You can also visualize the state-specific differences between ARIMA-fitted value
 
 ```r
 panE <- state_arima_pctdiff(
-  state_df,
+  state_list,
   save = T,
   width = 6,
   height = 3,
