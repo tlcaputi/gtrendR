@@ -113,10 +113,8 @@ arima_plot <- function(
 
   names(df) <- gsub(geo, "geo", names(df))
 
-
   maxval <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(geo)
   maxtime <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
-
 
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
@@ -158,6 +156,7 @@ arima_plot <- function(
 #' line_plot: Creates a simple line plot of searches over time
 #'
 #' @param df The dataframe as outputted by \code{run_arima}.
+#' @param geo The column name of the geography of searches that you want.
 #' @param beginplot The date you want the plot to start. Default is beginning of the time series.
 #' @param endplot The date you want the plot to end. Default is end of the time series.
 #' @param interrupt The date of the interruption (should be the same as \code{run_arima})
@@ -194,6 +193,7 @@ arima_plot <- function(
 
 line_plot <- function(
   df,
+  geo = 'US',
   beginplot = T,
   endplot = T,
   interrupt,
@@ -209,16 +209,22 @@ line_plot <- function(
   outfn
 ){
 
-  if(beginplot==T) min(ymd(df$timestamp), na.rm = T)
-  if(endplot==T) max(ymd(df$timestamp), na.rm = T)
+  if(beginplot==T) beginplot <- ymd(min(ymd(df$timestamp), na.rm = T))
+  if(endplot==T) endplot <- ymd(max(ymd(df$timestamp), na.rm = T))
 
-  maxval <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(US)
+  beginplot <- ymd(beginplot)
+  endplot <- ymd(endplot)
+  interrupt <- ymd(interrupt)
+
+  names(df) <- gsub(geo, "geo", names(df))
+
+  maxval <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(geo)
   maxtime <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
 
   p <- ggplot(df)
-  p <- p + annotate("text", x = interrupt - (as.numeric((endplot - beginplot)) * 0.02), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
+  p <- p + annotate("text", x = interrupt - as.numeric(as.numeric(endplot - beginplot) * 0.02), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
   p <- p + geom_vline(xintercept=as.numeric(interrupt), linetype="dashed", color="grey74")
-  p <- p + geom_line(aes(x=timestamp, y=US, group=1), color="blue", linetype="solid", size=lwd)
+  p <- p + geom_line(aes(x=timestamp, y=geo, group=1), color="blue", linetype="solid", size=lwd)
   p <- p + geom_point(aes(x = maxtime, y = maxval), size=2, color="red")
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=date_format("%b %Y"),
@@ -231,6 +237,8 @@ line_plot <- function(
   p <- p + theme_classic()
 
   if(save) ggsave(p, width=width, height=height, dpi=300, filename=outfn)
+
+  names(df) <- gsub("geo", geo, names(df))
 
   return(p)
 

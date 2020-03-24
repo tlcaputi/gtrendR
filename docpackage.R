@@ -9,8 +9,6 @@ if(grepl("w32", R.Version()$platform)){
   ROOTPATH <- "/media/sf_Google_Drive/modules/gtrendR"
 }
 
-
 document()
-
 
 print("Documentation process successful.")

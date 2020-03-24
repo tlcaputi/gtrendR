@@ -15,5 +15,9 @@ Imports:
     lubridate,
     dplyr,
     ggplot2,
-    forecast
+    forecast,
+    scales,
+    cowplot,
+    reshape2,
+    usmap
 RoxygenNote: 7.0.2
