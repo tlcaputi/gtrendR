@@ -58,6 +58,7 @@ run_arima <- function(
 #' difference between the actual and expected searches for a single geography.
 #'
 #' @param df The dataframe as outputted by \code{run_arima}.
+#' @param geo The column name of the geography of searches that you want.
 #' @param beginplot The date you want the plot to start
 #' @param endplot The date you want the plot to end.
 #' @param interrupt The date of the interruption (should be the same as \code{run_arima})
@@ -93,6 +94,7 @@ run_arima <- function(
 
 arima_plot <- function(
   df,
+  geo = 'US',
   title = NULL,
   xlab = "Date",
   ylab = "Query Fraction\n(Per 10 Million Searches)",
