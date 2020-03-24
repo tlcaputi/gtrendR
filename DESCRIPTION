@@ -1,6 +1,6 @@
 Package: gtrendR
 Title: An R Complement to the gtrends Python package
-Version: 0.0.0.9002
+Version: 0.0.1.0000
 Authors@R:
     person(given = "Theodore",
            family = "Caputi",
@@ -12,6 +12,15 @@ License: No license. Unauthorized use is strictly prohibited.
 Encoding: UTF-8
 LazyData: true
 Imports:
+    lubridate,
+    dplyr,
+    ggplot2,
+    forecast,
+    scales,
+    cowplot,
+    reshape2,
+    usmap
+Depends:
     lubridate,
     dplyr,
     ggplot2,
