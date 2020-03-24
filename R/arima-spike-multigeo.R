@@ -259,6 +259,7 @@ state_arima_spaghetti = function(
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
   interrupt <- ymd(interrupt)
+  arima_spaghetti_df <- ymd(arima_spaghetti_df)
 
   arima_spaghetti_df <- arima_spaghetti_df %>% filter(timestamp %within% interval(beginplot, endplot))
   arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)
