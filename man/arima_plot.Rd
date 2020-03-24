@@ -16,6 +16,7 @@ arima_plot(
   endplot,
   lbreak = "1 year",
   linelabel = "Interruption",
+  linelabelpos = 0.02,
   interrupt,
   width = 6,
   height = 3,

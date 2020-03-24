@@ -29,8 +29,10 @@ run_arima <- function(
 
   freq <- min(as.numeric(diff.Date(tmpdf$timestamp)), na.rm = T)
 
+
   ## RUN ARIMA ON THE TIME SERIES
   ts <- ts(tmpdf$geo, freq = 365.25/freq, start = decimal_date(begin))
+
   ts_training <- window(ts, end = decimal_date(interrupt-1))
   ts_test <- window(ts, start = decimal_date(interrupt))
   mod <- auto.arima(ts_training)
@@ -105,6 +107,7 @@ arima_plot <- function(
   endplot,
   lbreak = "1 year",
   linelabel = "Interruption",
+  linelabelpos = 0.02,
   interrupt,
   width = 6,
   height = 3,
@@ -125,7 +128,7 @@ arima_plot <- function(
   ## CREATE PLOT
   poly <- with(df  %>% filter(timestamp %within% interval(interrupt - 1, endplot)), data.frame(x = c(timestamp, rev(timestamp)), y = c(geo, rev(fitted)), polycolor="grey81"))
   p <- ggplot(df)
-  p <- p + annotate("text", x = interrupt - (as.numeric((endplot - beginplot)) * 0.02), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
+  p <- p + annotate("text", x = interrupt - (as.numeric((endplot - beginplot)) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
   p <- p + geom_vline(xintercept=as.numeric(interrupt - 1), linetype="dashed", color="grey74")
   p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill="grey80"), fill="grey80")
   p <- p + geom_line(aes(x=timestamp, y=fitted, group=1, color="red"), linetype="solid", size=lwd)

@@ -115,24 +115,22 @@ state_arima = function(
   begin = T,
   end = T,
   interrupt = "2020-03-01"
-){
+  ){
 
 
   data$timestamp <- ymd(data$timestamp)
   if(begin == T) begin <- min(ymd(data$timestamp), na.rm = T)
   if(end == T) end <- max(ymd(data$timestamp), na.rm = T)
 
-
   begin <- ymd(begin)
   end <- ymd(end)
   interrupt <- ymd(interrupt)
 
-
   df <- data %>% filter(timestamp %within% interval(begin, end))
+  names(df) <- gsub("US_", "", names(df))
   freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
   states_in_dataset <- names(df)[names(df) %in% state.abb]
   states_in_dataset <- c(states_in_dataset, "US")
-
 
   ## Spaghetti plot dataset (each state for each time point)
   arima_spaghetti_df <- data.frame(matrix(NA, nrow = nrow(df), ncol = (length(states_in_dataset)*2) + 1))
