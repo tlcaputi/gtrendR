@@ -54,6 +54,8 @@ state_pct_change = function(
     beginperiod <- ymd(interrupt) - preperiod
   }
 
+  names(df) <- gsub("US_", "", names(df))
+
   df$timestamp <- ymd(df$timestamp)
   interrupt <- ymd(interrupt)
   beginperiod <- ymd(beginperiod)
