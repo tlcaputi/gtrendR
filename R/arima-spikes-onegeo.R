@@ -142,10 +142,10 @@ arima_plot <- function(
 
 
   if(!extend){
-    beginplot <- closest_date(data = tmpdf, date = beginplot, type = "beforeequal")
-    endplot <- closest_date(data = tmpdf, date = endplot, type = "afterequal")
+    beginplot <- closest_date(data = df, date = beginplot, type = "beforeequal")
+    endplot <- closest_date(data = df, date = endplot, type = "afterequal")
   }
-  interrupt <- closest_date(data = tmpdf, date = interrupt, type = "beforeequal")
+  interrupt <- closest_date(data = df, date = interrupt, type = "beforeequal")
 
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
@@ -250,10 +250,10 @@ line_plot <- function(
 
 
   if(!extend){
-    beginplot <- closest_date(data = tmpdf, date = beginplot, type = "beforeequal")
-    endplot <- closest_date(data = tmpdf, date = endplot, type = "afterequal")
+    beginplot <- closest_date(data = df, date = beginplot, type = "beforeequal")
+    endplot <- closest_date(data = df, date = endplot, type = "afterequal")
   }
-  interrupt <- closest_date(data = tmpdf, date = interrupt, type = "beforeequal")
+  interrupt <- closest_date(data = df, date = interrupt, type = "beforeequal")
 
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)

@@ -123,9 +123,9 @@ state_arima = function(
   if(begin == T) begin <- min(ymd(data$timestamp), na.rm = T)
   if(end == T) end <- max(ymd(data$timestamp), na.rm = T)
 
-  begin <- closest_date(data = tmpdf, date = begin, type = "beforeequal")
-  end <- closest_date(data = tmpdf, date = end, type = "afterequal")
-  interrupt <- closest_date(data = tmpdf, date = interrupt, type = "beforeequal")
+  begin <- closest_date(data = data, date = begin, type = "beforeequal")
+  end <- closest_date(data = data, date = end, type = "afterequal")
+  interrupt <- closest_date(data = data, date = interrupt, type = "beforeequal")
 
   begin <- ymd(begin)
   end <- ymd(end)
@@ -264,10 +264,10 @@ state_arima_spaghetti = function(
 
 
   if(!extend){
-    beginplot <- closest_date(data = tmpdf, date = beginplot, type = "beforeequal")
-    endplot <- closest_date(data = tmpdf, date = endplot, type = "afterequal")
+    beginplot <- closest_date(data = arima_spaghetti_df, date = beginplot, type = "beforeequal")
+    endplot <- closest_date(data = arima_spaghetti_df, date = endplot, type = "afterequal")
   }
-  interrupt <- closest_date(data = tmpdf, date = interrupt, type = "beforeequal")
+  interrupt <- closest_date(data = arima_spaghetti_df, date = interrupt, type = "beforeequal")
 
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
