@@ -20,6 +20,7 @@ state_arima_spaghetti(
   xfmt = date_format("\%d \%b"),
   states_with_labels = c("CA", "NY", "US", "IL", "TX"),
   states_to_exclude = c(),
+  extend = F,
   save = T,
   width = 6,
   height = 4,

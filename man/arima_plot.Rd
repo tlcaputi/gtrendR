@@ -22,7 +22,8 @@ arima_plot(
   width = 6,
   height = 3,
   lwd = 0.3,
-  save = T
+  save = T,
+  extend = F
 )
 }
 \arguments{

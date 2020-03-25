@@ -123,6 +123,10 @@ state_arima = function(
   if(begin == T) begin <- min(ymd(data$timestamp), na.rm = T)
   if(end == T) end <- max(ymd(data$timestamp), na.rm = T)
 
+  begin <- closest_date(data = tmpdf, date = begin, type = "beforeequal")
+  end <- closest_date(data = tmpdf, date = end, type = "afterequal")
+  interrupt <- closest_date(data = tmpdf, date = interrupt, type = "beforeequal")
+
   begin <- ymd(begin)
   end <- ymd(end)
   interrupt <- ymd(interrupt)
@@ -244,6 +248,7 @@ state_arima_spaghetti = function(
   xfmt = date_format("%d %b"),
   states_with_labels = c("CA", "NY", "US", "IL", "TX"),
   states_to_exclude = c(),
+  extend = F,
   save = T,
   width = 6,
   height = 4,
@@ -257,10 +262,18 @@ state_arima_spaghetti = function(
     arima_spaghetti_df <- state_arima_list
   }
 
+
+  if(!extend){
+    beginplot <- closest_date(data = tmpdf, date = beginplot, type = "beforeequal")
+    endplot <- closest_date(data = tmpdf, date = endplot, type = "afterequal")
+  }
+  interrupt <- closest_date(data = tmpdf, date = interrupt, type = "beforeequal")
+
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
   interrupt <- ymd(interrupt)
-  arima_spaghetti_df <- ymd(arima_spaghetti_df)
+
+  arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)
 
   arima_spaghetti_df <- arima_spaghetti_df %>% filter(timestamp %within% interval(beginplot, endplot))
   arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)

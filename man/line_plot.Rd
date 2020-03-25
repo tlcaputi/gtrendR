@@ -18,6 +18,7 @@ line_plot(
   lbreak = "1 year",
   xfmt = date_format("\%b \%Y"),
   lwd = 0.3,
+  extend = F,
   width = 6,
   height = 3,
   save = T,
