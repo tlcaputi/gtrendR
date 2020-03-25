@@ -230,8 +230,8 @@ line_plot <- function(
 
   names(df) <- gsub(geo, "geo", names(df))
 
-  maxval <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(geo)
-  maxtime <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
+  maxval <- df %>% filter(timestamp >= interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(geo)
+  maxtime <- df %>% filter(timestamp >= interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
 
   p <- ggplot(df)
   p <- p + annotate("text", x = interrupt - as.numeric(as.numeric(endplot - beginplot) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
