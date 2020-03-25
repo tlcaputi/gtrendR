@@ -10,6 +10,7 @@ arima_plot(
   geo = "US",
   title = NULL,
   xlab = "Date",
+  xfmt = date_format("\%b \%Y"),
   ylab = "Query Fraction\\n(Per 10 Million Searches)",
   outfn = "./output/fig.pdf",
   beginplot,

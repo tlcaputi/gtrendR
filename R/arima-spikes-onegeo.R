@@ -101,6 +101,7 @@ arima_plot <- function(
   geo = 'US',
   title = NULL,
   xlab = "Date",
+  xfmt = date_format("%b %Y"),
   ylab = "Query Fraction\n(Per 10 Million Searches)",
   outfn = './output/fig.pdf',
   beginplot,
@@ -134,7 +135,7 @@ arima_plot <- function(
   p <- p + geom_line(aes(x=timestamp, y=fitted, group=1, color="red"), linetype="solid", size=lwd)
   p <- p + geom_line(aes(x=timestamp, y=geo, group=1, color="blue"), linetype="solid", size=lwd)
   p <- p + scale_x_date(date_breaks = lbreak,
-                   labels=date_format("%b %Y"),
+                   labels=xfmt,
                    limits = as.Date(c(beginplot, endplot)))
   p <- p + labs(
     title= title,
@@ -208,6 +209,7 @@ line_plot <- function(
   xlab = "Date",
   ylab = "Query Fraction\n(Per 10 Million Searches)",
   lbreak = "1 year",
+  xfmt = date_format("%b %Y"),
   lwd = 0.3,
   width = 6,
   height = 3,
@@ -233,7 +235,7 @@ line_plot <- function(
   p <- p + geom_line(aes(x=timestamp, y=geo, group=1), color="blue", linetype="solid", size=lwd)
   p <- p + geom_point(aes(x = maxtime, y = maxval), size=2, color="red")
   p <- p + scale_x_date(date_breaks = lbreak,
-                   labels=date_format("%b %Y"),
+                   labels=xfmt,
                    limits = as.Date(c(beginplot, endplot)))
   p <- p + labs(
     title= title,
