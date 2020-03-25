@@ -27,7 +27,12 @@ run_arima <- function(
   tmpdf$timestamp <- ymd(tmpdf$timestamp)
   if(begin == T) begin <- min(ymd(tmpdf$timestamp))
   if(end == T) end <- max(ymd(tmpdf$timestamp))
-  interrupt <- ymd(interrupt) - 1
+
+
+  interrupt <- ymd(interrupt)
+  begin <- ymd(begin)
+  end <- ymd(end)
+
 
   freq <- min(as.numeric(diff.Date(tmpdf$timestamp)), na.rm = T)
 
