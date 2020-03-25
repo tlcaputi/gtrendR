@@ -28,14 +28,11 @@ run_arima <- function(
   if(begin == T) begin <- min(ymd(tmpdf$timestamp))
   if(end == T) end <- max(ymd(tmpdf$timestamp))
 
-
   interrupt <- ymd(interrupt)
   begin <- ymd(begin)
   end <- ymd(end)
 
-
   freq <- min(as.numeric(diff.Date(tmpdf$timestamp)), na.rm = T)
-
 
   ## RUN ARIMA ON THE TIME SERIES
   ts <- ts(tmpdf$geo, freq = 365.25/freq, start = decimal_date(begin))
@@ -126,8 +123,8 @@ arima_plot <- function(
 
   names(df) <- gsub(geo, "geo", names(df))
 
-  maxval <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(geo)
-  maxtime <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
+  maxval <- df %>% filter(timestamp >= interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(geo)
+  maxtime <- df %>% filter(timestamp >= interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
 
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
@@ -238,7 +235,7 @@ line_plot <- function(
 
   p <- ggplot(df)
   p <- p + annotate("text", x = interrupt - as.numeric(as.numeric(endplot - beginplot) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
-  p <- p + geom_vline(xintercept=as.numeric(interrupt), linetype="dashed", color="grey74")
+  p <- p + geom_vline(xintercept=as.numeric(interrupt - 1), linetype="dashed", color="grey74")
   p <- p + geom_line(aes(x=timestamp, y=geo, group=1), color="blue", linetype="solid", size=lwd)
   p <- p + geom_point(aes(x = maxtime, y = maxval), size=2, color="red")
   p <- p + scale_x_date(date_breaks = lbreak,
