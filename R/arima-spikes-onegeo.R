@@ -13,6 +13,8 @@
 run_arima <- function(
   df,
   interrupt,
+  begin = T,
+  end = T,
   geo = "US",
   polycolor = "grey81"
 ){
@@ -23,9 +25,9 @@ run_arima <- function(
 
   ## SET PARAMETERS
   tmpdf$timestamp <- ymd(tmpdf$timestamp)
-  begin <- min(ymd(tmpdf$timestamp))
+  if(begin) begin <- min(ymd(tmpdf$timestamp))
+  if(end) end <- max(ymd(tmpdf$timestamp))
   interrupt <- ymd(interrupt) - 1
-  end <- max(ymd(tmpdf$timestamp))
 
   freq <- min(as.numeric(diff.Date(tmpdf$timestamp)), na.rm = T)
 

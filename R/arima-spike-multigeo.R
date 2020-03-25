@@ -171,7 +171,6 @@ state_arima = function(
   }
 
   arima_spaghetti_df$timestamp <- as.character(ymd(arima_spaghetti_df$timestamp))
-
   out <- list("spaghetti" = arima_spaghetti_df, "summary" = arima_summary_df, "interrupt"=interrupt)
 
 
@@ -250,7 +249,7 @@ state_arima_spaghetti = function(
 ){
 
   if(class(state_arima_list)=="list"){
-    arima_spaghetti_df <- state_arima_list[[1]]    
+    arima_spaghetti_df <- state_arima_list[[1]]
     if(is.na(interrupt)) interrupt <- state_arima_list[[3]]
   } else{
     arima_spaghetti_df <- state_arima_list
@@ -268,7 +267,7 @@ state_arima_spaghetti = function(
   states_in_dataset <- c(states_in_dataset, "US")
 
   p <- ggplot(arima_spaghetti_df)
-  p <- p + geom_vline(xintercept=as.numeric(interrupt - freq), linetype="dashed", color="grey72")
+  p <- p + geom_vline(xintercept=as.numeric(interrupt - 1), linetype="dashed", color="grey72")
 
   maxval <- 0
   ct <- 0
