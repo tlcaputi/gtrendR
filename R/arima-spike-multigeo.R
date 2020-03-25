@@ -117,7 +117,6 @@ state_arima = function(
   interrupt = "2020-03-01"
   ){
 
-
   data$timestamp <- ymd(data$timestamp)
   if(begin == T) begin <- min(ymd(data$timestamp), na.rm = T)
   if(end == T) end <- max(ymd(data$timestamp), na.rm = T)
@@ -133,8 +132,8 @@ state_arima = function(
   states_in_dataset <- c(states_in_dataset, "US")
 
   ## Spaghetti plot dataset (each state for each time point)
-  arima_spaghetti_df <- data.frame(matrix(NA, nrow = nrow(df), ncol = (length(states_in_dataset)*2) + 1))
-  names(arima_spaghetti_df) <- c("timestamp", states_in_dataset, paste0(states_in_dataset, "_fitted"))
+  arima_spaghetti_df <- data.frame(matrix(NA, nrow = nrow(df), ncol = (length(states_in_dataset)*3) + 1))
+  names(arima_spaghetti_df) <- c("timestamp", states_in_dataset, paste0(states_in_dataset, "_fitted"), paste0(states_in_dataset, "_pctdiff"))
   arima_spaghetti_df$timestamp <- ymd(df$timestamp)
 
   ## Summary (one data point for each state)
@@ -147,31 +146,35 @@ state_arima = function(
     time_series <- ts(df[, st], freq = 365.25/freq, start = decimal_date(begin))
     ts_train <- window(time_series, end = decimal_date(interrupt - 1))
     ts_test <- window(time_series, start = decimal_date(interrupt))
-    mod <- auto.arima(ts_train)
 
-    fitted_values <- forecast(mod, length(ts_test))
-    fitted_values$mean <- ifelse(fitted_values$mean<0, NA, fitted_values$mean)
+    if(!all(is.na(ts_train)) & !all(is.na(ts_test))){
 
-    vname1 <- paste0(st, "_fitted")
-    vname2 <- paste0(st, "_pctdiff")
-    arima_spaghetti_df[, st] <- c(ts_train, ts_test)
-    arima_spaghetti_df[, vname1] <- c(ts_train, fitted_values$mean)
+      mod <- auto.arima(ts_train)
 
+      fitted_values <- forecast(mod, length(ts_test))
+      fitted_values$mean <- ifelse(fitted_values$mean<0, NA, fitted_values$mean)
 
-    timestamp <- arima_spaghetti_df[, "timestamp"]
-    pctdiff <- (arima_spaghetti_df[, st] / arima_spaghetti_df[, vname1]) - 1
-    arima_spaghetti_df[, vname2] <- pctdiff
+      vname1 <- paste0(st, "_fitted")
+      vname2 <- paste0(st, "_pctdiff")
+      arima_spaghetti_df[, st] <- c(ts_train, ts_test)
+      arima_spaghetti_df[, vname1] <- c(ts_train, fitted_values$mean)
 
-    arima_summary_df$actual <- ifelse(arima_summary_df$state == st, mean(ts_test, na.rm = T), arima_summary_df$actual)
-    arima_summary_df$fitted <- ifelse(arima_summary_df$state == st, mean(fitted_values$mean, na.rm = T) , arima_summary_df$fitted)
+      timestamp <- arima_spaghetti_df[, "timestamp"]
+      pctdiff <- (arima_spaghetti_df[, st] / arima_spaghetti_df[, vname1]) - 1
+      arima_spaghetti_df[, vname2] <- pctdiff
 
+      arima_summary_df$actual <- ifelse(arima_summary_df$state == st, mean(ts_test, na.rm = T), arima_summary_df$actual)
+      arima_summary_df$fitted <- ifelse(arima_summary_df$state == st, mean(fitted_values$mean, na.rm = T) , arima_summary_df$fitted)
+
+    }
 
   }
 
-  arima_summary_df$timestamp <- as.character(ymd(arima_summary_df$timestamp))
   arima_spaghetti_df$timestamp <- as.character(ymd(arima_spaghetti_df$timestamp))
 
   out <- list("spaghetti" = arima_spaghetti_df, "summary" = arima_summary_df, "interrupt"=interrupt)
+
+
   return(out)
 
 }
@@ -247,12 +250,11 @@ state_arima_spaghetti = function(
 ){
 
   if(class(state_arima_list)=="list"){
-    arima_spaghetti_df <- state_arima_list[[2]]
+    arima_spaghetti_df <- state_arima_list[[1]]    
+    if(is.na(interrupt)) interrupt <- state_arima_list[[3]]
   } else{
     arima_spaghetti_df <- state_arima_list
   }
-
-  if(is.na(interrupt)) interrupt <- state_arima_list[[3]]
 
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
@@ -361,7 +363,7 @@ state_arima_pctdiff = function(
 ){
 
     if(class(state_arima_list)=="list"){
-      arima_summary_df <- state_arima_list[[1]]
+      arima_summary_df <- state_arima_list[[2]]
     } else{
       arima_summary_df <- state_arima_list
     }
