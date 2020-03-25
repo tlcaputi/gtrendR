@@ -203,6 +203,7 @@ line_plot <- function(
   endplot = T,
   interrupt,
   linelabel = "Interruption",
+  linelabelpos = 0.02,
   title = NULL,
   xlab = "Date",
   ylab = "Query Fraction\n(Per 10 Million Searches)",
@@ -227,7 +228,7 @@ line_plot <- function(
   maxtime <- df %>% filter(timestamp > interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
 
   p <- ggplot(df)
-  p <- p + annotate("text", x = interrupt - as.numeric(as.numeric(endplot - beginplot) * 0.02), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
+  p <- p + annotate("text", x = interrupt - as.numeric(as.numeric(endplot - beginplot) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
   p <- p + geom_vline(xintercept=as.numeric(interrupt), linetype="dashed", color="grey74")
   p <- p + geom_line(aes(x=timestamp, y=geo, group=1), color="blue", linetype="solid", size=lwd)
   p <- p + geom_point(aes(x = maxtime, y = maxval), size=2, color="red")

@@ -11,6 +11,7 @@ line_plot(
   endplot = T,
   interrupt,
   linelabel = "Interruption",
+  linelabelpos = 0.02,
   title = NULL,
   xlab = "Date",
   ylab = "Query Fraction\\n(Per 10 Million Searches)",
