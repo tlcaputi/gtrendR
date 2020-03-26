@@ -63,13 +63,13 @@ colorschemer <- function(col){
 
   if(col == "red"){
     getPalette <- colorRampPalette(brewer.pal(100, "RdBu"))
-    assign("hicol",    getPalette(1000)[900], pos=parent.frame())
-    assign("locol",    getPalette(1000)[700], pos=parent.frame())
-    assign("nucol",    getPalette(1000)[550], pos=parent.frame())
-    assign("opcol",    getPalette(1000)[200], pos=parent.frame())
-    assign("highcol",  getPalette(1000)[900], pos=parent.frame())
-    assign("lowcol",   getPalette(1000)[550], pos=parent.frame())
-    assign("midcol",   getPalette(1000)[200], pos=parent.frame())
+    assign("hicol",    rev(getPalette(1000))[900], pos=parent.frame())
+    assign("locol",    rev(getPalette(1000))[700], pos=parent.frame())
+    assign("nucol",    rev(getPalette(1000))[550], pos=parent.frame())
+    assign("opcol",    rev(getPalette(1000))[200], pos=parent.frame())
+    assign("highcol",  rev(getPalette(1000))[900], pos=parent.frame())
+    assign("lowcol",   rev(getPalette(1000))[550], pos=parent.frame())
+    assign("midcol",   rev(getPalette(1000))[200], pos=parent.frame())
   }
 
 }

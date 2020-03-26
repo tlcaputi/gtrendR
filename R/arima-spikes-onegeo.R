@@ -177,7 +177,7 @@ arima_plot <- function(
     y = ylab
   )
   p <- p + scale_colour_manual(name = 'Legend', values=c(hicol, locol), labels = c('Actual','Expected'))
-  p <- p + scale_fill_manual(values=polycolor)
+  p <- p + scale_fill_manual(values=nucol)
   p <- p + theme_classic()
   p <- p + theme(legend.position=c(0.1,0.9))
   p <- p + theme(plot.title = element_text(hjust = 0.5))
@@ -255,7 +255,7 @@ line_plot <- function(
   height = 3,
   save = T,
   outfn
-){
+  ){
 
   colorschemer(colorscheme)
 
