@@ -14,7 +14,7 @@ state_pct_change(
   scalelimits = NULL,
   linecol = "gray",
   lowcol = "#8BADE1",
-  midcol = NA,
+  midcol = NULL,
   highcol = "#EB2836",
   save = T,
   width = 6,

@@ -20,7 +20,8 @@ Imports:
     cowplot,
     reshape2,
     usmap,
-    imputeTS
+    imputeTS,
+    boot
 Depends:
     lubridate,
     dplyr,
@@ -30,5 +31,6 @@ Depends:
     cowplot,
     reshape2,
     usmap,
-    imputeTS
+    imputeTS,
+    boot
 RoxygenNote: 7.0.2
