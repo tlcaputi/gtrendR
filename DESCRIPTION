@@ -23,7 +23,7 @@ Imports:
     imputeTS,
     boot,
     RColorBrewer,
-    colorRampsv
+    colorRamps
 Depends:
     lubridate,
     dplyr,
