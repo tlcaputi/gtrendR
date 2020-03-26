@@ -4,7 +4,7 @@
 \alias{state_arima}
 \title{state_arima: Run this first to do ARIMA by state functions}
 \usage{
-state_arima(data, begin = T, end = T, interrupt = "2020-03-01")
+state_arima(data, begin = T, end = T, interrupt = "2020-03-01", kalman = F)
 }
 \arguments{
 \item{data}{A dataframe including time as \code{timestamp} and searches for your given geography in one column.}

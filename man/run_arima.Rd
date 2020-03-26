@@ -4,15 +4,7 @@
 \alias{run_arima}
 \title{Run this first. It applies the ARIMA to predict future values and then produces a dataset with the actual and fitted values.}
 \usage{
-run_arima(
-  df,
-  interrupt,
-  begin = T,
-  end = T,
-  geo = "US",
-  polycolor = "grey81",
-  kalman = T
-)
+run_arima(df, interrupt, begin = T, end = T, geo = "US", kalman = F)
 }
 \arguments{
 \item{df}{A dataframe including time as \code{timestamp} and searches for your given geography in one column.}

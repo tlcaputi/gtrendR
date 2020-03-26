@@ -17,8 +17,8 @@ run_arima <- function(
   begin = T,
   end = T,
   geo = "US",
-  polycolor = "grey81",
-  kalman = T
+  # polycolor = "#6391b5",
+  kalman = F
   ){
 
 
@@ -43,14 +43,14 @@ run_arima <- function(
   freq <- min(as.numeric(diff.Date(tmpdf$timestamp)), na.rm = T)
 
   ## RUN ARIMA ON THE TIME SERIES
-  ts <- ts(tmpdf$geo, freq = 365.25/freq, start = decimal_date(begin))
+  time_series <- ts(tmpdf$geo, freq = 365.25/freq, start = decimal_date(begin))
   if(kalman){
-    ts <- na_kalman(ts, model="auto.arima")
-    tmpdf$geo <- as.numeric(ts)
+    time_series <- na_kalman(time_series, model="auto.arima")
+    tmpdf$geo <- as.numeric(time_series)
   }
 
-  ts_training <- window(ts, end = decimal_date(interrupt) - 0.1/365)
-  ts_test <- window(ts, start = decimal_date(interrupt))
+  ts_training <- window(time_series, end = decimal_date(interrupt) - 0.1/365)
+  ts_test <- window(time_series, start = decimal_date(interrupt))
   mod <- auto.arima(ts_training)
 
   ## EXTRACT FITTED VALUES
@@ -64,7 +64,7 @@ run_arima <- function(
 
   names(df_to_cbind) <- gsub("[.]", "", names(df_to_cbind))
   finaldf <- cbind.data.frame(tmpdf, df_to_cbind)
-  finaldf$polycolor <- polycolor
+  # finaldf$polycolor <- polycolor
   finaldf$fitted <- ifelse(is.na(finaldf$fitted), finaldf$geo, finaldf$fitted)
 
   names(finaldf) <- gsub("geo", geo, names(finaldf))
@@ -112,7 +112,6 @@ run_arima <- function(
 #'            lwd = 0.3,
 #'            save = T
 #'            )
-
 arima_plot <- function(
   df,
   geo = 'US',
@@ -126,6 +125,9 @@ arima_plot <- function(
   lbreak = "1 year",
   linelabel = "Interruption",
   linelabelpos = 0.02,
+  actuallinecolor = "#163C55",
+  counterfactualcolor = "#3AB1DD",
+  polycolor = "#A4E8F4",
   interrupt,
   width = 6,
   height = 3,
@@ -151,16 +153,17 @@ arima_plot <- function(
   endplot <- ymd(endplot)
   interrupt <- ymd(interrupt)
 
-
+  df$polycolor <- polycolor
 
   ## CREATE PLOT
-  poly <- with(df  %>% filter(timestamp %within% interval(interrupt - 1, endplot)), data.frame(x = c(timestamp, rev(timestamp)), y = c(geo, rev(fitted)), polycolor="grey81"))
+  poly <- with(df %>% filter(timestamp %within% interval(closest_date(df, interrupt, type="before"), endplot)),
+              data.frame(x = c(timestamp, rev(timestamp)), y = c(geo, rev(fitted)), polycolor="grey81"))
   p <- ggplot(df)
   p <- p + annotate("text", x = interrupt - (as.numeric((endplot - beginplot)) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
   p <- p + geom_vline(xintercept=closest_date(df, date=interrupt, type="before"), linetype="dashed", color="grey74")
-  p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill="grey80"), fill="grey80")
-  p <- p + geom_line(aes(x=timestamp, y=fitted, group=1, color="red"), linetype="solid", size=lwd)
-  p <- p + geom_line(aes(x=timestamp, y=geo, group=1, color="blue"), linetype="solid", size=lwd)
+  p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=polycolor), fill=polycolor, alpha=0.5)
+  p <- p + geom_line(aes(x=timestamp, y=fitted, group=1, color=counterfactualcolor), linetype="solid", size=lwd)
+  p <- p + geom_line(aes(x=timestamp, y=geo, group=1, color=actuallinecolor), linetype="solid", size=lwd)
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
                    limits = as.Date(c(beginplot, endplot)))
@@ -169,8 +172,8 @@ arima_plot <- function(
     x = xlab,
     y = ylab
   )
-  p <- p + scale_colour_manual(name = 'Legend', values =c('blue'='blue','red'='red'), labels = c('Actual','Expected'))
-  p <- p + scale_fill_manual(values="grey80")
+  p <- p + scale_colour_manual(name = 'Legend', values =c(actuallinecolor, counterfactualcolor), labels = c('Actual','Expected'))
+  p <- p + scale_fill_manual(values=polycolor)
   p <- p + theme_classic()
   p <- p + theme(legend.position=c(0.1,0.9))
   p <- p + theme(plot.title = element_text(hjust = 0.5))
@@ -178,7 +181,6 @@ arima_plot <- function(
   if(save) ggsave(p, width=width, height=height, dpi=300, filename=outfn)
 
   names(df) <- gsub("geo", geo, names(df))
-
 
   return(p)
 

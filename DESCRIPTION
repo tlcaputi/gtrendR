@@ -19,7 +19,8 @@ Imports:
     scales,
     cowplot,
     reshape2,
-    usmap
+    usmap,
+    imputeTS
 Depends:
     lubridate,
     dplyr,
@@ -28,5 +29,6 @@ Depends:
     scales,
     cowplot,
     reshape2,
-    usmap
+    usmap,
+    imputeTS
 RoxygenNote: 7.0.2

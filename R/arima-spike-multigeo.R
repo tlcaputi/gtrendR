@@ -31,7 +31,6 @@
 #'   highcol = "dodgerblue4"
 #' )
 
-
 state_pct_change = function(
   df,
   interrupt,
@@ -69,12 +68,17 @@ state_pct_change = function(
       timestamp, before, state.abb
     )
 
+  
+
   tmp_long <- melt(tmp, id.vars = c("timestamp", "before"), variable.name = "abbr", value.name = "searches")
   statedf <- tmp_long %>%
                 group_by(abbr) %>%
                 summarise(
-                  change = (mean(searches[before==0], na.rm = T) / mean(searches[before==1], na.rm = T)) - 1
-                ) %>% ungroup()
+                  searches_after = mean(searches[before==0], na.rm = T),
+                  searches_before = mean(searches[before==1], na.rm = T)
+                ) %>% ungroup() %>% mutate(
+                  change = ((searches_after / searches_before) - 1)
+                )
   statedf$state <- state.name[match(statedf$abbr, state.abb)]
   p <- plot_usmap(
           data = statedf,
@@ -92,7 +96,9 @@ state_pct_change = function(
 
   if(save) ggsave(p, width=width, height=height, dpi=300, filename=outfn)
 
-  return(p)
+
+  out <- list(statedf, p)
+  return(out)
 
 }
 
@@ -116,7 +122,8 @@ state_arima = function(
   data,
   begin = T,
   end = T,
-  interrupt = "2020-03-01"
+  interrupt = "2020-03-01",
+  kalman = F
   ){
 
   data$timestamp <- ymd(data$timestamp)
@@ -150,6 +157,11 @@ state_arima = function(
     print(sprintf("[%s] Processing state %s", Sys.time(), st))
 
     time_series <- ts(df[, st], freq = 365.25/freq, start = decimal_date(begin))
+    if(kalman){
+      time_series <- na_kalman(time_series, model="auto.arima")
+      df[, st] <- as.numeric(time_series)
+    }
+
     ts_train <- window(time_series, end = decimal_date(interrupt - 1))
     ts_test <- window(time_series, start = decimal_date(interrupt))
 
@@ -253,14 +265,20 @@ state_arima_spaghetti = function(
   width = 6,
   height = 4,
   outfn = "./output/fig.png"
-){
+  ){
+
 
   if(class(state_arima_list)=="list"){
-    arima_spaghetti_df <- state_arima_list[[1]]
+    arima_spaghetti_df <- state_arima_list[[2]]
     if(is.na(interrupt)) interrupt <- state_arima_list[[3]]
   } else{
-    arima_spaghetti_df <- state_arima_list
+     arima_spaghetti_df <- state_arima_list
   }
+
+  arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)
+  beginplot <- ymd(beginplot)
+  endplot <- ymd(endplot)
+  interrupt <- ymd(interrupt)
 
 
   if(!extend){
@@ -269,23 +287,21 @@ state_arima_spaghetti = function(
   }
   interrupt <- closest_date(data = arima_spaghetti_df, date = interrupt, type = "beforeequal")
 
-  beginplot <- ymd(beginplot)
-  endplot <- ymd(endplot)
-  interrupt <- ymd(interrupt)
 
   arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)
-
   arima_spaghetti_df <- arima_spaghetti_df %>% filter(timestamp %within% interval(beginplot, endplot))
-  arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)
+
   freq <- min(as.numeric(diff.Date(arima_spaghetti_df$timestamp)), na.rm = T)
   states_in_dataset <- names(arima_spaghetti_df)[names(arima_spaghetti_df) %in% state.abb]
   states_in_dataset <- c(states_in_dataset, "US")
 
+
   p <- ggplot(arima_spaghetti_df)
-  p <- p + geom_vline(xintercept=as.numeric(interrupt - 1), linetype="dashed", color="grey72")
+  p <- p + geom_vline(xintercept=closest_date(data = arima_spaghetti_df, date = interrupt, type="before"), linetype="dashed", color="grey72")
 
   maxval <- 0
   ct <- 0
+
 
   for(st in states_in_dataset){
     ct <- ct + 1
@@ -309,7 +325,6 @@ state_arima_spaghetti = function(
       }
     }
   }
-
 
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
