@@ -125,9 +125,11 @@ arima_plot <- function(
   lbreak = "1 year",
   linelabel = "Interruption",
   linelabelpos = 0.02,
-  counterfactualcolor = "#ec7f73",
-  actuallinecolor = "#EB2836",
-  polycolor = "#FFE5DE",
+  hicol = NA,
+  locol = NA,
+  nucol = NA,
+  opcol = NA,
+  colorscheme = "red",
   polyalpha = 0.1,
   interrupt,
   width = 6,
@@ -137,6 +139,7 @@ arima_plot <- function(
   extend = F
   ){
 
+  colorschemer(colorscheme)
 
   names(df) <- gsub(geo, "geo", names(df))
 
@@ -161,10 +164,10 @@ arima_plot <- function(
               data.frame(x = c(timestamp, rev(timestamp)), y = c(geo, rev(fitted)), polycolor=polycolor))
   p <- ggplot(df)
   p <- p + annotate("text", x = interrupt - (as.numeric((endplot - beginplot)) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
-  p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=polycolor), fill=polycolor, polyalpha=0.5)
+  p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=nucol), fill=nucol, alpha=polyalpha)
   p <- p + geom_vline(xintercept=closest_date(df, date=interrupt, type="before"), linetype="dashed", color="grey74")
-  p <- p + geom_line(aes(x=timestamp, y=fitted, group=1, color=counterfactualcolor), linetype="solid", size=lwd)
-  p <- p + geom_line(aes(x=timestamp, y=geo, group=1, color=actuallinecolor), linetype="solid", size=lwd)
+  p <- p + geom_line(aes(x=timestamp, y=fitted, group=1, color=locol), linetype="solid", size=lwd)
+  p <- p + geom_line(aes(x=timestamp, y=geo, group=1, color=hicol), linetype="solid", size=lwd)
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
                    limits = as.Date(c(beginplot, endplot)))
@@ -173,7 +176,7 @@ arima_plot <- function(
     x = xlab,
     y = ylab
   )
-  p <- p + scale_colour_manual(name = 'Legend', values=c(actuallinecolor, counterfactualcolor), labels = c('Actual','Expected'))
+  p <- p + scale_colour_manual(name = 'Legend', values=c(hicol, locol), labels = c('Actual','Expected'))
   p <- p + scale_fill_manual(values=polycolor)
   p <- p + theme_classic()
   p <- p + theme(legend.position=c(0.1,0.9))
@@ -240,7 +243,11 @@ line_plot <- function(
   xlab = "Date",
   ylab = "Query Fraction\n(Per 10 Million Searches)",
   lbreak = "1 year",
-  linecolor = "#EB2836",
+  hicol = NA,
+  locol = NA,
+  nucol = NA,
+  opcol = NA,
+  colorscheme = "red",
   xfmt = date_format("%b %Y"),
   lwd = 0.3,
   extend = F,
@@ -249,6 +256,8 @@ line_plot <- function(
   save = T,
   outfn
 ){
+
+  colorschemer(colorscheme)
 
   if(beginplot==T) beginplot <- ymd(min(ymd(df$timestamp), na.rm = T))
   if(endplot==T) endplot <- ymd(max(ymd(df$timestamp), na.rm = T))
@@ -272,8 +281,8 @@ line_plot <- function(
   p <- ggplot(df)
   p <- p + annotate("text", x = interrupt - as.numeric(as.numeric(endplot - beginplot) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
   p <- p + geom_vline(xintercept=closest_date(df, date=interrupt, type="before"), linetype="dashed", color="grey74")
-  p <- p + geom_line(aes(x=timestamp, y=geo, group=1), color=linecolor, linetype="solid", size=lwd)
-  p <- p + geom_point(aes(x = maxtime, y = maxval), size=2, color="red")
+  p <- p + geom_line(aes(x=timestamp, y=geo, group=1), color=hicol, linetype="solid", size=lwd)
+  p <- p + geom_point(aes(x = maxtime, y = maxval), size=2, color=opcol)
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
                    limits = as.Date(c(beginplot, endplot)))

@@ -38,3 +38,38 @@ closest_date <- function(
   return(out)
 
 }
+
+
+#' Colorscheme
+#'
+#' @param col A data frame that includes a column `timestamp`
+#' @keywords
+#' @export
+#' @examples
+#' colorschemer("red")
+
+colorschemer <- function(col){
+
+  if(col == "blue"){
+    getPalette <- colorRampPalette(brewer.pal(100, "RdBu"))
+    if(is.na(hicol) | !exists(hicol))        assign("hicol",    getPalette(1000)[900], pos=parent.frame())
+    if(is.na(locol) | !exists(locol))        assign("locol",    getPalette(1000)[700], pos=parent.frame())
+    if(is.na(nucol) | !exists(nucol))        assign("nucol",    getPalette(1000)[550], pos=parent.frame())
+    if(is.na(opcol) | !exists(opcol))        assign("opcol",    getPalette(1000)[200], pos=parent.frame())
+    if(is.na(highcol) | !exists(highcol))    assign("highcol",  getPalette(1000)[900], pos=parent.frame())
+    if(is.na(lowcol) | !exists(lowcol))      assign("lowcol",   getPalette(1000)[550], pos=parent.frame())
+    if(is.na(midcol) | !exists(midcol))      assign("midcol",   getPalette(1000)[200], pos=parent.frame())
+  }
+
+  if(col == "red"){
+    getPalette <- colorRampPalette(brewer.pal(100, "RdBu"))
+    if(is.na(hicol) | !exists(hicol))        assign("hicol",    getPalette(1000)[900], pos=parent.frame())
+    if(is.na(locol) | !exists(locol))        assign("locol",    getPalette(1000)[700], pos=parent.frame())
+    if(is.na(nucol) | !exists(nucol))        assign("nucol",    getPalette(1000)[550], pos=parent.frame())
+    if(is.na(opcol) | !exists(opcol))        assign("opcol",    getPalette(1000)[200], pos=parent.frame())
+    if(is.na(highcol) | !exists(highcol))    assign("highcol",  getPalette(1000)[900], pos=parent.frame())
+    if(is.na(lowcol) | !exists(lowcol))      assign("lowcol",   getPalette(1000)[550], pos=parent.frame())
+    if(is.na(midcol) | !exists(midcol))      assign("midcol",   getPalette(1000)[200], pos=parent.frame())
+  }
+
+}

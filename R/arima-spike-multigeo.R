@@ -40,9 +40,10 @@ state_pct_change = function(
   scaletitle = "% Increase\nin Searches",
   scalelimits = NULL,
   linecol = "gray",
-  lowcol = "#8BADE1",
+  lowcol = NA,
   midcol = NULL,
-  highcol = "#EB2836",
+  highcol = NA,
+  colorscheme = "red",
   save = T,
   width = 6,
   height = 4,
@@ -50,8 +51,10 @@ state_pct_change = function(
   bootnum = 1000,
   alpha = 0.05,
   return_df = T
-){
+  ){
 
+
+  colorschemer(colorscheme)
 
   if(!is.na(preperiod) & is.na(beginperiod)){
     beginperiod <- ymd(interrupt) - preperiod
@@ -299,8 +302,11 @@ state_arima_spaghetti = function(
   xfmt = date_format("%d %b"),
   states_with_labels = c("CA", "NY", "US", "IL", "TX"),
   states_to_exclude = c(),
-  maincolor = "#EB2836",
-  spaghetticolor = "#E49C94",
+  hicol = NA,
+  locol = NA,
+  nucol = NA,
+  opcol = NA,
+  colorscheme = "red",
   spaghettialpha = 0.25,
   extend = F,
   save = T,
@@ -309,6 +315,8 @@ state_arima_spaghetti = function(
   outfn = "./output/fig.png"
   ){
 
+
+  colorschemer(colorscheme)
 
   if(class(state_arima_list)=="list"){
     arima_spaghetti_df <- state_arima_list[[2]]
@@ -358,9 +366,9 @@ state_arima_spaghetti = function(
 
     if(!(st %in% states_to_exclude)){
       if(st=="US"){
-        p <- p + geom_line(tmpdf, mapping = aes(x=x, y=y), color=maincolor, linetype="solid", alpha=1, size=lwd*2)
+        p <- p + geom_line(tmpdf, mapping = aes(x=x, y=y), color=hicol, linetype="solid", alpha=1, size=lwd*2)
       } else{
-        p <- p + geom_line(tmpdf, mapping = aes(x=x, y=y), color=spaghetticolor, linetype="solid", alpha=spaghettialpha, size=lwd)
+        p <- p + geom_line(tmpdf, mapping = aes(x=x, y=y), color=locol, linetype="solid", alpha=spaghettialpha, size=lwd)
       }
       if(st %in% states_with_labels){
         p <- p + annotate("text", x=max(timestamp[!is.na(pctdiff)])+1, y=pctdiff[length(pctdiff)], label=st)
@@ -424,14 +432,17 @@ state_arima_pctdiff = function(
   state_arima_list,
   linecol = "gray",
   scaletitle = "% Diff.\nin Searches",
-  lowcol = "#8BADE1",
+  lowcol = NA,
   midcol = NULL,
-  highcol = "#EB2836",
+  highcol = NA,
+  colorscheme = "red",
   save = T,
   width = 6,
   height = 4,
   outfn = "./output/fig.png"
 ){
+
+  colorschemer(colorscheme)
 
     if(class(state_arima_list)=="list"){
       arima_summary_df <- state_arima_list[[2]]

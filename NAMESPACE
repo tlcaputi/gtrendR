@@ -2,6 +2,7 @@
 
 export(arima_plot)
 export(closest_date)
+export(colorschemer)
 export(line_plot)
 export(run_arima)
 export(state_arima)

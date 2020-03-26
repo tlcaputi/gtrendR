@@ -21,7 +21,8 @@ Imports:
     reshape2,
     usmap,
     imputeTS,
-    boot
+    boot,
+    RColorBrewer
 Depends:
     lubridate,
     dplyr,
@@ -32,5 +33,6 @@ Depends:
     reshape2,
     usmap,
     imputeTS,
-    boot
+    boot,
+    RColorBrewer
 RoxygenNote: 7.0.2
