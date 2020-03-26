@@ -22,7 +22,8 @@ Imports:
     usmap,
     imputeTS,
     boot,
-    RColorBrewer
+    RColorBrewer,
+    colorRampsv
 Depends:
     lubridate,
     dplyr,
@@ -34,5 +35,6 @@ Depends:
     usmap,
     imputeTS,
     boot,
-    RColorBrewer
+    RColorBrewer,
+    colorRamps
 RoxygenNote: 7.0.2
