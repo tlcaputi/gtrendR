@@ -157,14 +157,14 @@ arima_plot <- function(
   endplot <- ymd(endplot)
   interrupt <- ymd(interrupt)
 
-  df$polycolor <- polycolor
+  df$polycolor <- nucol
 
   ## CREATE PLOT
   poly <- with(df %>% filter(timestamp %within% interval(closest_date(df, interrupt, type="before"), endplot)),
-              data.frame(x = c(timestamp, rev(timestamp)), y = c(geo, rev(fitted)), polycolor=polycolor))
+              data.frame(x = c(timestamp, rev(timestamp)), y = c(geo, rev(fitted)), polycolor=nucol))
   p <- ggplot(df)
   p <- p + annotate("text", x = interrupt - (as.numeric((endplot - beginplot)) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
-  p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=nucol), fill=nucol, alpha=polyalpha)
+  p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=polycolor), fill=polycolor, alpha=polyalpha)
   p <- p + geom_vline(xintercept=closest_date(df, date=interrupt, type="before"), linetype="dashed", color="grey74")
   p <- p + geom_line(aes(x=timestamp, y=fitted, group=1, color=locol), linetype="solid", size=lwd)
   p <- p + geom_line(aes(x=timestamp, y=geo, group=1, color=hicol), linetype="solid", size=lwd)
