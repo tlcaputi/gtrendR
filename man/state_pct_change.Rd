@@ -19,7 +19,10 @@ state_pct_change(
   save = T,
   width = 6,
   height = 4,
-  outfn = "./output/fig.png"
+  outfn = "./output/fig.png",
+  bootnum = 1000,
+  alpha = 0.05,
+  return_df = T
 )
 }
 \arguments{

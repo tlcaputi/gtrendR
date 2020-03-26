@@ -46,8 +46,12 @@ state_pct_change = function(
   save = T,
   width = 6,
   height = 4,
-  outfn = "./output/fig.png"
+  outfn = "./output/fig.png",
+  bootnum = 1000,
+  alpha = 0.05,
+  return_df = T
 ){
+
 
   if(!is.na(preperiod) & is.na(beginperiod)){
     beginperiod <- ymd(interrupt) - preperiod
@@ -68,8 +72,6 @@ state_pct_change = function(
       timestamp, before, state.abb
     )
 
-
-
   tmp_long <- melt(tmp, id.vars = c("timestamp", "before"), variable.name = "abbr", value.name = "searches")
   statedf <- tmp_long %>%
                 group_by(abbr) %>%
@@ -80,6 +82,38 @@ state_pct_change = function(
                   change = ((searches_after / searches_before) - 1)
                 )
   statedf$state <- state.name[match(statedf$abbr, state.abb)]
+
+  samplemean <- function(x, d) {
+    return(mean(x[d]))
+  }
+
+  set.seed(1234)
+  statedf$hi95 <- NA
+  statedf$lo95 <- NA
+  locs <- statedf$abbr
+  for(loc in locs){
+    beforesearches <- tmp %>% filter(before == 1) %>% pull(loc)
+    aftersearches <- tmp %>% filter(before == 0) %>% pull(loc)
+
+    beforemeans <- boot(data = beforesearches, statistic = samplemean, R = bootnum)
+    aftermeans <- boot(data = aftersearches, statistic = samplemean, R = bootnum)
+
+    bootdf <- data.frame("beforemeans" = beforemeans$t, "aftermeans" = aftermeans$t)
+    bootdf <- bootdf %>% mutate(
+      pctdiff = ((aftermeans / beforemeans) - 1)
+    )
+
+    booted_vec <- bootdf %>% pull(pctdiff)
+    hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
+    lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
+
+    statedf$hi95 <- ifelse(statedf$abbr == loc, hi95, statedf$hi95)
+    statedf$lo95 <- ifelse(statedf$abbr == loc, lo95, statedf$lo95)
+
+  }
+
+
+
   p <- plot_usmap(
           data = statedf,
           values = "change",
@@ -96,11 +130,16 @@ state_pct_change = function(
 
   if(save) ggsave(p, width=width, height=height, dpi=300, filename=outfn)
 
+  if(return_df){
+    out <- list(statedf, p)
+  } else{
+    out <- p
+  }
 
-  out <- list(statedf, p)
   return(out)
 
 }
+
 
 
 #' state_arima: Run this first to do ARIMA by state functions
@@ -260,8 +299,8 @@ state_arima_spaghetti = function(
   xfmt = date_format("%d %b"),
   states_with_labels = c("CA", "NY", "US", "IL", "TX"),
   states_to_exclude = c(),
-  maincolor = "#163C55",
-  spaghetticolor = "#163C55",
+  maincolor = "#EB2836",
+  spaghetticolor = "##E49C94",
   spaghettialpha = 0.25,
   extend = F,
   save = T,
