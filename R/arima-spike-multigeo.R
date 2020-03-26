@@ -68,7 +68,7 @@ state_pct_change = function(
       timestamp, before, state.abb
     )
 
-  
+
 
   tmp_long <- melt(tmp, id.vars = c("timestamp", "before"), variable.name = "abbr", value.name = "searches")
   statedf <- tmp_long %>%
@@ -260,6 +260,9 @@ state_arima_spaghetti = function(
   xfmt = date_format("%d %b"),
   states_with_labels = c("CA", "NY", "US", "IL", "TX"),
   states_to_exclude = c(),
+  maincolor = "#163C55",
+  spaghetticolor = "#163C55",
+  spaghettialpha = 0.25,
   extend = F,
   save = T,
   width = 6,
@@ -316,9 +319,9 @@ state_arima_spaghetti = function(
 
     if(!(st %in% states_to_exclude)){
       if(st=="US"){
-        p <- p + geom_line(tmpdf, mapping = aes(x=x, y=y), color="dodgerblue4", linetype="solid", alpha=1, size=lwd*2)
+        p <- p + geom_line(tmpdf, mapping = aes(x=x, y=y), color=maincolor, linetype="solid", alpha=1, size=lwd*2)
       } else{
-        p <- p + geom_line(tmpdf, mapping = aes(x=x, y=y), color="blue", linetype="solid", alpha=0.25, size=lwd)
+        p <- p + geom_line(tmpdf, mapping = aes(x=x, y=y), color=spaghetticolor, linetype="solid", alpha=spaghettialpha, size=lwd)
       }
       if(st %in% states_with_labels){
         p <- p + annotate("text", x=max(timestamp[!is.na(pctdiff)])+1, y=pctdiff[length(pctdiff)], label=st)

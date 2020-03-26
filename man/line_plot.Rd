@@ -16,6 +16,7 @@ line_plot(
   xlab = "Date",
   ylab = "Query Fraction\\n(Per 10 Million Searches)",
   lbreak = "1 year",
+  linecolor = "#163C55",
   xfmt = date_format("\%b \%Y"),
   lwd = 0.3,
   extend = F,

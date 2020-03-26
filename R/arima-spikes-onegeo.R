@@ -238,6 +238,7 @@ line_plot <- function(
   xlab = "Date",
   ylab = "Query Fraction\n(Per 10 Million Searches)",
   lbreak = "1 year",
+  linecolor = "#163C55",
   xfmt = date_format("%b %Y"),
   lwd = 0.3,
   extend = F,
@@ -269,7 +270,7 @@ line_plot <- function(
   p <- ggplot(df)
   p <- p + annotate("text", x = interrupt - as.numeric(as.numeric(endplot - beginplot) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
   p <- p + geom_vline(xintercept=closest_date(df, date=interrupt, type="before"), linetype="dashed", color="grey74")
-  p <- p + geom_line(aes(x=timestamp, y=geo, group=1), color="blue", linetype="solid", size=lwd)
+  p <- p + geom_line(aes(x=timestamp, y=geo, group=1), color=linecolor, linetype="solid", size=lwd)
   p <- p + geom_point(aes(x = maxtime, y = maxval), size=2, color="red")
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
