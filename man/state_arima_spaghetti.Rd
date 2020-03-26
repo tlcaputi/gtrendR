@@ -21,7 +21,7 @@ state_arima_spaghetti(
   states_with_labels = c("CA", "NY", "US", "IL", "TX"),
   states_to_exclude = c(),
   maincolor = "#EB2836",
-  spaghetticolor = "##E49C94",
+  spaghetticolor = "#E49C94",
   spaghettialpha = 0.25,
   extend = F,
   save = T,
