@@ -10,7 +10,6 @@
 #' run_arima(df = data, interrupt = ymd("2019-12-19"), geo = "US")
 
 
-
 run_arima <- function(
   df,
   interrupt,
@@ -32,7 +31,7 @@ run_arima <- function(
 
   begin <- closest_date(data = tmpdf, date = begin, type = "beforeequal")
   end <- closest_date(data = tmpdf, date = end, type = "afterequal")
-  interrupt <- closest_date(data = tmpdf, date = interrupt, type = "beforeequal")
+  interrupt <- closest_date(data = tmpdf, date = interrupt, type = "before")
 
   begin <- ymd(begin)
   end <- ymd(end)
@@ -43,14 +42,20 @@ run_arima <- function(
   freq <- min(as.numeric(diff.Date(tmpdf$timestamp)), na.rm = T)
 
   ## RUN ARIMA ON THE TIME SERIES
+  # ts_training <- window(time_series, end = decimal_date(interrupt) - 0.5/365)
+  # ts_test <- window(time_series, start = decimal_date(interrupt))
+
   time_series <- ts(tmpdf$geo, freq = 365.25/freq, start = decimal_date(begin))
+  ts_training <- ts(tmpdf %>% filter(timestamp <= interrupt) %>% pull(geo), freq = 365.25/freq, start = decimal_date(begin))
+  ts_test <- ts(tmpdf %>% filter(timestamp > interrupt) %>% pull(geo), freq = 365.25/freq, start = decimal_date(interrupt))
+
   if(kalman){
     time_series <- na_kalman(time_series, model="auto.arima")
+    ts_training <- na_kalman(ts_training, model="auto.arima")
     tmpdf$geo <- as.numeric(time_series)
   }
 
-  ts_training <- window(time_series, end = decimal_date(interrupt) - 0.1/365)
-  ts_test <- window(time_series, start = decimal_date(interrupt))
+
   mod <- auto.arima(ts_training)
 
   ## EXTRACT FITTED VALUES
@@ -130,7 +135,7 @@ arima_plot <- function(
   nucol = NA,
   opcol = NA,
   colorscheme = "red",
-  polyalpha = 0.1,
+  polyalpha = 0.9,
   interrupt,
   width = 6,
   height = 3,
@@ -139,7 +144,17 @@ arima_plot <- function(
   extend = F
   ){
 
+
   colorschemer(colorscheme)
+
+
+  freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
+  interrupt <- ymd(interrupt)
+  if(freq == 1){
+    interrupt_line <- interrupt -1
+  } else{
+    interrupt_line <- interrupt
+  }
 
   names(df) <- gsub(geo, "geo", names(df))
 
@@ -151,7 +166,7 @@ arima_plot <- function(
     beginplot <- closest_date(data = df, date = beginplot, type = "beforeequal")
     endplot <- closest_date(data = df, date = endplot, type = "afterequal")
   }
-  interrupt <- closest_date(data = df, date = interrupt, type = "beforeequal")
+  interrupt <- closest_date(data = df, date = interrupt, type = "before")
 
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
@@ -160,12 +175,12 @@ arima_plot <- function(
   df$polycolor <- nucol
 
   ## CREATE PLOT
-  poly <- with(df %>% filter(timestamp %within% interval(closest_date(df, interrupt, type="before"), endplot)),
+  poly <- with(df %>% filter(timestamp %within% interval(interrupt, endplot)),
               data.frame(x = c(timestamp, rev(timestamp)), y = c(geo, rev(fitted)), polycolor=nucol))
   p <- ggplot(df)
   p <- p + annotate("text", x = interrupt - (as.numeric((endplot - beginplot)) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
-  p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=polycolor), fill=polycolor, alpha=polyalpha)
-  p <- p + geom_vline(xintercept=closest_date(df, date=interrupt, type="before"), linetype="dashed", color="grey74")
+  p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=nucol), fill=nucol, alpha=polyalpha)
+  p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey74")
   p <- p + geom_line(aes(x=timestamp, y=fitted, group=1, color=locol), linetype="solid", size=lwd)
   p <- p + geom_line(aes(x=timestamp, y=geo, group=1, color=hicol), linetype="solid", size=lwd)
   p <- p + scale_x_date(date_breaks = lbreak,
@@ -189,6 +204,7 @@ arima_plot <- function(
   return(p)
 
 }
+
 
 
 
@@ -259,6 +275,16 @@ line_plot <- function(
 
   colorschemer(colorscheme)
 
+
+  freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
+  interrupt <- ymd(interrupt)
+  if(freq == 1){
+    interrupt_line <- interrupt -1
+  } else{
+    interrupt_line <- interrupt
+  }
+
+
   if(beginplot==T) beginplot <- ymd(min(ymd(df$timestamp), na.rm = T))
   if(endplot==T) endplot <- ymd(max(ymd(df$timestamp), na.rm = T))
 
@@ -280,7 +306,7 @@ line_plot <- function(
 
   p <- ggplot(df)
   p <- p + annotate("text", x = interrupt - as.numeric(as.numeric(endplot - beginplot) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
-  p <- p + geom_vline(xintercept=closest_date(df, date=interrupt, type="before"), linetype="dashed", color="grey74")
+  p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey74")
   p <- p + geom_line(aes(x=timestamp, y=geo, group=1), color=hicol, linetype="solid", size=lwd)
   p <- p + geom_point(aes(x = maxtime, y = maxval), size=2, color=opcol)
   p <- p + scale_x_date(date_breaks = lbreak,

@@ -23,7 +23,7 @@ arima_plot(
   nucol = NA,
   opcol = NA,
   colorscheme = "red",
-  polyalpha = 0.1,
+  polyalpha = 0.9,
   interrupt,
   width = 6,
   height = 3,

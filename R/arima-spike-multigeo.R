@@ -325,6 +325,15 @@ state_arima_spaghetti = function(
      arima_spaghetti_df <- state_arima_list
   }
 
+  freq <- min(as.numeric(diff.Date(arima_spaghetti_df$timestamp)), na.rm = T)
+  interrupt <- ymd(interrupt)
+  if(freq == 1){
+    interrupt_line <- interrupt -1
+  } else{
+    interrupt_line <- interrupt
+  }
+
+
   arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
