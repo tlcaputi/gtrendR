@@ -178,7 +178,7 @@ arima_plot <- function(
   poly <- with(df %>% filter(timestamp %within% interval(interrupt, endplot)),
               data.frame(x = c(timestamp, rev(timestamp)), y = c(geo, rev(fitted)), polycolor=nucol))
   p <- ggplot(df)
-  p <- p + annotate("text", x = interrupt - (as.numeric((endplot - beginplot)) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
+  p <- p + annotate("text", x = interrupt_line - (as.numeric((endplot - beginplot)) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
   p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=nucol), fill=nucol, alpha=polyalpha)
   p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey74")
   p <- p + geom_line(aes(x=timestamp, y=fitted, group=1, color=locol), linetype="solid", size=lwd)
@@ -305,7 +305,7 @@ line_plot <- function(
   maxtime <- df %>% filter(timestamp >= interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
 
   p <- ggplot(df)
-  p <- p + annotate("text", x = interrupt - as.numeric(as.numeric(endplot - beginplot) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
+  p <- p + annotate("text", x = interrupt_line - as.numeric(as.numeric(endplot - beginplot) * linelabelpos), y = maxval*0.98, label = linelabel, hjust=1, vjust = 1)
   p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey74")
   p <- p + geom_line(aes(x=timestamp, y=geo, group=1), color=hicol, linetype="solid", size=lwd)
   p <- p + geom_point(aes(x = maxtime, y = maxval), size=2, color=opcol)
