@@ -57,8 +57,8 @@ colorschemer <- function(col){
     assign("nucol",    getPalette(1000)[550], pos=parent.frame())
     assign("opcol",    getPalette(1000)[200], pos=parent.frame())
     assign("highcol",  getPalette(1000)[900], pos=parent.frame())
-    assign("lowcol",   getPalette(1000)[550], pos=parent.frame())
-    assign("midcol",   getPalette(1000)[200], pos=parent.frame())
+    assign("lowcol",   getPalette(1000)[200], pos=parent.frame())
+    assign("midcol",   getPalette(1000)[550], pos=parent.frame())
   }
 
   if(col == "red"){
@@ -68,8 +68,20 @@ colorschemer <- function(col){
     assign("nucol",    rev(getPalette(1000))[550], pos=parent.frame())
     assign("opcol",    rev(getPalette(1000))[200], pos=parent.frame())
     assign("highcol",  rev(getPalette(1000))[900], pos=parent.frame())
-    assign("lowcol",   rev(getPalette(1000))[550], pos=parent.frame())
-    assign("midcol",   rev(getPalette(1000))[200], pos=parent.frame())
+    assign("lowcol",   rev(getPalette(1000))[200], pos=parent.frame())
+    assign("midcol",   rev(getPalette(1000))[550], pos=parent.frame())
+  }
+
+
+  if(col == "jamaim"){
+    getPalette <- colorRampPalette(brewer.pal(100, "RdBu"))
+    assign("hicol",    "#2F5763", pos=parent.frame())
+    assign("locol",    "#F7941D", pos=parent.frame())
+    assign("nucol",    "#BDD1DA", pos=parent.frame())
+    assign("opcol",    "#F7941D", pos=parent.frame())
+    assign("highcol",  "#2F5763", pos=parent.frame())
+    assign("lowcol",   NULL,      pos=parent.frame())
+    assign("midcol",   "#BDD1DA", pos=parent.frame())
   }
 
 }
