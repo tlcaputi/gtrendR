@@ -47,6 +47,7 @@ state_pct_change = function(
   save = T,
   width = 6,
   height = 4,
+  bootstrap = T,
   outfn = "./output/fig.png",
   bootnum = 1000,
   alpha = 0.05,
@@ -90,29 +91,32 @@ state_pct_change = function(
     return(mean(x[d]))
   }
 
-  set.seed(1234)
-  statedf$hi95 <- NA
-  statedf$lo95 <- NA
-  locs <- statedf$abbr
-  for(loc in locs){
-    beforesearches <- tmp %>% filter(before == 1) %>% pull(loc)
-    aftersearches <- tmp %>% filter(before == 0) %>% pull(loc)
 
-    beforemeans <- boot(data = beforesearches, statistic = samplemean, R = bootnum)
-    aftermeans <- boot(data = aftersearches, statistic = samplemean, R = bootnum)
+  if(bootstrap){
+    set.seed(1234)
+    statedf$hi95 <- NA
+    statedf$lo95 <- NA
+    locs <- statedf$abbr
+    for(loc in locs){
+      beforesearches <- tmp %>% filter(before == 1) %>% pull(loc)
+      aftersearches <- tmp %>% filter(before == 0) %>% pull(loc)
 
-    bootdf <- data.frame("beforemeans" = beforemeans$t, "aftermeans" = aftermeans$t)
-    bootdf <- bootdf %>% mutate(
-      pctdiff = ((aftermeans / beforemeans) - 1)
-    )
+      beforemeans <- boot(data = beforesearches, statistic = samplemean, R = bootnum)
+      aftermeans <- boot(data = aftersearches, statistic = samplemean, R = bootnum)
 
-    booted_vec <- bootdf %>% pull(pctdiff)
-    hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
-    lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
+      bootdf <- data.frame("beforemeans" = beforemeans$t, "aftermeans" = aftermeans$t)
+      bootdf <- bootdf %>% mutate(
+        pctdiff = ((aftermeans / beforemeans) - 1)
+      )
 
-    statedf$hi95 <- ifelse(statedf$abbr == loc, hi95, statedf$hi95)
-    statedf$lo95 <- ifelse(statedf$abbr == loc, lo95, statedf$lo95)
+      booted_vec <- bootdf %>% pull(pctdiff)
+      hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
+      lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
 
+      statedf$hi95 <- ifelse(statedf$abbr == loc, hi95, statedf$hi95)
+      statedf$lo95 <- ifelse(statedf$abbr == loc, lo95, statedf$lo95)
+
+    }
   }
 
 

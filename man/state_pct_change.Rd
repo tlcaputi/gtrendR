@@ -20,6 +20,7 @@ state_pct_change(
   save = T,
   width = 6,
   height = 4,
+  bootstrap = T,
   outfn = "./output/fig.png",
   bootnum = 1000,
   alpha = 0.05,

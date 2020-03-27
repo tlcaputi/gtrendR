@@ -90,7 +90,7 @@ fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.1, 1))
 save_plot("./output/Fig1.png", fig, base_width=6, base_height=6)
 ```
 
-![arima-spike-onegeo](images/Fig1.png)
+<!-- ![arima-spike-onegeo](images/Fig1.png) -->
 
 
 ### ARIMA Spike with Multiple Geographies
@@ -184,4 +184,4 @@ fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.05, 1))
 save_plot("./output/Fig2.png", fig, base_width=7, base_height=12)
 ```
 
-![arima-spike-multigeo](images/Fig2.png)
+<!-- ![arima-spike-multigeo](images/Fig2.png) -->
