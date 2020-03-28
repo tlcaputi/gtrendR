@@ -48,7 +48,7 @@ state_arima_spaghetti(
 
 \item{xlab}{x-axis label, default is "Date"}
 
-\item{ylab}{y-axis label, default is "Actual Versus Model-Fitted\nSearch Queries (% Diff.)"}
+\item{ylab}{y-axis label, default is "Actual Versus Model-Fitted Search Queries (% Diff.)"}
 
 \item{linelabel}{label next to interruption line}
 

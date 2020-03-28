@@ -258,7 +258,7 @@ state_arima = function(
 #' @param xlab x-axis label, default is "Date"
 #' @param lbreak space between tick marks on x axis
 #' @param xfmt date format for x axis
-#' @param ylab y-axis label, default is "Actual Versus Model-Fitted\nSearch Queries (% Diff.)"
+#' @param ylab y-axis label, default is "Actual Versus Model-Fitted Search Queries (% Diff.)"
 #' @param linelabel label next to interruption line
 #' @param lwd line width
 #' @param states_with_labels vector of states that you want to have labels
