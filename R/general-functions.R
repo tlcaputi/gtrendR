@@ -50,38 +50,41 @@ closest_date <- function(
 
 colorschemer <- function(col){
 
+  pe <- parent.frame()
+  hicol <- if(exists("hicol", pe)) get("hicol", pe) else {NA}
+  locol <- if(exists("locol", pe)) get("locol", pe) else {NA}
+
   if(col == "blue"){
     getPalette <- colorRampPalette(brewer.pal(100, "RdBu"))
-    assign("hicol",    getPalette(1000)[900], pos=parent.frame())
-    assign("locol",    getPalette(1000)[700], pos=parent.frame())
-    assign("nucol",    getPalette(1000)[550], pos=parent.frame())
-    assign("opcol",    getPalette(1000)[200], pos=parent.frame())
-    assign("highcol",  getPalette(1000)[900], pos=parent.frame())
-    assign("lowcol",   getPalette(1000)[200], pos=parent.frame())
-    assign("midcol",   getPalette(1000)[550], pos=parent.frame())
+    if(is.null(hicol) || is.na(hicol)) assign("hicol",    getPalette(1000)[900], pos=parent.frame())
+    if(is.null(locol) || is.na(locol)) assign("locol",    getPalette(1000)[700], pos=parent.frame())
+    if(is.null(nucol) || is.na(nucol)) assign("nucol",    getPalette(1000)[550], pos=parent.frame())
+    if(is.null(opcol) || is.na(opcol)) assign("opcol",    getPalette(1000)[200], pos=parent.frame())
+    if(is.null(highcol) || is.na(highcol)) assign("highcol",  getPalette(1000)[900], pos=parent.frame())
+    if(is.null(lowcol) || is.na(lowcol)) assign("lowcol",   getPalette(1000)[200], pos=parent.frame())
+    if(is.null(midcol) || is.na(midcol)) assign("midcol",   getPalette(1000)[550], pos=parent.frame())
   }
 
   if(col == "red"){
     getPalette <- colorRampPalette(brewer.pal(100, "RdBu"))
-    assign("hicol",    rev(getPalette(1000))[900], pos=parent.frame())
-    assign("locol",    rev(getPalette(1000))[700], pos=parent.frame())
-    assign("nucol",    rev(getPalette(1000))[550], pos=parent.frame())
-    assign("opcol",    rev(getPalette(1000))[200], pos=parent.frame())
-    assign("highcol",  rev(getPalette(1000))[900], pos=parent.frame())
-    assign("lowcol",   rev(getPalette(1000))[200], pos=parent.frame())
-    assign("midcol",   rev(getPalette(1000))[550], pos=parent.frame())
+    if(is.null(hicol) || is.na(hicol)) assign("hicol",    rev(getPalette(1000))[900], pos=parent.frame())
+    if(is.null(locol) || is.na(locol)) assign("locol",    rev(getPalette(1000))[700], pos=parent.frame())
+    if(is.null(nucol) || is.na(nucol)) assign("nucol",    rev(getPalette(1000))[550], pos=parent.frame())
+    if(is.null(opcol) || is.na(opcol)) assign("opcol",    rev(getPalette(1000))[200], pos=parent.frame())
+    if(is.null(highcol) || is.na(highcol)) assign("highcol",  rev(getPalette(1000))[900], pos=parent.frame())
+    if(is.null(lowcol) || is.na(lowcol)) assign("lowcol",   rev(getPalette(1000))[200], pos=parent.frame())
+    if(is.null(midcol) || is.na(midcol)) assign("midcol",   rev(getPalette(1000))[550], pos=parent.frame())
   }
 
 
   if(col == "jamaim"){
     getPalette <- colorRampPalette(brewer.pal(100, "RdBu"))
-    assign("hicol",    "#2F5763", pos=parent.frame())
-    assign("locol",    "#F7941D", pos=parent.frame())
-    assign("nucol",    "#BDD1DA", pos=parent.frame())
-    assign("opcol",    "#F7941D", pos=parent.frame())
-    assign("highcol",  "#2F5763", pos=parent.frame())
-    assign("lowcol",   NULL,      pos=parent.frame())
-    assign("midcol",   "#BDD1DA", pos=parent.frame())
+    if(is.null(hicol) || is.na(hicol)) assign("hicol",    "#2F5763", pos=parent.frame())
+    if(is.null(locol) || is.na(locol)) assign("locol",    "#F7941D", pos=parent.frame())
+    if(is.null(nucol) || is.na(nucol)) assign("nucol",    "#BDD1DA", pos=parent.frame())
+    if(is.null(opcol) || is.na(opcol)) assign("opcol",    "#F7941D", pos=parent.frame())
+    if(is.null(highcol) || is.na(highcol)) assign("highcol",  "#2F5763", pos=parent.frame())
+    if(is.null(lowcol) || is.na(lowcol)) assign("lowcol",   "white",      pos=parent.frame())
+    if(is.null(midcol) || is.na(midcol)) assign("midcol",   "#F7941D", pos=parent.frame())
   }
-
 }
