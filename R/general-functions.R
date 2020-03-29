@@ -53,6 +53,11 @@ colorschemer <- function(col){
   pe <- parent.frame()
   hicol <- if(exists("hicol", pe)) get("hicol", pe) else {NA}
   locol <- if(exists("locol", pe)) get("locol", pe) else {NA}
+  nucol <- if(exists("nucol", pe)) get("nucol", pe) else {NA}
+  opcol <- if(exists("opcol", pe)) get("opcol", pe) else {NA}
+  highcol <- if(exists("highcol", pe)) get("highcol", pe) else {NA}
+  lowcol <- if(exists("lowcol", pe)) get("lowcol", pe) else {NA}
+  midcol <- if(exists("midcol", pe)) get("midcol", pe) else {NA}
 
   if(col == "blue"){
     getPalette <- colorRampPalette(brewer.pal(100, "RdBu"))
@@ -75,7 +80,6 @@ colorschemer <- function(col){
     if(is.null(lowcol) || is.na(lowcol)) assign("lowcol",   rev(getPalette(1000))[200], pos=parent.frame())
     if(is.null(midcol) || is.na(midcol)) assign("midcol",   rev(getPalette(1000))[550], pos=parent.frame())
   }
-
 
   if(col == "jamaim"){
     getPalette <- colorRampPalette(brewer.pal(100, "RdBu"))
