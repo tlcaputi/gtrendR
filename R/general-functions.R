@@ -84,11 +84,11 @@ colorschemer <- function(col){
   if(col == "jamaim"){
     getPalette <- colorRampPalette(brewer.pal(100, "RdBu"))
     if(is.null(hicol) || is.na(hicol)) assign("hicol",    "#2F5763", pos=parent.frame())
-    if(is.null(locol) || is.na(locol)) assign("locol",    "#F7941D", pos=parent.frame())
+    if(is.null(locol) || is.na(locol)) assign("locol",    "#C3D6DE", pos=parent.frame())
     if(is.null(nucol) || is.na(nucol)) assign("nucol",    "#BDD1DA", pos=parent.frame())
     if(is.null(opcol) || is.na(opcol)) assign("opcol",    "#F7941D", pos=parent.frame())
     if(is.null(highcol) || is.na(highcol)) assign("highcol",  "#2F5763", pos=parent.frame())
     if(is.null(lowcol) || is.na(lowcol)) assign("lowcol",   "white",      pos=parent.frame())
-    if(is.null(midcol) || is.na(midcol)) assign("midcol",   "#F7941D", pos=parent.frame())
+    if(is.null(midcol) || is.na(midcol)) assign("midcol",   "#C3D6DE", pos=parent.frame())
   }
 }
