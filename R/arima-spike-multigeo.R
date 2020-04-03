@@ -24,7 +24,7 @@
 #'   beginperiod = NA,
 #'   preperiod = 90,
 #'   endperiod = "2020-03-23",
-#'   scaletitle = "Pct. Increase\nin Searches",
+#'   scaletitle = "Pct. Increase in Searches",
 #'   linecol = "gray",
 #'   lowcol = "red",
 #'   midcol = "white",
@@ -37,7 +37,7 @@ state_pct_change = function(
   beginperiod = NA,
   preperiod,
   endperiod,
-  scaletitle = "% Increase\nin Searches",
+  scaletitle = "\% Increase\nin Searches",
   scalelimits = NULL,
   linecol = "gray",
   lowcol = NA,
@@ -257,7 +257,7 @@ state_arima = function(
 #' @param xlab x-axis label, default is "Date"
 #' @param lbreak space between tick marks on x axis
 #' @param xfmt date format for x axis
-#' @param ylab y-axis label, default is "Actual Versus Model-Fitted Search Queries (% Diff.)"
+#' @param ylab y-axis label, default is "Actual Versus Model-Fitted Search Queries (Pct Diff.)"
 #' @param linelabel label next to interruption line
 #' @param lwd line width
 #' @param states_with_labels vector of states that you want to have labels
@@ -274,14 +274,14 @@ state_arima = function(
 #'   interrupt = "2019-03-01",
 #'   title = NULL,
 #'   xlab = "Date",
-#'   ylab = "Actual Versus Model-Fitted\nSearch Queries (% Diff.)",
+#'   ylab = "Actual Versus Model-Fitted Search Queries (Pct Diff.)",
 #'   data = read.csv("./temp/data.csv", header = T, stringsAsFactor = F),
-#'   linelabel = "COVID-19\nOutbreak",
+#'   linelabel = "COVID-19 Outbreak",
 #'   lbreak = "1 week",
 #'   lwd = 0.4,
 #'   beginplot = ymd("2019-03-01")-(7*1),
 #'   endplot = ymd("2019-03-18"),
-#'   xfmt = date_format("%d %b"),
+#'   xfmt = date_format("\\%d \\%b"),
 #'   states_with_labels = c("CA", "NY", "US", "IA"),
 #'   states_to_exclude = c("IA"),
 #'   save = T,
@@ -394,7 +394,7 @@ state_arima_spaghetti = function(
   p <- p + scale_y_continuous(
     limits = ylim,
     labels = function(x) paste0(x*100, "%")
-  ) # Multiply by 100 & add %
+  ) # Multiply by 100 & add Pct
   p <- p + labs(
     title= title,
     x = xlab,
@@ -430,7 +430,7 @@ state_arima_spaghetti = function(
 #' state_arima_pctdiff(
 #'   state_list,
 #'   linecol = "gray",
-#'   scaletitle = "% Diff.\nin Searches",
+#'   scaletitle = "Pct Diff nin Searches",
 #'   lowcol = "white",
 #'   midcol = NULL,
 #'   highcol = "dodgerblue4",
