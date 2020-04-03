@@ -73,7 +73,7 @@ line_plot(
   linelabel = "Interruption",
   title = NULL,
   xlab = "Date",
-  ylab = "Query Fraction\n(Per 10 Million Searches)",
+  ylab = "Query Fraction (Per 10 Million Searches)",
   lbreak = "1 year",
   lwd = 0.3,
   width = 6,

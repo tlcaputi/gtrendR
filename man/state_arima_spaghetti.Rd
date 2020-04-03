@@ -47,7 +47,7 @@ state_arima_spaghetti(
 
 \item{xlab}{x-axis label, default is "Date"}
 
-\item{ylab}{y-axis label, default is "Actual Versus Model-Fitted Search Queries (% Diff.)"}
+\item{ylab}{y-axis label, default is "Actual Versus Model-Fitted Search Queries (Pct Diff.)"}
 
 \item{linelabel}{label next to interruption line}
 
@@ -78,14 +78,13 @@ state_arima_spaghetti(
   interrupt = "2019-03-01",
   title = NULL,
   xlab = "Date",
-  ylab = "Actual Versus Model-Fitted\nSearch Queries (\% Diff.)",
+  ylab = "Actual Versus Model-Fitted Search Queries (Pct Diff.)",
   data = read.csv("./temp/data.csv", header = T, stringsAsFactor = F),
-  linelabel = "COVID-19\nOutbreak",
+  linelabel = "COVID-19 Outbreak",
   lbreak = "1 week",
   lwd = 0.4,
   beginplot = ymd("2019-03-01")-(7*1),
   endplot = ymd("2019-03-18"),
-  xfmt = date_format("\%d \%b"),
   states_with_labels = c("CA", "NY", "US", "IA"),
   states_to_exclude = c("IA"),
   save = T,

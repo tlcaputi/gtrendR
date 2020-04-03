@@ -37,7 +37,7 @@ state_pct_change = function(
   beginperiod = NA,
   preperiod,
   endperiod,
-  scaletitle = "\% Increase\nin Searches",
+  scaletitle = "Pct. Increase\nin Searches",
   scalelimits = NULL,
   linecol = "gray",
   lowcol = NA,

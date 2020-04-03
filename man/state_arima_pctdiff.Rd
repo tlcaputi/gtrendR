@@ -46,7 +46,7 @@ state_arima_pctdiff: Run this first to do ARIMA by state functions
 state_arima_pctdiff(
   state_list,
   linecol = "gray",
-  scaletitle = "\% Diff.\nin Searches",
+  scaletitle = "Pct Diff nin Searches",
   lowcol = "white",
   midcol = NULL,
   highcol = "dodgerblue4",

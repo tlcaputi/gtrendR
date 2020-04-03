@@ -77,7 +77,7 @@ arima_plot(
            beginplot = "2019-09-01",
            endplot = "2020-01-15",
            lbreak = "1 year",
-           linelabel = "Tobacco 21\nSigned",
+           linelabel = "Tobacco 21 Signed",
            interrupt = ymd("2019-12-19"),
            width = 6,
            height = 3,
