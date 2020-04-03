@@ -281,7 +281,6 @@ state_arima = function(
 #'   lwd = 0.4,
 #'   beginplot = ymd("2019-03-01")-(7*1),
 #'   endplot = ymd("2019-03-18"),
-#'   xfmt = date_format("\\%d \\%b"),
 #'   states_with_labels = c("CA", "NY", "US", "IA"),
 #'   states_to_exclude = c("IA"),
 #'   save = T,
