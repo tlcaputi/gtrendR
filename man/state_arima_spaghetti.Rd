@@ -2,8 +2,7 @@
 % Please edit documentation in R/arima-spike-multigeo.R
 \name{state_arima_spaghetti}
 \alias{state_arima_spaghetti}
-\title{state_arima_spaghetti: Use the output of state_arima to create a state-level spaghetti plot
-of differences between the ARIMA model and actual searches}
+\title{state_arima_spaghetti: Use the output of state_arima to create a state-level spaghetti plot of differences between the ARIMA model and actual searches}
 \usage{
 state_arima_spaghetti(
   state_arima_list,
@@ -71,8 +70,7 @@ state_arima_spaghetti(
 \item{outfn}{output filename}
 }
 \description{
-state_arima_spaghetti: Use the output of state_arima to create a state-level spaghetti plot
-of differences between the ARIMA model and actual searches
+state_arima_spaghetti: Use the output of state_arima to create a state-level spaghetti plot of differences between the ARIMA model and actual searches
 }
 \examples{
 state_arima_spaghetti(

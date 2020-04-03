@@ -246,8 +246,7 @@ state_arima = function(
 
 
 
-#' state_arima_spaghetti: Use the output of state_arima to create a state-level spaghetti plot
-#' of differences between the ARIMA model and actual searches
+#' state_arima_spaghetti: Use the output of state_arima to create a state-level spaghetti plot of differences between the ARIMA model and actual searches
 #'
 #' @param state_arima_list A dataframe including time as \code{timestamp} and searches for your given geography in one column.
 #' @param interrupt The date where things change. ARIMA will be predicted on all days before the interrupt.
