@@ -78,7 +78,41 @@ panB <- arima_plot(
 
   ## Saving arguments
   save = T, # If T, save plot
-  outfn = './output/panA.png', # Location to save plot
+  outfn = './output/panB.png', # Location to save plot
+  width = 6, # Width in inches
+  height = 3 # Height in inches
+
+)
+
+
+
+panC <- arima_ciplot(
+  US_df, ## data from run_arima
+
+  ## Create a vertical "interruption" line in your plot
+  interrupt = "2020-03-01", # Date of an interruption
+
+  ## Plot Arguments
+  beginplot = T, # Start date for the plot. If T, beginning of data
+  endplot = "2020-04-01", # End date for the plot. If T, end of data
+  title = NULL, # If NULL, no Title
+  xlab = "Date", # x axis label
+  lbreak = "1 week", # Space between x-axis tick marks
+  xfmt = date_format("%b %Y"), # Format of dates on x axis
+  ylab = "Greater than Expected (%)", # y axis label
+  lwd = 1, # Width of the line
+
+  ## Set a colorscheme
+  colorscheme = "blue",  # Color schemes set in this package "red", 'blue" or "jamaim"
+
+  # ... customize any color using these
+  hicol = NA, # Actual color
+  nucol = NA, # Polygon color
+
+
+  ## Saving arguments
+  save = T, # If T, save plot
+  outfn = './output/panC.png', # Location to save plot
   width = 6, # Width in inches
   height = 3 # Height in inches
 
@@ -94,9 +128,15 @@ title <- ggdraw() +
     plot.margin = margin(0, 0, 0, 7)
   )
 
-fig <- plot_grid(panA, panB, labels=c(LETTERS[1:2]), ncol=1, nrow=2, rel_heights=c(1,1))
+fig <- plot_grid(panA, panB, panC, labels=c(LETTERS[1:3]), ncol=1, nrow=3, rel_heights=c(1,1,1))
 fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.1, 1))
-save_plot("./output/Fig1.png", fig, base_width=6, base_height=6)
+save_plot("./output/Fig1.png", fig, base_width=6, base_height=10)
+
+
+
+
+
+
 
 
 out <- state_pct_change(
@@ -123,7 +163,7 @@ out <- state_pct_change(
 
   ## Saving arguments
   save = T, # If T, save plot
-  outfn = './output/panC.png', # Location to save plot
+  outfn = './output/panD.png', # Location to save plot
   width = 6, # Width in inches
   height = 3, # Height in inches
 
@@ -136,7 +176,7 @@ out <- state_pct_change(
 
 )
 
-panC <- out[[2]]
+panD <- out[[2]]
 
 
 state_list <- state_arima(
@@ -147,135 +187,12 @@ state_list <- state_arima(
   kalman = T ## If True, Kalman impute NAs in the time series
 )
 
-
-
-state_arima_spaghetti = function(
-  state_arima_list,
-  beginplot,
-  endplot,
-  interrupt = NA,
-  ylim = NULL,
-  title = NULL,
-  xlab = "Date",
-  ylab = "Actual Versus Model-Fitted\nSearch Queries (% Diff.)",
-  linelabel = "Interruption",
-  lbreak = "1 week",
-  lwd = 0.4,
-  xfmt = date_format("%d %b"),
-  states_with_labels = c("CA", "NY", "US", "IL", "TX"),
-  states_to_exclude = c(),
-  hicol = NA,
-  locol = NA,
-  nucol = NA,
-  opcol = NA,
-  colorscheme = "red",
-  spaghettialpha = 0.25,
-  extend = F,
-  save = T,
-  width = 6,
-  height = 4,
-  outfn = "./output/fig.png"
-  ){
-
-
-  colorschemer(colorscheme)
-
-  if(class(state_arima_list)=="list"){
-    arima_spaghetti_df <- state_arima_list[[1]]
-    if(is.na(interrupt)) interrupt <- state_arima_list[[3]]
-  } else{
-     arima_spaghetti_df <- state_arima_list
-  }
-
-  arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)
-  beginplot <- ymd(beginplot)
-  endplot <- ymd(endplot)
-  interrupt <- ymd(interrupt)
-
-
-  freq <- min(as.numeric(diff.Date(arima_spaghetti_df$timestamp)), na.rm = T)
-  interrupt <- ymd(interrupt)
-  if(freq == 1){
-    interrupt_line <- interrupt -1
-  } else{
-    interrupt_line <- interrupt
-  }
-
-
-
-
-  if(!extend){
-    beginplot <- closest_date(data = arima_spaghetti_df, date = beginplot, type = "beforeequal")
-    endplot <- closest_date(data = arima_spaghetti_df, date = endplot, type = "afterequal")
-  }
-  interrupt <- closest_date(data = arima_spaghetti_df, date = interrupt, type = "beforeequal")
-
-
-  arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)
-  arima_spaghetti_df <- arima_spaghetti_df %>% filter(timestamp %within% interval(beginplot, endplot))
-
-  freq <- min(as.numeric(diff.Date(arima_spaghetti_df$timestamp)), na.rm = T)
-  states_in_dataset <- names(arima_spaghetti_df)[names(arima_spaghetti_df) %in% state.abb]
-  states_in_dataset <- c(states_in_dataset, "US")
-
-
-  p <- ggplot(arima_spaghetti_df)
-  p <- p + geom_vline(xintercept=closest_date(data = arima_spaghetti_df, date = interrupt, type="before"), linetype="dashed", color="grey72")
-
-  maxval <- 0
-  ct <- 0
-
-
-  for(st in states_in_dataset){
-    ct <- ct + 1
-
-    pctdiffvname <- paste0(st, "_pctdiff")
-
-    timestamp <- arima_spaghetti_df$timestamp
-    pctdiff <- arima_spaghetti_df[, pctdiffvname]
-    maxval <- max(c(maxval, pctdiff), na.rm = T)
-
-    tmpdf <- data.frame(x = timestamp, y = pctdiff)
-
-    if(!(st %in% states_to_exclude)){
-      if(st=="US"){
-        p <- p + geom_line(tmpdf, mapping = aes(x=x, y=y), color=hicol, linetype="solid", alpha=1, size=lwd*2)
-      } else{
-        p <- p + geom_line(tmpdf, mapping = aes(x=x, y=y), color=locol, linetype="solid", alpha=spaghettialpha, size=lwd)
-      }
-      if(st %in% states_with_labels){
-        p <- p + annotate("text", x=max(timestamp[!is.na(pctdiff)])+1, y=pctdiff[length(pctdiff)], label=st)
-      }
-    }
-  }
-
-  p <- p + scale_x_date(date_breaks = lbreak,
-                   labels=xfmt,
-                   limits = c(as.Date(beginplot), as.Date(endplot) + 5))
-  p <- p + scale_y_continuous(
-    limits = ylim,
-    labels = function(x) paste0(x*100, "%")
-  ) # Multiply by 100 & add Pct
-  p <- p + labs(
-    title= title,
-    x = xlab,
-    y = ylab
-  )
-  p <- p + geom_hline(yintercept=0, linetype="dashed", color="grey72")
-  p <- p + theme_classic()
-
-  if(save) ggsave(p, width=width, height=height, dpi=300, filename=outfn)
-
-  return(p)
-
-}
-
-panD <- state_arima_spaghetti(
+panE <- state_arima_spaghetti(
   state_list, # data from state_arima
   interrupt = "2020-03-01", # should be the same as state_arima
 
   ## Plot Arguments
-  beginplot = ymd(interrupt) - 7, # Start date for the plot. If T, beginning of data
+  beginplot = "2020-02-28", # Start date for the plot. If T, beginning of data
   endplot = "2020-04-01", # End date for the plot. If T, end of data
   title = NULL, # If NULL, no Title
   xlab = "Date", # x axis label
@@ -298,13 +215,13 @@ panD <- state_arima_spaghetti(
 
   ## Saving arguments
   save = T, # If T, save plot
-  outfn = './output/panD.png', # Location to save plot
+  outfn = './output/panE.png', # Location to save plot
   width = 6, # Width in inches
   height = 3 # Height in inches
 )
 
 
-panE <- state_arima_pctdiff(
+panF <- state_arima_pctdiff(
   state_list, # data from state_arima
 
   ## Set a colorscheme
@@ -321,7 +238,7 @@ panE <- state_arima_pctdiff(
 
   ## Saving arguments
   save = T, # If T, save plot
-  outfn = './output/panE.png', # Location to save plot
+  outfn = './output/panF.png', # Location to save plot
   width = 6, # Width in inches
   height = 3 # Height in inches
 
@@ -338,6 +255,6 @@ title <- ggdraw() +
   theme(
     plot.margin = margin(0, 0, 0, 7)
   )
-fig <- plot_grid(panC, panD, panE, labels=c(LETTERS[3:5]), ncol=1, nrow=3, rel_heights=c(1.1, 1, 1.1))
+fig <- plot_grid(panD, panE, panF, labels=c(LETTERS[4:6]), ncol=1, nrow=3, rel_heights=c(1.1, 1, 1.1))
 fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.05, 1))
 save_plot("./output/Fig2.png", fig, base_width=7, base_height=12)

@@ -16,7 +16,9 @@ run_arima <- function(
   begin = T,
   end = T,
   geo = "US",
-  kalman = F
+  kalman = F,
+  bootstrap = F,
+  bootnum = 1000
   ){
 
 
@@ -51,14 +53,21 @@ run_arima <- function(
   if(kalman){
     time_series <- na_kalman(time_series, model="auto.arima")
     ts_training <- na_kalman(ts_training, model="auto.arima")
+    ts_test <- na_kalman(ts_test, model="auto.arima")
     tmpdf$geo <- as.numeric(time_series)
   }
 
-
   mod <- auto.arima(ts_training)
 
+
   ## EXTRACT FITTED VALUES
-  fitted_values <- forecast(mod, length(ts_test))
+  if(bootstrap){
+    set.seed(1234)
+    fitted_values <- forecast(mod, h = length(ts_test), bootstrap = TRUE, npaths = bootnum)
+  } else{
+    fitted_values <- forecast(mod, h = length(ts_test))
+  }
+
 
   ## ADD THE FITTED VALUES TO THE DATA FRAME
   tmp1 <- data.frame(matrix(NA, nrow=nrow(tmpdf) - length(fitted_values$mean), ncol=5))
@@ -195,6 +204,153 @@ line_plot <- function(
   return(p)
 
 }
+
+
+#' arima_ciplot This uses the output from \code{run_arima} to create a figure showing the
+#' confidence interval of the ARIMA
+#'
+#' @param df The dataframe as outputted by \code{run_arima}.
+#' @param geo The column name of the geography of searches that you want.
+#' @param beginplot The date you want the plot to start
+#' @param endplot The date you want the plot to end.
+#' @param interrupt The date of the interruption (should be the same as \code{run_arima})
+#' @param linelabel Label next to the vertical interruption line
+#' @param title The title of the figure. The default is no title.
+#' @param xlab The label for the x axis
+#' @param ylab The label for the y axis
+#' @param ylim length-2 vector with ymin and ymax, Default NULL
+#' @param lbreak The distance between tick marks in the x axis, i.e., "one year" or "3 month"
+#' @param lwd Line width
+#' @param width Width of the plot in inches
+#' @param height Height of the plot in inches
+#' @param save Default is True. If False, the plot is not saved.
+#' @param outfn Where to save the plot.
+#' @keywords
+#' @export
+#' @examples
+#' arima_plot(
+#'            df,
+#'            title = "Searches to Purchase Cigarettes - US",
+#'            xlab = "Date",
+#'            ylab = "Query Fraction",
+#'            outfn = './output/fig.pdf',
+#'            beginplot = "2019-09-01",
+#'            endplot = "2020-01-15",
+#'            lbreak = "1 year",
+#'            linelabel = "Tobacco 21 Signed",
+#'            interrupt = ymd("2019-12-19"),
+#'            width = 6,
+#'            height = 3,
+#'            lwd = 0.3,
+#'            save = T
+#'            )
+arima_ciplot <- function(
+  df,
+  geo = 'US',
+  title = NULL,
+  xlab = "Date",
+  xfmt = date_format("%b %Y"),
+  ylab = "Greater Than Expected (%)",
+  ylim = NULL,
+  outfn = './output/fig.pdf',
+  beginplot,
+  endplot,
+  lbreak = "1 month",
+  hicol = NA,
+  locol = NA,
+  nucol = NA,
+  opcol = NA,
+  colorscheme = "red",
+  polyalpha = 0.9,
+  interrupt,
+  width = 6,
+  height = 3,
+  lwd = 0.3,
+  save = T,
+  extend = F
+  ){
+
+
+
+  colorschemer(colorscheme)
+
+
+  freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
+  interrupt <- ymd(interrupt)
+  if(freq == 1){
+    interrupt_line <- interrupt -1
+  } else{
+    interrupt_line <- interrupt
+  }
+
+  if(beginplot==T) beginplot <- ymd(interrupt)
+  if(endplot==T) endplot <- ymd(max(ymd(df$timestamp), na.rm = T))
+
+  names(df) <- gsub(geo, "geo", names(df))
+
+  maxval <- df %>% filter(timestamp >= interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(geo)
+  maxtime <- df %>% filter(timestamp >= interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
+
+  if(!extend){
+    beginplot <- closest_date(data = df, date = beginplot, type = "beforeequal")
+    endplot <- closest_date(data = df, date = endplot, type = "afterequal")
+  }
+  interrupt <- closest_date(data = df, date = interrupt, type = "before")
+
+  beginplot <- ymd(beginplot)
+  endplot <- ymd(endplot)
+  interrupt <- ymd(interrupt)
+
+  if(!extend){
+    beginplot <- closest_date(data = df, date = beginplot, type = "beforeequal")
+    endplot <- closest_date(data = df, date = endplot, type = "afterequal")
+  }
+  interrupt <- closest_date(data = df, date = interrupt, type = "before")
+
+  beginplot <- ymd(beginplot)
+  endplot <- ymd(endplot)
+  interrupt <- ymd(interrupt)
+
+  tmp <- with(df %>% filter(timestamp %within% interval(interrupt, endplot)),
+                data.frame(
+                  "timestamp" = timestamp,
+                  "pctdiff" = geo/fitted - 1,
+                  "lo95" = geo/hi95 - 1,
+                  "hi95" = geo/lo95 - 1,
+                  "polycolor" = nucol
+                ))
+
+
+  ## CREATE PLOT
+  poly <- with(tmp,
+              data.frame(x = c(timestamp, rev(timestamp)), y = c(lo95, rev(hi95)), polycolor=nucol))
+  p <- ggplot(tmp)
+  p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=nucol), fill=nucol, alpha=polyalpha)
+  p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey74")
+  p <- p + geom_line(aes(x=timestamp, y=pctdiff, group=1, color=hicol), linetype="solid", size=lwd)
+  p <- p + scale_x_date(date_breaks = lbreak,
+                   labels=xfmt,
+                   limits = as.Date(c(beginplot, endplot)))
+  p <- p + labs(
+    title= title,
+    x = xlab,
+    y = ylab
+  )
+  p <- p + scale_y_continuous(
+    limits = ylim,
+    labels = function(x) paste0(x*100, "%")
+  ) # Multiply by 100 & add Pct
+  p <- p + theme_classic()
+  p <- p + theme(legend.position="none")
+
+  if(save) ggsave(p, width=width, height=height, dpi=300, filename=outfn)
+
+  names(df) <- gsub("geo", geo, names(df))
+
+  return(p)
+
+}
+
 
 
 #' This uses the output from \code{run_arima} to create a figure showing the

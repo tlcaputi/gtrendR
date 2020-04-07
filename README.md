@@ -8,7 +8,7 @@ This project is a work-in-progress. It works in some cases but may not work in m
 
 Before you begin using this package, pull the Google Trends data using the [gtrends package for Python3](https://www.github.com/tlcaputi/gtrends). For example, you may run the following:
 
-```{python}
+```python
 
 from gtrends import timeline
 
@@ -142,7 +142,46 @@ panB <- arima_plot(
 
   ## Saving arguments
   save = T, # If T, save plot
-  outfn = './output/panA.png', # Location to save plot
+  outfn = './output/panB.png', # Location to save plot
+  width = 6, # Width in inches
+  height = 3 # Height in inches
+
+)
+```
+
+
+We can also plot the difference between the actual and ARIMA-fitted values with the ARIMA 95% confidence interval
+
+
+```{r}
+panC <- arima_ciplot(
+  US_df, ## data from run_arima
+
+  ## Create a vertical "interruption" line in your plot
+  interrupt = "2020-03-01", # Date of an interruption
+
+  ## Plot Arguments
+  beginplot = T, # Start date for the plot. If T, beginning of data
+  endplot = "2020-04-01", # End date for the plot. If T, end of data
+  title = NULL, # If NULL, no Title
+  xlab = "Date", # x axis label
+  lbreak = "1 week", # Space between x-axis tick marks
+  xfmt = date_format("%b %Y"), # Format of dates on x axis
+  ylab = "Greater than Expected (%)", # y axis label
+  lwd = 1, # Width of the line
+
+  ## Set a colorscheme
+  colorscheme = "blue",  # Color schemes set in this package "red", 'blue" or "jamaim"
+
+  # ... customize any color using these
+  hicol = NA, # Actual line color
+  locol = NA, # Expected line color
+  nucol = NA, # Excess polygon color
+
+
+  ## Saving arguments
+  save = T, # If T, save plot
+  outfn = './output/panC.png', # Location to save plot
   width = 6, # Width in inches
   height = 3 # Height in inches
 
@@ -164,9 +203,9 @@ title <- ggdraw() +
     plot.margin = margin(0, 0, 0, 7)
   )
 
-fig <- plot_grid(panA, panB, labels=c(LETTERS[1:2]), ncol=1, nrow=2, rel_heights=c(1,1))
+fig <- plot_grid(panA, panB, panC, labels=c(LETTERS[1:3]), ncol=1, nrow=2, rel_heights=c(1,1))
 fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.1, 1))
-save_plot("./output/Fig1.png", fig, base_width=6, base_height=6)
+save_plot("./output/Fig1.png", fig, base_width=6, base_height=10)
 ```
 
 ![arima-spike-onegeo](READMEcode/output/Fig1.png)
@@ -202,7 +241,7 @@ out <- state_pct_change(
 
   ## Saving arguments
   save = T, # If T, save plot
-  outfn = './output/panC.png', # Location to save plot
+  outfn = './output/panD.png', # Location to save plot
   width = 6, # Width in inches
   height = 3, # Height in inches
 
@@ -219,7 +258,7 @@ out <- state_pct_change(
 If `return_df` is `T`, the data will be the first argument of the list and the plot will be the second argument of the list.
 
 ```{r}
-panC <- out[[2]]
+panD <- out[[2]]
 ```
 
 
@@ -240,7 +279,7 @@ Using the output from `state_arima`, you can create a spaghetti plot showing the
 
 
 ```r
-panD <- state_arima_spaghetti(
+panE <- state_arima_spaghetti(
   state_list, # data from state_arima
   interrupt = "2020-03-01", # should be the same as state_arima
 
@@ -268,7 +307,7 @@ panD <- state_arima_spaghetti(
 
   ## Saving arguments
   save = T, # If T, save plot
-  outfn = './output/panD.png', # Location to save plot
+  outfn = './output/panE.png', # Location to save plot
   width = 6, # Width in inches
   height = 3 # Height in inches
 )
@@ -278,7 +317,7 @@ panD <- state_arima_spaghetti(
 You can also visualize the state-specific differences between ARIMA-fitted values and actual values using `state_arima_pctdiff`.
 
 ```r
-panE <- state_arima_pctdiff(
+panF <- state_arima_pctdiff(
   state_list, # data from state_arima
 
   ## Set a colorscheme
@@ -317,9 +356,13 @@ title <- ggdraw() +
   theme(
     plot.margin = margin(0, 0, 0, 7)
   )
-fig <- plot_grid(panC, panD, panE, labels=c(LETTERS[3:5]), ncol=1, nrow=3, rel_heights=c(1.1, 1, 1.1))
+fig <- plot_grid(panD, panE, panF, labels=c(LETTERS[4:6]), ncol=1, nrow=3, rel_heights=c(1.1, 1, 1.1))
 fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.05, 1))
 save_plot("./output/Fig2.png", fig, base_width=7, base_height=12)
 ```
 
 ![arima-spike-onegeo](READMEcode/output/Fig2.png)
+
+
+
+### ARIMA Spike with One Geography but Multiple Terms
