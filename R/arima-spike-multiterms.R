@@ -211,7 +211,7 @@ multiterm_barplot <- function(
   }
 
   p <- ggplot(df)
-  p <- p + geom_bar(aes(x = term, y = mean, fill = hicol), stat = "identity", position=position_dodge(width=space))
+  p <- p + geom_bar(aes(x = term, y = mean), fill = hicol, stat = "identity", position=position_dodge(width=space))
   p <- p + geom_errorbar(aes(x = term, ymin = lo95, ymax = hi95), width=.2)
   p <- p + labs(
     title= title,

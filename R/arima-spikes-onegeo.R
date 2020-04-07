@@ -327,7 +327,7 @@ arima_ciplot <- function(
   p <- ggplot(tmp)
   p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=nucol), fill=nucol, alpha=polyalpha)
   p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey74")
-  p <- p + geom_line(aes(x=timestamp, y=pctdiff, group=1, color=hicol), linetype="solid", size=lwd)
+  p <- p + geom_line(aes(x=timestamp, y=pctdiff, group=1, color=hicol), color=hicol, linetype="solid", size=lwd)
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
                    limits = as.Date(c(beginplot, endplot)))
