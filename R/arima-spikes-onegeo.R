@@ -277,11 +277,7 @@ arima_ciplot <- function(
 
   freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
   interrupt <- ymd(interrupt)
-  if(freq == 1){
-    interrupt_line <- interrupt -1
-  } else{
-    interrupt_line <- interrupt
-  }
+  interrupt_line <- interrupt
 
   if(beginplot==T) beginplot <- ymd(interrupt)
   if(endplot==T) endplot <- ymd(max(ymd(df$timestamp), na.rm = T))
@@ -305,7 +301,6 @@ arima_ciplot <- function(
     beginplot <- closest_date(data = df, date = beginplot, type = "beforeequal")
     endplot <- closest_date(data = df, date = endplot, type = "afterequal")
   }
-  interrupt <- closest_date(data = df, date = interrupt, type = "before")
 
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)

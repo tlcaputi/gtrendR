@@ -6,7 +6,7 @@ This project is a work-in-progress. It works in some cases but may not work in m
 
 ## Usage
 
-Before you begin using this package, pull the Google Trends data using the [gtrends package for Python3](https://www.github.com/tlcaputi/gtrends). For example, you may run the following:
+Before you begin using this package, pull the Google Trends data using the [gtrends package for Python3](https://www.github.com/tlcaputi/gtrends). For example, you may run the following. I will use the data from this command to explain the package. Unfortunately, I cannot share the raw data.
 
 ```python
 
@@ -153,7 +153,7 @@ panB <- arima_plot(
 We can also plot the difference between the actual and ARIMA-fitted values with the ARIMA 95% confidence interval
 
 
-```{r}
+```r
 panC <- arima_ciplot(
   US_df, ## data from run_arima
 
@@ -191,7 +191,6 @@ panC <- arima_ciplot(
 Finally, you can merge the plots together to create a single figure.
 
 ```r
-
 ## This adds a title to the plot
 title <- ggdraw() +
   draw_label(
@@ -361,7 +360,7 @@ fig <- plot_grid(title, fig, ncol = 1, rel_heights = c(0.05, 1))
 save_plot("./output/Fig2.png", fig, base_width=7, base_height=12)
 ```
 
-![arima-spike-onegeo](READMEcode/output/Fig2.png)
+![arima-spike-multigeo](READMEcode/output/Fig2.png)
 
 
 
@@ -428,4 +427,4 @@ panG <- multiterm_barplot(
 
 
 
-![arima-spike-onegeo](READMEcode/output/panG.png)
+![arima-spike-multiterms](READMEcode/output/panG.png)
