@@ -208,7 +208,7 @@ state_arima = function(
       df[, st] <- as.numeric(time_series)
     }
 
-    ts_train <- window(time_series, end = decimal_date(interrupt - 1))
+    ts_train <- window(time_series, end = decimal_date(interrupt))
     ts_test <- window(time_series, start = decimal_date(interrupt))
 
     if(!all(is.na(ts_train)) & !all(is.na(ts_test))){
@@ -321,11 +321,18 @@ state_arima_spaghetti = function(
   colorschemer(colorscheme)
 
   if(class(state_arima_list)=="list"){
-    arima_spaghetti_df <- state_arima_list[[2]]
+    arima_spaghetti_df <- state_arima_list[[1]]
     if(is.na(interrupt)) interrupt <- state_arima_list[[3]]
   } else{
      arima_spaghetti_df <- state_arima_list
   }
+
+  arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)
+  beginplot <- ymd(beginplot)
+  endplot <- ymd(endplot)
+  interrupt <- ymd(interrupt)
+  diff <- abs(as.numeric(endplot - beginplot))
+
 
   freq <- min(as.numeric(diff.Date(arima_spaghetti_df$timestamp)), na.rm = T)
   interrupt <- ymd(interrupt)
@@ -336,10 +343,6 @@ state_arima_spaghetti = function(
   }
 
 
-  arima_spaghetti_df$timestamp <- ymd(arima_spaghetti_df$timestamp)
-  beginplot <- ymd(beginplot)
-  endplot <- ymd(endplot)
-  interrupt <- ymd(interrupt)
 
 
   if(!extend){
@@ -389,7 +392,7 @@ state_arima_spaghetti = function(
 
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
-                   limits = as.Date(c(beginplot, endplot)))
+                   limits = c(as.Date(beginplot), as.Date(endplot) + diff*0.01))
   p <- p + scale_y_continuous(
     limits = ylim,
     labels = function(x) paste0(x*100, "%")

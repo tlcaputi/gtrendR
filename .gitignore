@@ -2,3 +2,5 @@
 *bat/
 *old/
 *test/
+*READMEcode/input/
+*.csv
