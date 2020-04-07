@@ -190,17 +190,17 @@ multi_term_arima <- function(
 multiterm_barplot <- function(
   df,
   label_df = NA,
-  title = NULL, # If NULL, no Title
-  xlab = "Terms", # x axis label
-  ylab = "Greater than Expected (%)", # y axis label
-  ylim = NULL, # length-2 vector with ymin and ymax, default NULL
-  space = 0.8, # space between bars
-  colorscheme = "blue",  # Color schemes set in this package "red", 'blue" or "jamaim"
-  hicol = NA, # Actual color
-  save = T, # If T, save plot
-  outfn = './output/panG.png', # Location to save plot
-  width = 6, # Width in inches
-  height = 3 # Height in inches
+  title = NULL,
+  xlab = "Terms",
+  ylab = "Greater than Expected (%)",
+  ylim = NULL,
+  space = 0.8,
+  colorscheme = "blue",
+  hicol = NA,
+  save = T,
+  outfn = './output/panG.png',
+  width = 6,
+  height = 3 
   ){
 
   colorschemer(colorscheme)
