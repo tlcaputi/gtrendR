@@ -1,6 +1,6 @@
 # # Only run this once
 # library(devtools)
-devtools::install_github("tlcaputi/gtrendR")
+# devtools::install_github("tlcaputi/gtrendR")
 
 # Run this every time
 library("gtrendR")
@@ -309,4 +309,3 @@ panG <- multiterm_barplot(
   width = 6, # Width in inches
   height = 3 # Height in inches
 )
-panG
