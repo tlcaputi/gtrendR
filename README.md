@@ -6,7 +6,7 @@ This project is a work-in-progress. It works in some cases but may not work in m
 
 ## Usage
 
-Before you begin using this package, pull the Google Trends data using the [gtrends package for Python3](www.github.com/tlcaputi/gtrends). For example, you may run the following:
+Before you begin using this package, pull the Google Trends data using the [gtrends package for Python3](https://www.github.com/tlcaputi/gtrends). For example, you may run the following:
 
 ```{python}
 
@@ -28,7 +28,7 @@ timeline.theo_timeline(
 )
 ```
 
-To use the [gtrends package for Python3](www.github.com/tlcaputi/gtrends), you'll need to request an API Key from Google. You can do that easily [here](https://docs.google.com/forms/d/e/1FAIpQLSenHdGiGl1YF-7rVDDmmulN8R-ra9MnGLLs7gIIaAX9VHPdPg/viewform). If you do not wish to use the gtrends package for Python, you'll need to format your data to match the following and save it as a CSV:
+To use the [gtrends package for Python3](https://www.github.com/tlcaputi/gtrends), you'll need to request an API Key from Google. You can do that easily [here](https://docs.google.com/forms/d/e/1FAIpQLSenHdGiGl1YF-7rVDDmmulN8R-ra9MnGLLs7gIIaAX9VHPdPg/viewform). If you do not wish to use the gtrends package for Python, you'll need to format your data to match the following and save it as a CSV:
 
 |timestamp |US         |US_AL      |US_CA      |US_NY      |
 |----------|-----------|-----------|-----------|-----------|
