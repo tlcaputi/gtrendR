@@ -4,7 +4,7 @@
 
 Before you begin using this package, pull the Google Trends data using the gtrends package for Python.
 
-If you do not wish to use the gtrends package for Python, you'll need to format your data in the following format and save it as a CSV:
+If you do not wish to use the gtrends package for Python, you'll need to format your data to match the following and save it as a CSV:
 
 |timestamp |US         |US_AL      |US_CA      |US_NY      |
 |----------|-----------|-----------|-----------|-----------|
