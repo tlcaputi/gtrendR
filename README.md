@@ -6,11 +6,11 @@ This project is a work-in-progress. It works in some cases but may not work in m
 
 ## Usage
 
-Before you begin using this package, pull the Google Trends data using the [gtrends package for Python3](https://www.github.com/tlcaputi/gtrends). For example, you may run the following. I will use the data from this command to explain the package. Unfortunately, I cannot share the raw data.
+Before you begin using this package, pull the Google Trends data using the [gtrendspy package for Python3](https://www.github.com/tlcaputi/gtrendspy). For example, you may run the following. I will use the data from this command to explain the package. Unfortunately, I cannot share the raw data.
 
 ```python
 
-from gtrends import timeline
+from gtrendspy import timeline
 
 timeline.theo_timeline(
     terms = ['hand washing', 'social isolation'],
@@ -28,7 +28,7 @@ timeline.theo_timeline(
 )
 ```
 
-To use the [gtrends package for Python3](https://www.github.com/tlcaputi/gtrends), you'll need to request an API Key from Google. You can do that easily [here](https://docs.google.com/forms/d/e/1FAIpQLSenHdGiGl1YF-7rVDDmmulN8R-ra9MnGLLs7gIIaAX9VHPdPg/viewform). If you do not wish to use the gtrends package for Python, you'll need to format your data to match the following and save it as a CSV:
+To use the [gtrendspy package for Python3](https://www.github.com/tlcaputi/gtrendspy), you'll need to request an API Key from Google. You can do that easily [here](https://docs.google.com/forms/d/e/1FAIpQLSenHdGiGl1YF-7rVDDmmulN8R-ra9MnGLLs7gIIaAX9VHPdPg/viewform). If you do not wish to use the gtrends package for Python, you'll need to format your data to match the following and save it as a CSV:
 
 |timestamp |US         |US_AL      |US_CA      |US_NY      |
 |----------|-----------|-----------|-----------|-----------|
@@ -42,21 +42,19 @@ To use the [gtrends package for Python3](https://www.github.com/tlcaputi/gtrends
 |2020-01-09|415.2533228|448.5096531|222.1345994|333.3310304|
 |2020-01-10|919.4877736|254.382975 |811.7631744|134.159574 |
 
-Notice that the column with dates is titled "timestamp" and all other column names correspond to geographies. For example, the search value for the US on 2020-01-02 is 642.9. The search value for Alabama (US_AL) is 636.2.
+Notice that the column with dates is titled "timestamp" and all other column names correspond to geographies. For example, the search value for the US on 2020-01-02 is 642.9. The search value for the same date for Alabama (US_AL) is 636.2.
 
 (NOTE: These are randomly generated values that do not correspond to actual search volumes for anything.)
 
 ### Installing the package
 
-```{r}
-
+```r
 # Only run this once
 library(devtools)
 devtools::install_github("tlcaputi/gtrendR", force = T)
 
 # Run this every time
 library("gtrendR")
-
 ```
 
 ### ARIMA Spike with One Geography
@@ -402,7 +400,7 @@ Using this data, we can create a barplot using `multiterm_barplot`
 
 ```r
 panG <- multiterm_barplot(
-  df = multiterms,
+  df = multiterms %>% arrange(pctdiff),
 
   ## Graphing Parameters
   title = NULL, # If NULL, no Title
