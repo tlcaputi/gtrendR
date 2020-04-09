@@ -254,6 +254,7 @@ arima_ciplot <- function(
   ylim = NULL,
   outfn = './output/fig.pdf',
   beginplot,
+  hline = T,
   endplot,
   lbreak = "1 month",
   hicol = NA,
@@ -297,14 +298,14 @@ arima_ciplot <- function(
   endplot <- ymd(endplot)
   interrupt <- ymd(interrupt)
 
-  if(!extend){
-    beginplot <- closest_date(data = df, date = beginplot, type = "beforeequal")
-    endplot <- closest_date(data = df, date = endplot, type = "afterequal")
-  }
-
-  beginplot <- ymd(beginplot)
-  endplot <- ymd(endplot)
-  interrupt <- ymd(interrupt)
+  # if(!extend){
+  #   beginplot <- closest_date(data = df, date = beginplot, type = "beforeequal")
+  #   endplot <- closest_date(data = df, date = endplot, type = "afterequal")
+  # }
+  #
+  # beginplot <- ymd(beginplot)
+  # endplot <- ymd(endplot)
+  # interrupt <- ymd(interrupt)
 
   tmp <- with(df %>% filter(timestamp %within% interval(interrupt, endplot)),
                 data.frame(
@@ -321,8 +322,11 @@ arima_ciplot <- function(
               data.frame(x = c(timestamp, rev(timestamp)), y = c(lo95, rev(hi95)), polycolor=nucol))
   p <- ggplot(tmp)
   p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=nucol), fill=nucol, alpha=polyalpha)
-  p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey74")
   p <- p + geom_line(aes(x=timestamp, y=pctdiff, group=1, color=hicol), color=hicol, linetype="solid", size=lwd)
+  p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey74")
+  if(hline){
+    p <- p + geom_hline(xintercept=0, linetype="dashed", color="grey74")
+  }
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
                    limits = as.Date(c(beginplot, endplot)))
@@ -334,7 +338,7 @@ arima_ciplot <- function(
   p <- p + scale_y_continuous(
     limits = ylim,
     labels = function(x) paste0(x*100, "%")
-  ) # Multiply by 100 & add Pct
+  )
   p <- p + theme_classic()
   p <- p + theme(legend.position="none")
 

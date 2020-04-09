@@ -301,6 +301,7 @@ state_arima_spaghetti = function(
   linelabel = "Interruption",
   lbreak = "1 week",
   lwd = 0.4,
+  right_margin = 0.1,
   xfmt = date_format("%d %b"),
   states_with_labels = c("CA", "NY", "US", "IL", "TX"),
   states_to_exclude = c(),
@@ -336,13 +337,11 @@ state_arima_spaghetti = function(
 
   freq <- min(as.numeric(diff.Date(arima_spaghetti_df$timestamp)), na.rm = T)
   interrupt <- ymd(interrupt)
-  if(freq == 1){
-    interrupt_line <- interrupt -1
-  } else{
-    interrupt_line <- interrupt
-  }
-
-
+  interrupt_line <- interrupt
+  # if(freq == 1){
+  # interrupt_line <- interrupt -1
+  # } else{
+  # }
 
 
   if(!extend){
@@ -361,7 +360,7 @@ state_arima_spaghetti = function(
 
 
   p <- ggplot(arima_spaghetti_df)
-  p <- p + geom_vline(xintercept=closest_date(data = arima_spaghetti_df, date = interrupt, type="before"), linetype="dashed", color="grey72")
+  p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey72")
 
   maxval <- 0
   ct <- 0
@@ -392,7 +391,7 @@ state_arima_spaghetti = function(
 
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
-                   limits = c(as.Date(beginplot), as.Date(endplot) + diff*0.01))
+                   limits = c(ymd(beginplot), ymd(endplot) + diff*right_margin))
   p <- p + scale_y_continuous(
     limits = ylim,
     labels = function(x) paste0(x*100, "%")

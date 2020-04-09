@@ -6,7 +6,7 @@ This project is a work-in-progress. It works in some cases but may not work in m
 
 ## Usage
 
-Before you begin using this package, pull the Google Trends data using the [gtrendspy package for Python3](https://www.github.com/tlcaputi/gtrendspy). For example, you may run the following. I will use the data from this command to explain the package. Unfortunately, I cannot share the raw data.
+Before you begin using this package, pull the Google Trends data using the [gtrendspy package for Python3](https://www.github.com/tlcaputi/gtrendspy). For example, we will use the following data pull to demonstrate the features of the package. Unfortunately, I cannot share the raw data.
 
 ```python
 
@@ -186,6 +186,20 @@ panC <- arima_ciplot(
 )
 ```
 
+
+Note that because the outputs from these functions are ggplots, you can use ggplot functions to customize them even after they are outputted.
+
+```r
+panC <- panC +
+  scale_x_date(
+    limits = c(ymd("2020-03-01"), ymd("2020-04-01")),
+    date_breaks = "1 day",
+    labels = function(x) ifelse(as.numeric(x) %% 2 != 0, "", format(x, format = "%b %d"))
+  ) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1.0, hjust = 1.0))
+```
+
+
 Finally, you can merge the plots together to create a single figure.
 
 ```r
@@ -272,7 +286,7 @@ state_list <- state_arima(
 ```
 
 
-Using the output from `state_arima`, you can create a spaghetti plot showing the percent difference between the ARIMA-fitted values and the actual values with `state_arima_spaghetti`.
+Using the output from `state_arima`, you can create a spaghetti plot showing the percent difference between the ARIMA-fitted values and the actual values with `state_arima_spaghetti`. It doesn't look too great for this example (likely because "hand washing" was a rare search term before COVID19), but this kind of plot could be useful for other search terms.
 
 
 ```r
@@ -281,18 +295,19 @@ panE <- state_arima_spaghetti(
   interrupt = "2020-03-01", # should be the same as state_arima
 
   ## Plot Arguments
-  beginplot = ymd(interrupt) - 7, # Start date for the plot. If T, beginning of data
-  endplot = "2020-04-01", # End date for the plot. If T, end of data
+  beginplot = "2020-03-01", # Start date for the plot. If T, beginning of data
+  endplot = "2020-04-03", # End date for the plot. If T, end of data
   title = NULL, # If NULL, no Title
   xlab = "Date", # x axis label
-  lbreak = "1 month", # Space between x-axis tick marks
-  xfmt = date_format("%b %Y"), # Format of dates on x axis
-  ylab = "Query Fraction (Per 10 Million Searches)", # y axis label
+  lbreak = "1 week", # Space between x-axis tick marks
+  xfmt = date_format("%b-%d"), # Format of dates on x axis
+  ylab = "Query Fraction\n(Per 10 Million Searches)", # y axis label
   lwd = 1, # Width of the line
+  ylim = c(NA, NA), # y axis limts
 
   ## Spaghetti specific adjustments
   spaghettialpha = 0.25, # How transparent do you want the spaghetti lines
-  states_with_labels = c("CA", "NY", "US"), ## Add labels to the end of these
+  states_with_labels = c("US"), ## Add labels to the end of these
   states_to_exclude = c("IA"), ## Don't include these
 
   ## Set a colorscheme
@@ -308,6 +323,9 @@ panE <- state_arima_spaghetti(
   width = 6, # Width in inches
   height = 3 # Height in inches
 )
+
+panE <- panE + coord_cartesian(ylim = c(-10, 40))
+
 ```
 
 

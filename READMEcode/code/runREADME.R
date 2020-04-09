@@ -98,7 +98,7 @@ panC <- arima_ciplot(
   title = NULL, # If NULL, no Title
   xlab = "Date", # x axis label
   lbreak = "1 week", # Space between x-axis tick marks
-  xfmt = date_format("%b %Y"), # Format of dates on x axis
+  xfmt = date_format("%b-%d"), # Format of dates on x axis
   ylab = "Greater than Expected (%)", # y axis label
   lwd = 1, # Width of the line
 
@@ -118,9 +118,17 @@ panC <- arima_ciplot(
 
 )
 
+panC <- panC +
+  scale_x_date(
+    limits = c(ymd("2020-03-01"), ymd("2020-04-01")),
+    date_breaks = "1 day",
+    labels = function(x) ifelse(as.numeric(x) %% 2 != 0, "", format(x, format = "%b %d"))
+  ) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1.0, hjust = 1.0))
+
 title <- ggdraw() +
   draw_label(
-    "Google Searches",
+    "Google Searches for Hand Washing",
     fontface = 'bold',
     hjust = 0.5
   ) +
@@ -187,24 +195,29 @@ state_list <- state_arima(
   kalman = T ## If True, Kalman impute NAs in the time series
 )
 
+
+
+
 panE <- state_arima_spaghetti(
   state_list, # data from state_arima
   interrupt = "2020-03-01", # should be the same as state_arima
 
   ## Plot Arguments
-  beginplot = "2020-02-28", # Start date for the plot. If T, beginning of data
-  endplot = "2020-04-01", # End date for the plot. If T, end of data
+  beginplot = "2020-03-01", # Start date for the plot. If T, beginning of data
+  endplot = "2020-04-03", # End date for the plot. If T, end of data
   title = NULL, # If NULL, no Title
   xlab = "Date", # x axis label
-  lbreak = "1 month", # Space between x-axis tick marks
-  xfmt = date_format("%b %Y"), # Format of dates on x axis
+  lbreak = "1 week", # Space between x-axis tick marks
+  xfmt = date_format("%b-%d"), # Format of dates on x axis
   ylab = "Query Fraction\n(Per 10 Million Searches)", # y axis label
   lwd = 1, # Width of the line
+  ylim = c(NA, NA), # y axis limts
 
   ## Spaghetti specific adjustments
   spaghettialpha = 0.25, # How transparent do you want the spaghetti lines
   states_with_labels = c("US"), ## Add labels to the end of these
-  states_to_exclude = c("IA"), ## Don't include these
+  states_to_exclude = c("IA"), ## Don't include these states
+  right_margin = 0.05, # margin on right for labels
 
   ## Set a colorscheme
   colorscheme = "blue",  # Color schemes set in this package "red", 'blue" or "jamaim"
@@ -220,6 +233,7 @@ panE <- state_arima_spaghetti(
   height = 3 # Height in inches
 )
 
+panE <- panE + coord_cartesian(ylim = c(-10, 40))
 
 panF <- state_arima_pctdiff(
   state_list, # data from state_arima
@@ -248,7 +262,7 @@ panF <- state_arima_pctdiff(
 
 title <- ggdraw() +
   draw_label(
-    "Google Searches",
+    "Google Searches for Hand Washing",
     fontface = 'bold',
     hjust = 0.5
   ) +
