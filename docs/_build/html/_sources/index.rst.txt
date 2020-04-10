@@ -1,15 +1,10 @@
-.. gtrendR documentation master file, created by
-   sphinx-quickstart on Fri Apr 10 01:08:10 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to gtrendR's documentation!
-===================================
+gtrendR
+================================================================
 
 This package will help you analyze data from the Google Trends for Health API.
 
 Features
----------
+-------------------
 
 - Implement bootstrapped ARIMA-based Interrupted Time Series models over your data
 - Visualize these results for a single geography or by US state
@@ -18,14 +13,12 @@ Features
 
 
 Installation
------------
+--------------------
 
 Install the package by running
 
-```r
   library(devtools)
   devtools::install_github('tlcaputi/gtrendR')
-```
 
 .. toctree::
    :maxdepth: 2

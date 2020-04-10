@@ -1,10 +1,10 @@
-Welcome to gtrendR's documentation!
-===================================
+gtrendR
+================================================================
 
 This package will help you analyze data from the Google Trends for Health API.
 
 Features
----------
+-------------------
 
 - Implement bootstrapped ARIMA-based Interrupted Time Series models over your data
 - Visualize these results for a single geography or by US state
@@ -13,14 +13,12 @@ Features
 
 
 Installation
------------
+--------------------
 
 Install the package by running
 
-```r
   library(devtools)
   devtools::install_github('tlcaputi/gtrendR')
-```
 
 .. toctree::
    :maxdepth: 2
