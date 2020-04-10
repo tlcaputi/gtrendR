@@ -12,7 +12,8 @@ run_arima(
   geo = "US",
   kalman = F,
   bootstrap = F,
-  bootnum = 1000
+  bootnum = 1000,
+  linear = F
 )
 }
 \arguments{

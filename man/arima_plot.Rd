@@ -2,7 +2,7 @@
 % Please edit documentation in R/arima-spikes-onegeo.R
 \name{arima_plot}
 \alias{arima_plot}
-\title{This uses the output from \code{run_arima} to create a figure showing the
+\title{arima_plot: This uses the output from \code{run_arima} to create a figure showing the
 difference between the actual and expected searches for a single geography.}
 \usage{
 arima_plot(
@@ -29,7 +29,10 @@ arima_plot(
   height = 3,
   lwd = 0.3,
   save = T,
-  extend = F
+  extend = F,
+  labels = T,
+  alpha = 0.05,
+  labsize = 0.5
 )
 }
 \arguments{
@@ -64,7 +67,7 @@ arima_plot(
 \item{save}{Default is True. If False, the plot is not saved.}
 }
 \description{
-This uses the output from \code{run_arima} to create a figure showing the
+arima_plot: This uses the output from \code{run_arima} to create a figure showing the
 difference between the actual and expected searches for a single geography.
 }
 \examples{

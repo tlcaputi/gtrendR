@@ -5,7 +5,7 @@
 \title{multiterm_barplot: Use the data from multi_term_arima to create a barplot}
 \usage{
 multiterm_barplot(
-  df,
+  multiterm_list,
   label_df = NA,
   title = NULL,
   xlab = "Terms",
@@ -21,8 +21,6 @@ multiterm_barplot(
 )
 }
 \arguments{
-\item{df}{A dataframe including time as \code{timestamp} and searches for your given geography in one column.}
-
 \item{save}{Default is True, If False, don't save}
 
 \item{outfn}{Output filename}
@@ -30,6 +28,8 @@ multiterm_barplot(
 \item{width}{Width of file in inches}
 
 \item{height}{Height of file in inches}
+
+\item{df}{A dataframe including time as \code{timestamp} and searches for your given geography in one column.}
 
 \item{interrupt}{The date where things change. ARIMA will be predicted on all days before the interrupt.}
 

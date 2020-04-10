@@ -536,7 +536,7 @@ arima_plot <- function(
             size = labsize)
 
 
-    }
+    
   }
 
 
