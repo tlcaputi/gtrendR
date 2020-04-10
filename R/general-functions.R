@@ -92,3 +92,17 @@ colorschemer <- function(col){
     if(is.null(midcol) || is.na(midcol)) assign("midcol",   "#C3D6DE", pos=parent.frame())
   }
 }
+
+
+#' samplemean
+#'
+#' @param x vector
+#' @param d indices
+#' @keywords
+#' @export
+#' @examples
+
+
+samplemean <- function(x, d) {
+  return(mean(x[d]))
+}

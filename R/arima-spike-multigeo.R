@@ -87,11 +87,6 @@ state_pct_change = function(
                 )
   statedf$state <- state.name[match(statedf$abbr, state.abb)]
 
-  samplemean <- function(x, d) {
-    return(mean(x[d]))
-  }
-
-
   if(bootstrap){
     set.seed(1234)
     statedf$hi95 <- NA

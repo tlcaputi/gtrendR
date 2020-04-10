@@ -31,6 +31,7 @@ arima_plot(
   save = T,
   extend = F,
   labels = T,
+  bootnum = 1000,
   alpha = 0.05,
   labsize = 0.5
 )

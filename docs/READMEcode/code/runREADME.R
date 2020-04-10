@@ -4,7 +4,7 @@
 
 # Run this every time
 library("gtrendR")
-ROOTPATH <- "C:/Users/tcapu/Google Drive/modules/gtrendR/READMEcode"
+ROOTPATH <- "C:/Users/tcapu/Google Drive/modules/gtrendR/docs/READMEcode"
 setwd(ROOTPATH)
 
 US_df <- run_arima(
@@ -327,7 +327,7 @@ panG <- multiterm_barplot(
 
 
 
-multiterm_spaghetti(
+panH <- multiterm_spaghetti(
   multiterm_list = multiterms,
   interrupt = "2020-03-01",
   terms_to_use = NA,
@@ -337,8 +337,8 @@ multiterm_spaghetti(
   endplot = "2020-04-03", # End date for the plot. If T, end of data
   title = NULL, # If NULL, no Title
   xlab = "Date", # x axis label
-  lbreak = "1 week", # Space between x-axis tick marks
-  xfmt = date_format("%b-%d"), # Format of dates on x axis
+  lbreak = "1 month", # Space between x-axis tick marks
+  xfmt = date_format("%b-%Y"), # Format of dates on x axis
   ylab = "Query Fraction\n(Per 10 Million Searches)", # y axis label
   lwd = 1, # Width of the line
   ylim = c(NA, NA), # y axis limts

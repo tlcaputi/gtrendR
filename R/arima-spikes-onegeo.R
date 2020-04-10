@@ -448,6 +448,7 @@ arima_plot <- function(
   save = T,
   extend = F,
   labels = T,
+  bootnum = 1000,
   alpha =0.05,
   labsize = 0.5
   ){
@@ -536,7 +537,7 @@ arima_plot <- function(
             size = labsize)
 
 
-    
+
   }
 
 
