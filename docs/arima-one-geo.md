@@ -8,7 +8,10 @@ US_df <- run_arima(
   df = read.csv("./input/handwashing_day.csv", header = T, stringsAsFactor = F), # Data from gtrends
   interrupt = "2020-03-01", # Interruption point in your data
   geo = "US", # geography you want to use
+  bootstrap = F, # bootstrap the confidence intervals
+  linear = F, # Default F. If False, uses ARIMA. If True, uses a linear model.
   kalman = T # If True, uses Kalman method to impute time series
+
 )
 ```
 
@@ -62,6 +65,7 @@ panB <- arima_plot(
   interrupt = "2020-03-01", # Date of an interruption
   linelabel = "COVID19",
   linelabelpos = 0.02, # Where the label goes near the interruption line
+
 
   ## Plot Arguments
   beginplot = "2019-09-01", # Start date for the plot. If T, beginning of data

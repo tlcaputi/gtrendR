@@ -9,7 +9,6 @@
 #' @examples
 #' run_arima(df = data, interrupt = ymd("2019-12-19"), geo = "US")
 
-
 run_arima <- function(
   df,
   interrupt,
@@ -18,7 +17,8 @@ run_arima <- function(
   geo = "US",
   kalman = F,
   bootstrap = F,
-  bootnum = 1000
+  bootnum = 1000,
+  linear = F
   ){
 
 
@@ -57,25 +57,59 @@ run_arima <- function(
     tmpdf$geo <- as.numeric(time_series)
   }
 
-  mod <- auto.arima(ts_training)
+  if(!linear){
+    mod <- auto.arima(ts_training)
 
+    ## EXTRACT FITTED VALUES
+    if(bootstrap){
+      set.seed(1234)
+      fitted_values <- forecast(mod, h = length(ts_test), bootstrap = TRUE, npaths = bootnum)
+    } else{
+      fitted_values <- forecast(mod, h = length(ts_test))
+    }
 
-  ## EXTRACT FITTED VALUES
-  if(bootstrap){
-    set.seed(1234)
-    fitted_values <- forecast(mod, h = length(ts_test), bootstrap = TRUE, npaths = bootnum)
   } else{
-    fitted_values <- forecast(mod, h = length(ts_test))
+
+    x_train <- 1:length(ts_training)
+    y_train <- as.numeric(ts_training)
+    train <- data.frame("x" = x_train, "y" = y_train)
+
+    mod <- lm(y ~ x, data = train)
+
+    x_test <- (length(ts_training) + 1):(length(ts_training) + length(ts_test))
+    ft <- data.frame("x" = x_test, "y" = NA)
+
+
+    if(bootstrap){
+
+      conf95 <- boot_predict(mod, newdata = ft, R=1000, condense = F)
+      conf95 <- data.frame(conf95)
+      names(conf95)[3:5] <- c("fit", "lwr", "upr")
+      fitted_values <- data.frame("mean" = conf95$fit, "lower" = conf95$lwr, "upper" = conf95$upr)
+
+
+    } else{
+
+      conf95 <- predict(mod, newdata = ft, interval = "confidence", level = 0.95)
+      conf95 <- data.frame(conf95)
+      fitted_values <- data.frame("mean" = conf95$fit, "lower" = conf95$lwr, "upper" = conf95$upr)
+    }
+
+
+
   }
 
 
   ## ADD THE FITTED VALUES TO THE DATA FRAME
-  tmp1 <- data.frame(matrix(NA, nrow=nrow(tmpdf) - length(fitted_values$mean), ncol=5))
   tmp2 <- data.frame(fitted=fitted_values$mean, lo=fitted_values$lower, hi=fitted_values$upper)
+  tmp1 <- data.frame(matrix(NA, nrow=nrow(tmpdf) - length(fitted_values$mean), ncol=ncol(tmp2)))
   names(tmp1) <- names(tmp2)
   df_to_cbind <- rbind.data.frame(tmp1, tmp2)
 
   names(df_to_cbind) <- gsub("[.]", "", names(df_to_cbind))
+  names(df_to_cbind) <- gsub("^lo$", "lo95", names(df_to_cbind))
+  names(df_to_cbind) <- gsub("^hi$", "hi95", names(df_to_cbind))
+
   finaldf <- cbind.data.frame(tmpdf, df_to_cbind)
   # finaldf$polycolor <- polycolor
   finaldf$fitted <- ifelse(is.na(finaldf$fitted), finaldf$geo, finaldf$fitted)
@@ -84,7 +118,6 @@ run_arima <- function(
 
   return(finaldf)
 }
-
 
 
 #' line_plot: Creates a simple line plot of searches over time
@@ -352,7 +385,7 @@ arima_ciplot <- function(
 
 
 
-#' This uses the output from \code{run_arima} to create a figure showing the
+#' arima_plot: This uses the output from \code{run_arima} to create a figure showing the
 #' difference between the actual and expected searches for a single geography.
 #'
 #' @param df The dataframe as outputted by \code{run_arima}.
@@ -413,7 +446,10 @@ arima_plot <- function(
   height = 3,
   lwd = 0.3,
   save = T,
-  extend = F
+  extend = F,
+  labels = T,
+  alpha =0.05,
+  labsize = 0.5
   ){
 
 
@@ -473,6 +509,36 @@ arima_plot <- function(
   p <- p + theme_classic()
   p <- p + theme(legend.position=c(0.1,0.9))
   p <- p + theme(plot.title = element_text(hjust = 0.5))
+
+
+
+  if(labels){
+    set.seed(1234)
+    expectedsearches <- df %>% filter(timestamp %within% interval(interrupt, endplot)) %>% pull(fitted)
+    actualsearches <- df %>%   filter(timestamp %within% interval(interrupt, endplot)) %>% pull(geo)
+
+    expectedmeans <- boot(data = expectedsearches, statistic = samplemean, R = bootnum)
+    actualmeans <- boot(data = actualsearches, statistic = samplemean, R = bootnum)
+
+    bootdf <- data.frame("expectedmeans" = expectedmeans$t, "actualmeans" = actualmeans$t)
+    bootdf <- bootdf %>% mutate(
+      pctdiff = ((actualmeans / expectedmeans) - 1)
+    )
+
+    booted_vec <- bootdf %>% pull(pctdiff)
+    mn <- sum(expectedsearches, na.rm = T) / sum(actualsearches, na.rm = T) - 1
+    hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
+    lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
+
+    p <- p + annotate("text", x = 0.5, y = 0.9,
+            label = sprintf("%1.0f%% Excess Searches (95%%CI %1.0f - %1.0f)",
+                    mn*100, lo95*100, hi95*100),
+            size = labsize)
+
+
+    }
+  }
+
 
   if(save) ggsave(p, width=width, height=height, dpi=300, filename=outfn)
 

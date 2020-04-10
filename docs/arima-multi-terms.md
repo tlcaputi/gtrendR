@@ -26,7 +26,8 @@ multiterms <- multi_term_arima(
   ## Analytical arguments
   bootstrap = T, # Bootstrap CIs
   bootnum = 1000, # Number of bootstraps
-  kalman = T # If T, impute with Kalman
+  kalman = T, # If T, impute with Kalman
+  linear = F # If T, uses linear model rather than ARIMA.
 )
 ```
 
@@ -59,6 +60,46 @@ panG <- multiterm_barplot(
   )
 ```
 
-
-
 ![arima-spike-multiterms](READMEcode/output/panG.png)
+
+
+We may want to make a spaghetti plot visualizing how several related terms have increased together. We can use `multiterm_spaghetti` to create a plot where the spaghetti is individual (related) terms and the mean is represented by a darker line. Here, we only have two terms -- this plot would look nicer with more terms.
+
+### multiterm_spaghetti
+```r
+
+multiterm_spaghetti(
+  multiterm_list = multiterms,
+  interrupt = "2020-03-01",
+  terms_to_use = NA,
+
+  ## Plot Arguments
+  beginplot = "2020-01-01", # Start date for the plot. If T, beginning of data
+  endplot = "2020-04-03", # End date for the plot. If T, end of data
+  title = NULL, # If NULL, no Title
+  xlab = "Date", # x axis label
+  lbreak = "1 week", # Space between x-axis tick marks
+  xfmt = date_format("%b-%d"), # Format of dates on x axis
+  ylab = "Query Fraction\n(Per 10 Million Searches)", # y axis label
+  lwd = 1, # Width of the line
+  ylim = c(NA, NA), # y axis limts
+
+  ## Spaghetti specific adjustments
+  spaghettialpha = 0.6, # How transparent do you want the spaghetti lines
+
+  ## Set a colorscheme
+  colorscheme = "blue",  # Color schemes set in this package "red", 'blue" or "jamaim"
+
+  # ... customize any color using these
+  hicol = NA, # Color of US line
+  locol = NA, # Color of other lines
+
+  ## Saving arguments
+  save = T, # If T, save plot
+  outfn = './output/panH.png', # Location to save plot
+  width = 6, # Width in inches
+  height = 3 # Height in inches
+)
+```
+
+![multiterm-spaghetti](READMEcode/output/panH.png)

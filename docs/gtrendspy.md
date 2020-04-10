@@ -43,3 +43,28 @@ To use the [gtrendspy package for Python3](https://www.github.com/tlcaputi/gtren
 Notice that the column with dates is titled "timestamp" and all other column names correspond to geographies. For example, the search value for the US on 2020-01-02 is 642.9. The search value for the same date for Alabama (US_AL) is 636.2.
 
 (NOTE: These are randomly generated values that do not correspond to actual search volumes for anything.)
+
+
+You may be interested not just in a particular search term but in a series of related search terms. In this case, you may consider using Google Trends' built-in "Top Queries" feature. You can implement that through the following function:
+
+```python
+
+from gtrendspy import topterms
+
+
+topterms.theo_timeline_top(
+        root_terms = ['apple', 'cats'], # a list of the root terms you're interested in
+        num_terms_per_root = 3, # how many additional terms you want per root term
+        start = '2019-01-01', # the start date
+        end = '2020-01-01', # the end date
+        timeframe_list = ['month'], # the timeframe you want
+        outpath = "/path/to/ROOTPATH/output",
+        creds = "/path/to/creds",
+        region = ['US'], # the region you're interested in. ONLY CHOOSE 1 or None
+        batch_size = 2
+        )
+
+```
+
+
+This will automatically pull the top `num_terms_per_root` search queries related to each of your root terms and pull the appropriate timeline files. Right now it only works with one region at a time. This could be useful for creating a [multi-term barplot](/latest/en/arima-multi-terms/#multiterm_barplot) or [spaghetti plot](/latest/en/arima-multi-terms/#multiterm_spaghetti).  
