@@ -23,7 +23,12 @@ Imports:
     imputeTS,
     boot,
     RColorBrewer,
-    colorRamps
+    colorRamps,
+    rvest,
+    gsubfn,
+    RCurl,
+    googlesheets4,
+    zoo
 Depends:
     lubridate,
     dplyr,
@@ -36,5 +41,10 @@ Depends:
     imputeTS,
     boot,
     RColorBrewer,
-    colorRamps
+    colorRamps,
+    rvest,
+    gsubfn,
+    RCurl,
+    googlesheets4,
+    zoo
 RoxygenNote: 7.1.0.9000

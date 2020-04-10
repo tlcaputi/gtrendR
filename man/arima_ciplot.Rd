@@ -15,6 +15,7 @@ arima_ciplot(
   ylim = NULL,
   outfn = "./output/fig.pdf",
   beginplot,
+  hline = T,
   endplot,
   lbreak = "1 month",
   hicol = NA,

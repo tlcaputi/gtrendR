@@ -481,3 +481,131 @@ arima_plot <- function(
   return(p)
 
 }
+
+
+
+
+
+#' get_rawcounts using estimates from Comscore
+#'
+#' @param df The dataframe as outputted by \code{run_arima}.
+#' @param month 1 or 2, 1 is the earlier month and 2 is the later. Default 2
+#' @param pct_desktop Assumption of the percentage of searches that are executed on Desktops. Default 0.35
+#' @param geo Location
+#' @param interrupt The date of the interruption (should be the same as \code{run_arima})
+#' @param qf_denominator Denominator for fractions given in gtrendspy. Default 10M.
+#' @param endperiod Compute raw counts from the interrupt to an enddate
+#' @keywords
+#' @export
+#' @examples
+#' get_rawcounts <- function(
+#'   df,
+#'   month = 2,
+#'   pct_desktop = 0.35,
+#'   geo = "US",
+#'   interrupt = "2020-03-01",
+#'   qf_denominator = 10000000,
+#'   endperiod = T
+#'   )
+
+
+get_rawcounts <- function(
+  df,
+  month = 2,
+  pct_desktop = 0.35,
+  geo = "US",
+  interrupt = "2020-03-01",
+  qf_denominator = 10000000,
+  endperiod = T
+  ){
+
+    html_data <- read_html("https://www.comscore.com/Insights/Rankings?cs_edgescape_cc=US#tab_search_query/")
+    spts <- html_data %>% html_nodes("script")
+    spts_text <- spts %>% html_text()
+    script_with_spreadsheet <- grep("public_spreadsheet_url", spts_text, value = T)
+    sheeturl <- strapplyc(script_with_spreadsheet, 'public_spreadsheet_url = "(.+pubhtml)";') %>% unlist()
+
+    sheets_deauth()
+    d <- read_sheet(sheeturl, sheet = "search_query")
+    names(d)[2] <- "engines"
+
+    google_searches <- d %>% filter(grepl("google", tolower(engines)))
+
+    if(month==1){
+      monthname <- names(d)[3]
+      num_searches <- d[1, 3]  %>% as.numeric()
+    } else {
+      monthname <- names(d)[4]
+      num_searches <- d[1, 4] %>% as.numeric()
+    }
+
+    print(sprintf("Using Comscore estimates for %s: %s Million Searches", monthname, num_searches))
+
+    tmpdf <- df
+    names(tmpdf) <- gsub(geo, "geo", names(tmpdf))
+    tmpdf$month <- month(tmpdf$timestamp)
+    month_as_date <- as.Date(tolower(paste0(monthname,"-15")), format = "%b-%Y-%d")
+    month_month <- month(month_as_date)
+    month_year <- year(month_as_date)
+    num_obs_in_month <- tmpdf %>%
+            filter(
+              month(timestamp) == month_month,
+              year(timestamp) == month_year
+            ) %>% nrow()
+
+    if(num_obs_in_month == 0){
+      freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
+      num_obs_in_month <- 30 / freq
+    }
+
+    print(sprintf("Assuming %s observations per month", num_obs_in_month))
+
+
+    tmpdf <- tmpdf %>% mutate(
+      num_desktop_searches_per_month = num_searches * 1000000,
+      num_obs_in_month = num_obs_in_month,
+      num_desktop_searches_per_obs = num_desktop_searches_per_month / num_obs_in_month,
+      pct_searches_desktop = pct_desktop,
+      num_total_searches_per_obs = num_desktop_searches_per_obs / pct_searches_desktop
+    )
+
+    tmpdf <- tmpdf %>% mutate(
+      rawcount_actual = geo * num_total_searches_per_obs / qf_denominator,
+      rawcount_fitted = fitted * num_total_searches_per_obs / qf_denominator,
+    )
+
+    tmpdf <- tmpdf %>% select(
+      timestamp,
+      geo,
+      fitted,
+      num_desktop_searches_per_month,
+      num_obs_in_month,
+      num_desktop_searches_per_obs,
+      pct_searches_desktop,
+      num_total_searches_per_obs,
+      rawcount_actual,
+      rawcount_fitted
+    )
+
+    if(!is.na(interrupt)){
+
+      if(is.logical(endperiod)) endperiod <- max(tmpdf$timestamp, na.rm = T)
+      endperiod <- ymd(endperiod)
+      interrupt <- ymd(interrupt)
+
+      totalsearches <- sum(tmpdf %>% filter(timestamp %within% interval(interrupt, endperiod)) %>% pull(rawcount_actual), na.rm = T)
+      expectedsearches <- sum(tmpdf %>% filter(timestamp %within% interval(interrupt, endperiod)) %>% pull(rawcount_fitted), na.rm = T)
+      excesssearches <- totalsearches - expectedsearches
+
+      print(sprintf("Actual Searches from %s to %s: %s", interrupt, endperiod, totalsearches))
+      print(sprintf("Expected Searches from %s to %s: %s", interrupt, endperiod, expectedsearches))
+      print(sprintf("Excess Searches from %s to %s: %s", interrupt, endperiod, excesssearches))
+    }
+
+    names(tmpdf) <- gsub("geo", geo, names(tmpdf))
+
+    return(tmpdf)
+
+
+
+}

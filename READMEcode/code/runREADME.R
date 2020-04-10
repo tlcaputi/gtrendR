@@ -14,6 +14,7 @@ US_df <- run_arima(
   kalman = T # If True, uses Kalman method to impute time series
 )
 
+
 panA <- line_plot(
   US_df, # data from run_arima
   geo = 'US', # geography you wnat to use

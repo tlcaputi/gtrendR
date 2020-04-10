@@ -16,6 +16,7 @@ state_arima_spaghetti(
   linelabel = "Interruption",
   lbreak = "1 week",
   lwd = 0.4,
+  right_margin = 0.1,
   xfmt = date_format("\%d \%b"),
   states_with_labels = c("CA", "NY", "US", "IL", "TX"),
   states_to_exclude = c(),
