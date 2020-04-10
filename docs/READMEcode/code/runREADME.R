@@ -3,9 +3,14 @@
 # devtools::install_github("tlcaputi/gtrendR")
 
 # Run this every time
+pacman::p_load(grid)
 library("gtrendR")
 ROOTPATH <- "C:/Users/tcapu/Google Drive/modules/gtrendR/docs/READMEcode"
 setwd(ROOTPATH)
+
+code_files <- dir("C:/Users/tcapu/Google Drive/modules/gtrendR/R", full.name = T)
+for(f in code_files) source(f)
+
 
 US_df <- run_arima(
   df = read.csv("./input/handwashing_day.csv", header = T, stringsAsFactor = F), # Data from gtrends
@@ -55,8 +60,9 @@ panB <- arima_plot(
 
   ## Create a vertical "interruption" line in your plot
   interrupt = "2020-03-01", # Date of an interruption
-  linelabel = "COVID19",
+  linelabel = "",
   linelabelpos = 0.02, # Where the label goes near the interruption line
+
 
   ## Plot Arguments
   beginplot = "2019-09-01", # Start date for the plot. If T, beginning of data
@@ -67,6 +73,8 @@ panB <- arima_plot(
   xfmt = date_format("%b %Y"), # Format of dates on x axis
   ylab = "Query Fraction\n(Per 10 Million Searches)", # y axis label
   lwd = 1, # Width of the line
+  label = T, # put increase in searches in plot
+  labsize = 0.8, # size of label
 
   ## Set a colorscheme
   colorscheme = "blue",  # Color schemes set in this package "red", 'blue" or "jamaim"
@@ -303,7 +311,7 @@ multiterms <- multi_term_arima(
 
 
 panG <- multiterm_barplot(
-  df = multiterms,
+  multiterm_list = multiterms,
 
   ## Graphing Parameters
   title = NULL, # If NULL, no Title

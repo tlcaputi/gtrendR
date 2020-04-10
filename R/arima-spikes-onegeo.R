@@ -358,7 +358,7 @@ arima_ciplot <- function(
   p <- p + geom_line(aes(x=timestamp, y=pctdiff, group=1, color=hicol), color=hicol, linetype="solid", size=lwd)
   p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey74")
   if(hline){
-    p <- p + geom_hline(xintercept=0, linetype="dashed", color="grey74")
+    p <- p + geom_hline(yintercept=0, linetype="dashed", color="grey74")
   }
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
@@ -485,6 +485,7 @@ arima_plot <- function(
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
   interrupt <- ymd(interrupt)
+  df$timestamp <- ymd(df$timestamp)
 
   df$polycolor <- nucol
 
@@ -515,6 +516,9 @@ arima_plot <- function(
 
   if(labels){
     set.seed(1234)
+    df$timestamp <- ymd(df$timestamp)
+    interrupt <- ymd(interrupt)
+    endplot <- ymd(endplot)
     expectedsearches <- df %>% filter(timestamp %within% interval(interrupt, endplot)) %>% pull(fitted)
     actualsearches <- df %>%   filter(timestamp %within% interval(interrupt, endplot)) %>% pull(geo)
 
@@ -527,14 +531,21 @@ arima_plot <- function(
     )
 
     booted_vec <- bootdf %>% pull(pctdiff)
-    mn <- sum(expectedsearches, na.rm = T) / sum(actualsearches, na.rm = T) - 1
+    mn <- sum(actualsearches, na.rm = T) / sum(expectedsearches, na.rm = T) - 1
     hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
     lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
 
-    p <- p + annotate("text", x = 0.5, y = 0.9,
-            label = sprintf("%1.0f%% Excess Searches (95%%CI %1.0f - %1.0f)",
-                    mn*100, lo95*100, hi95*100),
-            size = labsize)
+    lab <- sprintf("%1.0f%% Increase (95%%CI %1.0f - %1.0f)", mn*100, lo95*100, hi95*100)
+    g = grobTree(textGrob(lab, x=0.5, hjust=0.5, y=1, vjust=1, gp=gpar(fontsize=labsize*12)))
+    p <- p + annotation_custom(g)
+      # geom_text(data = NA, aes(label = lab, x = timestamp, y = geo), hjust = 0.5, vjust = 1)
+    # annotate(
+    #         "text",
+    #         x = as.Date(-Inf, origin = '2014-10-15'), y = Inf,
+    #         hjust = 0.5, vjust = 1,
+    #         label = sprintf("%1.0f%% Excess Searches (95%%CI %1.0f - %1.0f)",
+    #                 mn*100, lo95*100, hi95*100),
+    #         size = labsize)
 
 
 

@@ -190,7 +190,7 @@ multi_term_arima <- function(
 
 #' multiterm_barplot: Use the data from multi_term_arima to create a barplot
 #'
-#' @param df A dataframe including time as \code{timestamp} and searches for your given geography in one column.
+#' @param multiterm_list A dataframe including time as \code{timestamp} and searches for your given geography in one column.
 #' @param interrupt The date where things change. ARIMA will be predicted on all days before the interrupt.
 #' @param beginperiod How far back you want the "pre" period to go
 #' @param preperiod This creates a beginperiod but with a number of days instead of a date
@@ -249,7 +249,7 @@ multiterm_barplot <- function(
 
   colorschemer(colorscheme)
 
-  if(class(df)=="list"){
+  if(class(multiterm_list)=="list"){
     df <- multiterm_list[[1]]
   } else{
     df <- multiterm_list

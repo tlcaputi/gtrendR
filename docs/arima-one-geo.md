@@ -76,6 +76,8 @@ panB <- arima_plot(
   xfmt = date_format("%b %Y"), # Format of dates on x axis
   ylab = "Query Fraction (Per 10 Million Searches)", # y axis label
   lwd = 1, # Width of the line
+  label = T, # put increase in searches in plot
+  labsize = 0.8, # size of label
 
   ## Set a colorscheme
   colorscheme = "blue",  # Color schemes set in this package "red", 'blue" or "jamaim"
