@@ -1,10 +1,9 @@
-
-### ARIMA Spike with One Geography but Multiple Terms
+## ARIMA Spike with One Geography but Multiple Terms
 
 
 We may want to explore the difference between the ARIMA-forecasted and actual values for several terms. In that case, we start with `multi_term_arima`
 
-
+### multi_term_arima
 ```r
 multiterms <- multi_term_arima(
 
@@ -34,7 +33,7 @@ multiterms <- multi_term_arima(
 
 Using this data, we can create a barplot using `multiterm_barplot`
 
-
+### multiterm_barplot
 ```r
 panG <- multiterm_barplot(
   df = multiterms %>% arrange(pctdiff),

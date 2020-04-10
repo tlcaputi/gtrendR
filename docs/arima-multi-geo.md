@@ -1,8 +1,9 @@
-### ARIMA Spike with Multiple Geographies
+## ARIMA Spike with Multiple Geographies
 
 If you are interested in visualising changes by US state, you may want to create a figure showing the percentage change before versus after the interruption using `state_pct_change`.
 
 
+### state_pct_change
 ```r
 out <- state_pct_change(
   df = read.csv("./input/handwashing_day.csv", header = T, stringsAsFactor = F), ## Data from gtrends
@@ -51,6 +52,7 @@ panD <- out[[2]]
 
 To show how states differ from their individual ARIMA estimates, start with `state_arima`. Note, this may take a while.
 
+### state_arima
 ```r
 state_list <- state_arima(
   data = read.csv("./input/handwashing_day.csv", header = T, stringsAsFactor = F), ## Data from gtrends
@@ -64,7 +66,7 @@ state_list <- state_arima(
 
 Using the output from `state_arima`, you can create a spaghetti plot showing the percent difference between the ARIMA-fitted values and the actual values with `state_arima_spaghetti`. It doesn't look too great for this example (likely because "hand washing" was a rare search term before COVID19), but this kind of plot could be useful for other search terms.
 
-
+### state_arima_spaghetti
 ```r
 panE <- state_arima_spaghetti(
   state_list, # data from state_arima
@@ -107,6 +109,7 @@ panE <- panE + coord_cartesian(ylim = c(-10, 40))
 
 You can also visualize the state-specific differences between ARIMA-fitted values and actual values using `state_arima_pctdiff`.
 
+### state_arima_pctdiff
 ```r
 panF <- state_arima_pctdiff(
   state_list, # data from state_arima
@@ -136,7 +139,6 @@ Finally, combine the plots.
 
 
 ```r
-
 ## This creates a title
 title <- ggdraw() +
   draw_label(

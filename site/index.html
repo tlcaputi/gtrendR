@@ -54,7 +54,23 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#features">Features</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#project-layout">Project layout</a>
+    <li class="toctree-l2"><a class="reference internal" href="#graph-gallery">Graph Gallery</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#line_plot">line_plot</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#arima_plot">arima_plot</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#arima_ciplot">arima_ciplot</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#state_pct_change">state_pct_change</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#state_arima_spaghetti">state_arima_spaghetti</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#state_arima_pctdiff">state_arima_pctdiff</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#multiterm_barplot">multiterm_barplot</a>
+    </li>
+        </ul>
     </li>
     </ul>
                     </li>
@@ -72,15 +88,15 @@
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="arima-multi-geo/">Compare several geographies</a>
+                    <li class="toctree-l1"><a class="reference internal" href="absolute-counts/">Get absolute search counts</a>
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="arima-multi-terms/">Compare several terms</a>
+                    <li class="toctree-l1"><a class="reference internal" href="arima-multi-geo/">Compare spikes across several geographies</a>
                     </li>
                 </ul>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="absolute-counts/">Absolute counts</a>
+                    <li class="toctree-l1"><a class="reference internal" href="arima-multi-terms/">Compare spikes in several terms</a>
                     </li>
                 </ul>
       </div>
@@ -130,16 +146,32 @@
 <li>Compare search volume growth among several search terms</li>
 <li>Easily compute estimates of the absolute counts of Google searches using Comscore</li>
 </ul>
-<h2 id="project-layout">Project layout</h2>
-<pre><code>docs/
-    index.md  # The documentation homepage.
-    gtrendspy.md   # Pull data from gtrendspy
-    installation.md   # Install the gtrendR package
-    armia-one-geo.md   # Analyze a spike in searches
-    arima-multi-geo.md   # Compare several geographies
-    arima-multi-terms.md   # Compare several terms
-    absolute-counts.md   # Retrieve absolute counts of searches from Comscore
-</code></pre>
+<h2 id="graph-gallery">Graph Gallery</h2>
+<h4 id="line_plot">line_plot</h4>
+<p><a href="/arima-one-geo/#line_plot"><img alt="Line Plot" src="READMEcode/output/panA.png" /></a></p>
+<h4 id="arima_plot">arima_plot</h4>
+<p><a href="/arima-one-geo/#arima_plot"><img alt="ARIMA Plot" src="READMEcode/output/panB.png" /></a></p>
+<h4 id="arima_ciplot">arima_ciplot</h4>
+<p><a href="/arima-one-geo/#arima_ciplot"><img alt="ARIMA Confidence Intervals" src="READMEcode/output/panC.png" /></a></p>
+<h4 id="state_pct_change">state_pct_change</h4>
+<p><a href="/arima-multi-geo/#state_pct_change"><img alt="Percent Change by State" src="READMEcode/output/panD.png" /></a></p>
+<h4 id="state_arima_spaghetti">state_arima_spaghetti</h4>
+<p><a href="/arima-multi-geo/#state_arima_spaghetti"><img alt="Spaghetti Plot by State" src="READMEcode/output/panE.png" /></a></p>
+<h4 id="state_arima_pctdiff">state_arima_pctdiff</h4>
+<p><a href="/arima-multi-geo/#state_arima_pctdiff"><img alt="Percent Difference by State" src="READMEcode/output/panF.png" /></a></p>
+<h4 id="multiterm_barplot">multiterm_barplot</h4>
+<p><a href="/arima-multi-terms/#multiterm_barplot"><img alt="Percent Change by Term" src="READMEcode/output/panG.png" /></a></p>
+<!--
+## Project layout
+
+    docs/
+        index.md  # The documentation homepage.
+        gtrendspy.md   # Pull data from gtrendspy
+        installation.md   # Install the gtrendR package
+        armia-one-geo.md   # Analyze a spike in searches
+        arima-multi-geo.md   # Compare several geographies
+        arima-multi-terms.md   # Compare several terms
+        absolute-counts.md   # Retrieve absolute counts of searches from Comscore -->
               
             </div>
           </div>
@@ -195,5 +227,5 @@
 
 <!--
 MkDocs version : 1.1
-Build Date UTC : 2020-04-10 07:03:34
+Build Date UTC : 2020-04-10 07:37:26
 -->

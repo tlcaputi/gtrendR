@@ -7,9 +7,9 @@ nav:
   - Pull data from gtrendspy: gtrendspy.md
   - Install the gtrendR package: installation.md
   - Analyze a spike in searches: arima-one-geo.md
-  - Compare several geographies: arima-multi-geo.md
-  - Compare several terms: arima-multi-terms.md
-  - Absolute counts: absolute-counts.md
+  - Get absolute search counts: absolute-counts.md
+  - Compare spikes across several geographies: arima-multi-geo.md
+  - Compare spikes in several terms: arima-multi-terms.md
 
 
 # pages:

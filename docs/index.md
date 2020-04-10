@@ -12,6 +12,30 @@ This project is a work-in-progress. It works in some cases but may not work in m
 - Compare search volume growth among several search terms
 - Easily compute estimates of the absolute counts of Google searches using Comscore
 
+## Graph Gallery
+
+#### line_plot
+[![Line Plot](READMEcode/output/panA.png)](/arima-one-geo/#line_plot)
+
+#### arima_plot
+[![ARIMA Plot](READMEcode/output/panB.png)](/arima-one-geo/#arima_plot)
+
+#### arima_ciplot
+[![ARIMA Confidence Intervals](READMEcode/output/panC.png)](/arima-one-geo/#arima_ciplot)
+
+#### state_pct_change
+[![Percent Change by State](READMEcode/output/panD.png)](/arima-multi-geo/#state_pct_change)
+
+#### state_arima_spaghetti
+[![Spaghetti Plot by State](READMEcode/output/panE.png)](/arima-multi-geo/#state_arima_spaghetti)
+
+#### state_arima_pctdiff
+[![Percent Difference by State](READMEcode/output/panF.png)](/arima-multi-geo/#state_arima_pctdiff)
+
+#### multiterm_barplot
+[![Percent Change by Term](READMEcode/output/panG.png)](/arima-multi-terms/#multiterm_barplot)
+
+<!--
 ## Project layout
 
     docs/
@@ -21,4 +45,4 @@ This project is a work-in-progress. It works in some cases but may not work in m
         armia-one-geo.md   # Analyze a spike in searches
         arima-multi-geo.md   # Compare several geographies
         arima-multi-terms.md   # Compare several terms
-        absolute-counts.md   # Retrieve absolute counts of searches from Comscore
+        absolute-counts.md   # Retrieve absolute counts of searches from Comscore -->

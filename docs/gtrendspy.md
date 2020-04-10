@@ -1,8 +1,9 @@
 
-### The First Step: Pulling Data
+## The First Step: Pulling Data
 
 Before you begin using this package, pull the Google Trends data using the [gtrendspy package for Python3](https://www.github.com/tlcaputi/gtrendspy). For example, we will use the following data pull to demonstrate the features of the package. Unfortunately, I cannot share the raw data.
 
+### theo_timeline
 ```python
 
 from gtrendspy import timeline

@@ -1,8 +1,8 @@
-
-### ARIMA Spike with One Geography
+## ARIMA Spike with One Geography
 
 First, use `run_arima` to create a dataset in the correct format for other functions.
 
+### run_arima
 ```r
 US_df <- run_arima(
   df = read.csv("./input/handwashing_day.csv", header = T, stringsAsFactor = F), # Data from gtrends
@@ -15,6 +15,7 @@ US_df <- run_arima(
 Now, you're ready to produce a few interesting figures. The first figure is a simple line plot.
 
 
+### line_plot
 ```r
 panA <- line_plot(
   US_df, # data from run_arima
@@ -52,6 +53,7 @@ panA <- line_plot(
 
 You can also produce a plot that highlights the difference between the ARIMA-expected and actual search volumes.
 
+### arima_plot
 ```r
 panB <- arima_plot(
   US_df, ## data from run_arima
@@ -93,6 +95,7 @@ panB <- arima_plot(
 We can also plot the difference between the actual and ARIMA-fitted values with the ARIMA 95% confidence interval
 
 
+### arima_ciplot
 ```r
 panC <- arima_ciplot(
   US_df, ## data from run_arima

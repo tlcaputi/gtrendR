@@ -9,7 +9,7 @@
   <meta name="author" content="Theodore L Caputi">
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Absolute counts - gtrendR</title>
+  <title>Get absolute search counts - gtrendR</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -18,7 +18,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Absolute counts";
+    var mkdocs_page_name = "Get absolute search counts";
     var mkdocs_page_input_path = "absolute-counts.md";
     var mkdocs_page_url = null;
   </script>
@@ -63,18 +63,20 @@
                     <li class="toctree-l1"><a class="reference internal" href="../arima-one-geo/">Analyze a spike in searches</a>
                     </li>
                 </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../arima-multi-geo/">Compare several geographies</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../arima-multi-terms/">Compare several terms</a>
-                    </li>
-                </ul>
                 <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Absolute counts</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Get absolute search counts</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#raw_counts">raw_counts</a>
+    </li>
     </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../arima-multi-geo/">Compare spikes across several geographies</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../arima-multi-terms/">Compare spikes in several terms</a>
                     </li>
                 </ul>
       </div>
@@ -98,7 +100,7 @@
     
       
     
-    <li>Absolute counts</li>
+    <li>Get absolute search counts</li>
     <li class="wy-breadcrumbs-aside">
       
         <a href="https://github.com/tlcaputi/gtrendR/edit/master/docs/absolute-counts.md"
@@ -112,17 +114,24 @@
           <div role="main">
             <div class="section">
               
-                <h3 id="getting-raw-or-absolute-counts-of-searches-using-comscore">Getting Raw or Absolute Counts of Searches using Comscore</h3>
+                <h2 id="getting-raw-or-absolute-counts-of-searches-using-comscore">Getting Raw or Absolute Counts of Searches using Comscore</h2>
 <p>You may be interested in calculating an estimate of the raw count of searches executed since your interruption or as estimate for the raw count of "excess" searches (searches above what you would expect if your interruption didn't occur). For this, we use <code>get_rawcounts</code> -- but PLEASE read the following explanation before you use it.</p>
 <p>This function uses the estimates of monthly Desktop search volumes from <a href="https://www.comscore.com/Insights/Rankings?cs_edgescape_cc=US#tab_search_query/">Comscore</a> to extrapolate the count of volumes for your searches. This process is <a href="https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2719193">standard in the literature using Google search trends</a> but deserves some explanation. At any given time, Comscore provides estimates for the total volume of Desktop-based (i.e., not mobile) Google searches for the United States for two somewhat recent months. For example, as of April 10, 2020, they have estimates for January 2020 and February 2020. The function actively pulls these numbers from Comscore's website, so they will always be the two most current months available from Comscore. Still, Comscore gives us very limited information. We have to make several assumptions to calculate raw counts.</p>
 <ol>
-<li>We first make an assumption as to which of those is most correct for your analysis. If you set <code>month</code> to 1, it will take the volume estimate for the earlier month. If you leave <code>month</code> as the default (2), it will take volume estimate for the later month. We assume that the raw count of Desktop Google searches is unchanging among months in your dataset.</li>
-<li>Next, we need to assume how these Desktop Google searches are distributed within months. The function assumes that the searches are distributed uniformly, i.e., each day or week has the same number of searches. If the Comscore month is in your dataset, the function figures out how many observations were in that month, divides the raw count by that number, and sets the result as the raw count of Desktop searches for every observation. If the Comscore month is not in your dataset, the function divides the raw count by 30 and multiplies it by the minimum number of days between any two observations in your dataset. For example, if it daily data, it divides the raw count by 30 and multiplies it by 1 to get daily Desktop Google search count.</li>
-<li>Then, we have to make an assumption about the percentage of all Google searches that are executed on Desktops. You can set this parameter through <code>pct_desktop</code>. We use this number to back out the total number of Google searches (i.e., desktop and mobile). If there is 100 Desktop Google Searches, and you expect 35\% of Google searches to be Desktop searches, then the total number of Google searches is 100/0.35 = 285.</li>
+<li>
+<p>We first make an assumption as to which month is most correct for your analysis. If you set <code>month</code> to 1, it will take the volume estimate for the earlier month. If you leave <code>month</code> as the default (2), it will take volume estimate for the later month. We assume that the raw count of Desktop Google searches is unchanging among months in your dataset.</p>
+</li>
+<li>
+<p>Next, we need to assume how these Desktop Google searches are distributed within months. The function assumes that the searches are distributed uniformly, i.e., each day or week has the same number of searches. If the Comscore month is in your dataset, the function figures out how many observations were in that month, divides the raw count by that number, and sets the result as the raw count of Desktop searches for every observation. If the Comscore month is not in your dataset, the function divides the raw count by 30 and multiplies it by the minimum number of days between any two observations in your dataset. For example, if it daily data, it divides the raw count by 30 and multiplies it by 1 to get daily Desktop Google search count.</p>
+</li>
+<li>
+<p>Then, we have to make an assumption about the percentage of all Google searches that are executed on Desktops. You can set this parameter through <code>pct_desktop</code>. We use this number to back out the total number of Google searches (i.e., desktop and mobile). If there is 100 Desktop Google Searches, and you expect 35% of Google searches to be Desktop searches, then the total number of Google searches is 100/0.35 = 285.</p>
+</li>
 </ol>
 <p>This function prints the raw counts (the actual number of searches for your keywords, the expected number of searches, and the excess number of searches) between your <code>interrupt</code> and <code>endperiod</code>, as well as several of the assumptions from above. It also returns a data.frame that contains the raw search counts for each observation in the input data. I highly recommend you check the output data to ensure that the assumptions are reasonable.</p>
+<h3 id="raw_counts">raw_counts</h3>
 <pre><code class="r">
-rawcounts_data &lt;- get_rawcounts(
+rawcounts_df &lt;- get_rawcounts(
   df = US_df, # data from run_arima
 
   ## Analysis arguments
@@ -157,8 +166,10 @@ rawcounts_data &lt;- get_rawcounts(
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="../arima-multi-geo/" class="btn btn-neutral float-right" title="Compare spikes across several geographies">Next <span class="icon icon-circle-arrow-right"></span></a>
       
-        <a href="../arima-multi-terms/" class="btn btn-neutral" title="Compare several terms"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+        <a href="../arima-one-geo/" class="btn btn-neutral" title="Analyze a spike in searches"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -186,8 +197,10 @@ rawcounts_data &lt;- get_rawcounts(
           <a href="https://github.com/tlcaputi/gtrendR/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../arima-multi-terms/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../arima-one-geo/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
+      
+        <span style="margin-left: 15px"><a href="../arima-multi-geo/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
