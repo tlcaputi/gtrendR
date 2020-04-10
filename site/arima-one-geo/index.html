@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Theodore L Caputi">
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Analyze a spike in searches - gtrendR</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Analyze a spike in searches";
+    var mkdocs_page_input_path = "arima-one-geo.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> gtrendR</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">About gtrendR</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../gtrendspy/">Pull data from gtrendspy</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../installation/">Install the gtrendR package</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Analyze a spike in searches</a>
+    <ul class="current">
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../arima-multi-geo/">Compare several geographies</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../arima-multi-terms/">Compare several terms</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../absolute-counts/">Absolute counts</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">gtrendR</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Analyze a spike in searches</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/tlcaputi/gtrendR/edit/master/docs/arima-one-geo.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h3 id="arima-spike-with-one-geography">ARIMA Spike with One Geography</h3>
+<p>First, use <code>run_arima</code> to create a dataset in the correct format for other functions.</p>
+<pre><code class="r">US_df &lt;- run_arima(
+  df = read.csv(&quot;./input/handwashing_day.csv&quot;, header = T, stringsAsFactor = F), # Data from gtrends
+  interrupt = &quot;2020-03-01&quot;, # Interruption point in your data
+  geo = &quot;US&quot;, # geography you want to use
+  kalman = T # If True, uses Kalman method to impute time series
+)
+</code></pre>
+
+<p>Now, you're ready to produce a few interesting figures. The first figure is a simple line plot.</p>
+<pre><code class="r">panA &lt;- line_plot(
+  US_df, # data from run_arima
+  geo = 'US', # geography you wnat to use
+
+  ## Create a vertical &quot;interruption&quot; line in your plot
+  interrupt = &quot;2020-03-01&quot;, # Date of an interruption
+  linelabel = &quot;COVID19&quot;,
+
+  ## Plot arguments
+  beginplot = T, # Start date for the plot. If T, beginning of data
+  endplot = T, # End date for the plot. If T, end of data
+  title = NULL, # If NULL, no Title
+  xlab = &quot;Date&quot;, # x axis label
+  lbreak = &quot;3 year&quot;, # Space between x-axis tick marks
+  xfmt = date_format(&quot;%Y&quot;), # Format of dates on x axis
+  ylab = &quot;Query Fraction (Per 10 Million Searches)&quot;, # y axis label
+  lwd = 0.3, # Width of the line
+
+  ## Set a colorscheme
+  colorscheme = &quot;blue&quot;,  # Color schemes set in this package &quot;red&quot;, 'blue&quot; or &quot;jamaim&quot;
+
+  # ... customize any color using these
+  hicol = NA, # Searches line color
+  opcol = NA, # Color of point on top of spike
+
+
+  ## Saving arguments
+  save = T, # If T, save plot
+  outfn = './output/panA.png', # Location to save plot
+  width = 6, # Width in inches
+  height = 3 # Height in inches
+)
+</code></pre>
+
+<p>You can also produce a plot that highlights the difference between the ARIMA-expected and actual search volumes.</p>
+<pre><code class="r">panB &lt;- arima_plot(
+  US_df, ## data from run_arima
+
+  ## Create a vertical &quot;interruption&quot; line in your plot
+  interrupt = &quot;2020-03-01&quot;, # Date of an interruption
+  linelabel = &quot;COVID19&quot;,
+  linelabelpos = 0.02, # Where the label goes near the interruption line
+
+  ## Plot Arguments
+  beginplot = &quot;2019-09-01&quot;, # Start date for the plot. If T, beginning of data
+  endplot = &quot;2020-04-01&quot;, # End date for the plot. If T, end of data
+  title = NULL, # If NULL, no Title
+  xlab = &quot;Date&quot;, # x axis label
+  lbreak = &quot;1 month&quot;, # Space between x-axis tick marks
+  xfmt = date_format(&quot;%b %Y&quot;), # Format of dates on x axis
+  ylab = &quot;Query Fraction (Per 10 Million Searches)&quot;, # y axis label
+  lwd = 1, # Width of the line
+
+  ## Set a colorscheme
+  colorscheme = &quot;blue&quot;,  # Color schemes set in this package &quot;red&quot;, 'blue&quot; or &quot;jamaim&quot;
+
+  # ... customize any color using these
+  hicol = NA, # Actual line color
+  locol = NA, # Expected line color
+  nucol = NA, # Excess polygon color
+
+
+  ## Saving arguments
+  save = T, # If T, save plot
+  outfn = './output/panB.png', # Location to save plot
+  width = 6, # Width in inches
+  height = 3 # Height in inches
+
+)
+</code></pre>
+
+<p>We can also plot the difference between the actual and ARIMA-fitted values with the ARIMA 95% confidence interval</p>
+<pre><code class="r">panC &lt;- arima_ciplot(
+  US_df, ## data from run_arima
+
+  ## Create a vertical &quot;interruption&quot; line in your plot
+  interrupt = &quot;2020-03-01&quot;, # Date of an interruption
+
+  ## Plot Arguments
+  beginplot = T, # Start date for the plot. If T, beginning of data
+  endplot = &quot;2020-04-01&quot;, # End date for the plot. If T, end of data
+  title = NULL, # If NULL, no Title
+  xlab = &quot;Date&quot;, # x axis label
+  lbreak = &quot;1 week&quot;, # Space between x-axis tick marks
+  xfmt = date_format(&quot;%b %Y&quot;), # Format of dates on x axis
+  ylab = &quot;Greater than Expected (%)&quot;, # y axis label
+  lwd = 1, # Width of the line
+
+  ## Set a colorscheme
+  colorscheme = &quot;blue&quot;,  # Color schemes set in this package &quot;red&quot;, 'blue&quot; or &quot;jamaim&quot;
+
+  # ... customize any color using these
+  hicol = NA, # Actual line color
+  locol = NA, # Expected line color
+  nucol = NA, # Excess polygon color
+
+
+  ## Saving arguments
+  save = T, # If T, save plot
+  outfn = './output/panC.png', # Location to save plot
+  width = 6, # Width in inches
+  height = 3 # Height in inches
+
+)
+</code></pre>
+
+<p>Note that because the outputs from these functions are ggplots, you can use ggplot functions to customize them even after they are outputted.</p>
+<pre><code class="r">panC &lt;- panC +
+  scale_x_date(
+    limits = c(ymd(&quot;2020-03-01&quot;), ymd(&quot;2020-04-01&quot;)),
+    date_breaks = &quot;1 day&quot;,
+    labels = function(x) ifelse(as.numeric(x) %% 2 != 0, &quot;&quot;, format(x, format = &quot;%b %d&quot;))
+  ) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1.0, hjust = 1.0))
+</code></pre>
+
+<p>Finally, you can merge the plots together to create a single figure.</p>
+<pre><code class="r">## This adds a title to the plot
+title &lt;- ggdraw() +
+  draw_label(
+    &quot;Google Searches&quot;,
+    fontface = 'bold',
+    hjust = 0.5
+  ) +
+  theme(
+    plot.margin = margin(0, 0, 0, 7)
+  )
+
+fig &lt;- plot_grid(panA, panB, panC, labels=c(LETTERS[1:3]), ncol=1, nrow=2, rel_heights=c(1,1))
+fig &lt;- plot_grid(title, fig, ncol = 1, rel_heights = c(0.1, 1))
+save_plot(&quot;./output/Fig1.png&quot;, fig, base_width=6, base_height=10)
+</code></pre>
+
+<p><img alt="arima-spike-onegeo" src="../READMEcode/output/Fig1.png" /></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../arima-multi-geo/" class="btn btn-neutral float-right" title="Compare several geographies">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../installation/" class="btn btn-neutral" title="Install the gtrendR package"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/tlcaputi/gtrendR/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../installation/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../arima-multi-geo/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

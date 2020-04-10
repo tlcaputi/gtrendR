@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Theodore L Caputi">
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Compare several geographies - gtrendR</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Compare several geographies";
+    var mkdocs_page_input_path = "arima-multi-geo.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> gtrendR</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">About gtrendR</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../gtrendspy/">Pull data from gtrendspy</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../installation/">Install the gtrendR package</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../arima-one-geo/">Analyze a spike in searches</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Compare several geographies</a>
+    <ul class="current">
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../arima-multi-terms/">Compare several terms</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../absolute-counts/">Absolute counts</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">gtrendR</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Compare several geographies</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/tlcaputi/gtrendR/edit/master/docs/arima-multi-geo.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h3 id="arima-spike-with-multiple-geographies">ARIMA Spike with Multiple Geographies</h3>
+<p>If you are interested in visualising changes by US state, you may want to create a figure showing the percentage change before versus after the interruption using <code>state_pct_change</code>.</p>
+<pre><code class="r">out &lt;- state_pct_change(
+  df = read.csv(&quot;./input/handwashing_day.csv&quot;, header = T, stringsAsFactor = F), ## Data from gtrends
+
+  ## You will need to decide on the timeframes for &quot;before&quot; and &quot;after&quot;
+  beginperiod = NA, # If not NA, this is the start of the &quot;before&quot; period
+  preperiod = 90, # If beginperiod is NA, this uses 90 days before the interruption
+  interrupt = &quot;2020-03-01&quot;, # The date of the interruption
+  endperiod = &quot;2020-04-01&quot;, # The after period is the interruption to the endperiod
+
+  ## Scale Legend
+  scaletitle = &quot;% Increase\nin Searches&quot;,
+  scalelimits = NULL, # Vector of length 2 with lower and upper limit
+
+  ## Set a colorscheme
+  colorscheme = &quot;blue&quot;,  # Color schemes set in this package &quot;red&quot;, 'blue&quot; or &quot;jamaim&quot;
+
+  # ... customize any color using these
+  highcol = NA, # Color for highest percent change
+  midcol = NA, # Color for 0 percent change
+  lowcol = NA, # Color for lowest percent change
+  linecol = &quot;gray&quot;, # Line between states
+
+  ## Saving arguments
+  save = T, # If T, save plot
+  outfn = './output/panD.png', # Location to save plot
+  width = 6, # Width in inches
+  height = 3, # Height in inches
+
+  ## Get data back from this function
+  return_df = T,
+  # If this is True...
+  bootstrap = T, ## Bootstrap confidence intervals for pct change
+  bootnum = 1000, # Number of bootstraps
+  alpha = 0.05 # Alpha value for CIs
+
+)
+</code></pre>
+
+<p>If <code>return_df</code> is <code>T</code>, the data will be the first argument of the list and the plot will be the second argument of the list.</p>
+<pre><code class="r">panD &lt;- out[[2]]
+</code></pre>
+
+<p>To show how states differ from their individual ARIMA estimates, start with <code>state_arima</code>. Note, this may take a while.</p>
+<pre><code class="r">state_list &lt;- state_arima(
+  data = read.csv(&quot;./input/handwashing_day.csv&quot;, header = T, stringsAsFactor = F), ## Data from gtrends
+  interrupt = &quot;2020-03-01&quot;, ## Interruption point
+  begin = T, ## Beginning of the time period to use
+  end = T, ## End of the time period to use
+  kalman = T ## If True, Kalman impute NAs in the time series
+)
+</code></pre>
+
+<p>Using the output from <code>state_arima</code>, you can create a spaghetti plot showing the percent difference between the ARIMA-fitted values and the actual values with <code>state_arima_spaghetti</code>. It doesn't look too great for this example (likely because "hand washing" was a rare search term before COVID19), but this kind of plot could be useful for other search terms.</p>
+<pre><code class="r">panE &lt;- state_arima_spaghetti(
+  state_list, # data from state_arima
+  interrupt = &quot;2020-03-01&quot;, # should be the same as state_arima
+
+  ## Plot Arguments
+  beginplot = &quot;2020-03-01&quot;, # Start date for the plot. If T, beginning of data
+  endplot = &quot;2020-04-03&quot;, # End date for the plot. If T, end of data
+  title = NULL, # If NULL, no Title
+  xlab = &quot;Date&quot;, # x axis label
+  lbreak = &quot;1 week&quot;, # Space between x-axis tick marks
+  xfmt = date_format(&quot;%b-%d&quot;), # Format of dates on x axis
+  ylab = &quot;Query Fraction\n(Per 10 Million Searches)&quot;, # y axis label
+  lwd = 1, # Width of the line
+  ylim = c(NA, NA), # y axis limts
+
+  ## Spaghetti specific adjustments
+  spaghettialpha = 0.25, # How transparent do you want the spaghetti lines
+  states_with_labels = c(&quot;US&quot;), ## Add labels to the end of these
+  states_to_exclude = c(&quot;IA&quot;), ## Don't include these
+
+  ## Set a colorscheme
+  colorscheme = &quot;blue&quot;,  # Color schemes set in this package &quot;red&quot;, 'blue&quot; or &quot;jamaim&quot;
+
+  # ... customize any color using these
+  hicol = NA, # Color of US line
+  locol = NA, # Color of other lines
+
+  ## Saving arguments
+  save = T, # If T, save plot
+  outfn = './output/panE.png', # Location to save plot
+  width = 6, # Width in inches
+  height = 3 # Height in inches
+)
+
+panE &lt;- panE + coord_cartesian(ylim = c(-10, 40))
+
+</code></pre>
+
+<p>You can also visualize the state-specific differences between ARIMA-fitted values and actual values using <code>state_arima_pctdiff</code>.</p>
+<pre><code class="r">panF &lt;- state_arima_pctdiff(
+  state_list, # data from state_arima
+
+  ## Set a colorscheme
+  colorscheme = &quot;blue&quot;,  # Color schemes set in this package &quot;red&quot;, 'blue&quot; or &quot;jamaim&quot;
+
+  # ... customize any color using these
+  highcol = NA, # Color for highest percent change
+  midcol = NA, # Color for 0 percent change
+  lowcol = NA, # Color for lowest percent change
+  linecol = &quot;gray&quot;, # Line between states
+
+  ## Scale Arguments
+  scaletitle = &quot;% Diff.\nin Searches&quot;,
+
+  ## Saving arguments
+  save = T, # If T, save plot
+  outfn = './output/panE.png', # Location to save plot
+  width = 6, # Width in inches
+  height = 3 # Height in inches
+
+)
+</code></pre>
+
+<p>Finally, combine the plots.</p>
+<pre><code class="r">
+## This creates a title
+title &lt;- ggdraw() +
+  draw_label(
+    &quot;Google Searches&quot;,
+    fontface = 'bold',
+    hjust = 0.5
+  ) +
+  theme(
+    plot.margin = margin(0, 0, 0, 7)
+  )
+fig &lt;- plot_grid(panD, panE, panF, labels=c(LETTERS[4:6]), ncol=1, nrow=3, rel_heights=c(1.1, 1, 1.1))
+fig &lt;- plot_grid(title, fig, ncol = 1, rel_heights = c(0.05, 1))
+save_plot(&quot;./output/Fig2.png&quot;, fig, base_width=7, base_height=12)
+</code></pre>
+
+<p><img alt="arima-spike-multigeo" src="../READMEcode/output/Fig2.png" /></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../arima-multi-terms/" class="btn btn-neutral float-right" title="Compare several terms">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../arima-one-geo/" class="btn btn-neutral" title="Analyze a spike in searches"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/tlcaputi/gtrendR/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../arima-one-geo/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../arima-multi-terms/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

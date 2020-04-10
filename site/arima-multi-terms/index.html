@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Theodore L Caputi">
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Compare several terms - gtrendR</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Compare several terms";
+    var mkdocs_page_input_path = "arima-multi-terms.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> gtrendR</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">About gtrendR</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../gtrendspy/">Pull data from gtrendspy</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../installation/">Install the gtrendR package</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../arima-one-geo/">Analyze a spike in searches</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../arima-multi-geo/">Compare several geographies</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Compare several terms</a>
+    <ul class="current">
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../absolute-counts/">Absolute counts</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">gtrendR</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Compare several terms</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/tlcaputi/gtrendR/edit/master/docs/arima-multi-terms.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h3 id="arima-spike-with-one-geography-but-multiple-terms">ARIMA Spike with One Geography but Multiple Terms</h3>
+<p>We may want to explore the difference between the ARIMA-forecasted and actual values for several terms. In that case, we start with <code>multi_term_arima</code></p>
+<pre><code class="r">multiterms &lt;- multi_term_arima(
+
+  ## A folder containing all of your gtrends data and ONLY your gtrends data
+  input_dir = &quot;./input&quot;,
+
+  ## Which data to use
+  geo = &quot;US&quot;, # Geography you want to use
+  terms_to_use = NA, # Terms you'd like to analyze. If NA then all terms
+  timeframe_to_use = NA, # Only analyze data with filenames that contain a certain timeframe. If NA then all timeframes
+
+
+  ## Parameters of time periods
+  beginperiod = T, # Beginning of the before period, if T then beginning of data
+  preperiod = 90, # If beginperiod is logical, preperiod is the number of days before interrupt to include in before period
+  endperiod = T, # End of the end period, if T then end of data
+  interrupt = &quot;2020-03-01&quot;, # Date for interruption, splitting before and after periods
+
+
+  ## Analytical arguments
+  bootstrap = T, # Bootstrap CIs
+  bootnum = 1000, # Number of bootstraps
+  kalman = T # If T, impute with Kalman
+)
+</code></pre>
+
+<p>Using this data, we can create a barplot using <code>multiterm_barplot</code></p>
+<pre><code class="r">panG &lt;- multiterm_barplot(
+  df = multiterms %&gt;% arrange(pctdiff),
+
+  ## Graphing Parameters
+  title = NULL, # If NULL, no Title
+  xlab = &quot;Terms&quot;, # x axis label
+  label_df = NA, # Use a two-column dataframe to label the barplot x axis
+  ylab = &quot;Greater than Expected (%)&quot;, # y axis label
+  space = 0.8, # space between bars
+
+  ## Set a colorscheme
+  colorscheme = &quot;blue&quot;,  # Color schemes set in this package &quot;red&quot;, 'blue&quot; or &quot;jamaim&quot;
+
+  # ... customize any color using these
+  hicol = NA, # Color of bars
+
+  ## Saving arguments
+  save = T, # If T, save plot
+  outfn = './output/panG.png', # Location to save plot
+  width = 6, # Width in inches
+  height = 3 # Height in inches
+  )
+</code></pre>
+
+<p><img alt="arima-spike-multiterms" src="../READMEcode/output/panG.png" /></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../absolute-counts/" class="btn btn-neutral float-right" title="Absolute counts">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../arima-multi-geo/" class="btn btn-neutral" title="Compare several geographies"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/tlcaputi/gtrendR/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../arima-multi-geo/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../absolute-counts/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

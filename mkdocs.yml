@@ -1,1 +1,22 @@
 site_name: gtrendR
+repo_url: https://github.com/tlcaputi/gtrendR/
+site_author: Theodore L Caputi
+theme: readthedocs
+nav:
+  - About gtrendR: index.md
+  - Pull data from gtrendspy: gtrendspy.md
+  - Install the gtrendR package: installation.md
+  - Analyze a spike in searches: arima-one-geo.md
+  - Compare several geographies: arima-multi-geo.md
+  - Compare several terms: arima-multi-terms.md
+  - Absolute counts: absolute-counts.md
+
+
+# pages:
+#   - ['index.md', 'Homepage']
+#   - ['gtrendspy.md',   'Pull data from gtrendspy']
+#   - ['installation.md',   'Install the gtrendR package']
+#   - ['armia-one-geo.md',   'Analyze a spike in searches']
+#   - ['arima-multi-geo.md',   'Compare several geographies']
+#   - ['arima-multi-terms.md',   'Compare several terms']
+#   - ['absolute-counts.md',   'Retrieve absolute counts of searches from Comscore']
