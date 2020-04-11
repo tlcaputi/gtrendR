@@ -1,7 +1,10 @@
 
 ## The First Step: Pulling Data
 
-Before you begin using this package, pull the Google Trends data using the [gtrendspy package for Python3](https://www.github.com/tlcaputi/gtrendspy). For example, we will use the following data pull to demonstrate the features of the package. Unfortunately, I cannot share the raw data.
+Before you begin using this package, pull the Google Trends data using the [gtrendspy package for Python3](https://www.github.com/tlcaputi/gtrendspy).
+
+### Basic Download
+We will use the following data pull to demonstrate the features of the package. Unfortunately, I cannot share the raw data.
 
 ### theo_timeline
 ```python
@@ -24,7 +27,7 @@ timeline.theo_timeline(
 )
 ```
 
-To use the [gtrendspy package for Python3](https://www.github.com/tlcaputi/gtrendspy), you'll need to request an API Key from Google. You can do that easily [here](https://docs.google.com/forms/d/e/1FAIpQLSenHdGiGl1YF-7rVDDmmulN8R-ra9MnGLLs7gIIaAX9VHPdPg/viewform). If you do not wish to use the gtrends package for Python, you'll need to format your data to match the following and save it as a CSV:
+To use the [gtrendspy package for Python3](https://www.github.com/tlcaputi/gtrendspy), you'll need to request an API Key from Google. Don't let that discourage you -- it's easy! Complete the short application [here](https://docs.google.com/forms/d/e/1FAIpQLSenHdGiGl1YF-7rVDDmmulN8R-ra9MnGLLs7gIIaAX9VHPdPg/viewform). If you do not wish to use the gtrends package for Python, you'll need to format your data to match the following and save it as a CSV:
 
 ```
 |timestamp |US         |US_AL      |US_CA      |US_NY      |
@@ -44,11 +47,12 @@ Notice that the column with dates is titled "timestamp" and all other column nam
 
 (NOTE: These are randomly generated values that do not correspond to actual search volumes for anything.)
 
+### Download with Related Terms
 
 You may be interested not just in a particular search term but in a series of related search terms. In this case, you may consider using Google Trends' built-in "Top Queries" feature. You can implement that through the following function:
 
+### theo_timeline_top
 ```python
-
 from gtrendspy import topterms
 
 topterms.theo_timeline_top(
@@ -68,5 +72,4 @@ topterms.theo_timeline_top(
 
 ```
 
-
-This will automatically pull the top `num_terms_per_root` search queries related to each of your root terms and pull the appropriate timeline files. Right now it only works with one region at a time. This could be useful for creating a [multi-term barplot](/latest/en/arima-multi-terms/#multiterm_barplot) or [spaghetti plot](/latest/en/arima-multi-terms/#multiterm_spaghetti).
+This will automatically pull the top 10 search queries related to each of your root terms and pull the appropriate timeline files. Right now it only works with one region at a time. This could be useful for creating a [multi-term barplot](/latest/en/arima-multi-terms/#multiterm_barplot) or [spaghetti plot](/latest/en/arima-multi-terms/#multiterm_spaghetti).
