@@ -319,6 +319,8 @@ panG <- multiterm_barplot(
   label_df = NA, # Use a two-column dataframe to label the barplot x axis
   ylab = "Greater than Expected (%)", # y axis label
   space = 0.8, # space between bars
+  barlabels = F,
+  
 
   ## Set a colorscheme
   colorscheme = "blue",  # Color schemes set in this package "red", 'blue" or "jamaim"
