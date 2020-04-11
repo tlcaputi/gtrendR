@@ -82,7 +82,8 @@ multi_term_arima <- function(
   for (f in files){
 
     term <- basename(f)
-    term <- gsub("day|week|month|year|[.]csv|[_]", "", term)
+    term <- gsub("day|week|month|year|[.]csv", "", term)
+    term <- trimws(term)
 
     df <- read.csv(f, header = T, stringsAsFactor = F)
     df$timestamp <- ymd(df$timestamp)
@@ -97,6 +98,10 @@ multi_term_arima <- function(
     ts_test <- ts(df %>% filter(timestamp > interrupt) %>% pull(geo), freq = 365.25/freq, start = decimal_date(interrupt))
 
     if(kalman){
+
+      if(sum(!is.na(ts_training)) < 3 | sum(!is.na(ts_test)) < 3){
+        next
+      }
       time_series <- na_kalman(time_series, model="auto.arima")
       ts_training <- na_kalman(ts_training, model="auto.arima")
       ts_test <- na_kalman(ts_test, model="auto.arima")
@@ -163,9 +168,9 @@ multi_term_arima <- function(
 
     summ <- data.frame(
       "term" = term,
-      "mean" = mean(preds$actual / preds$fitted, na.rm = T),
-      "lo95" = mean(preds$actual / preds$hi95, na.rm = T),
-      "hi95" = mean(preds$actual / preds$lo95, na.rm = T)
+      "mean" = mean((preds$actual / preds$fitted) - 1, na.rm = T),
+      "lo95" = mean((preds$actual / preds$hi95) - 1, na.rm = T),
+      "hi95" = mean((preds$actual / preds$lo95) - 1, na.rm = T)
     )
 
     summ_dat[[ct]] <- summ
@@ -244,7 +249,8 @@ multiterm_barplot <- function(
   save = T,
   outfn = './output/panG.png',
   width = 6,
-  height = 3
+  height = 3,
+  barlabels = T
   ){
 
   colorschemer(colorscheme)
@@ -260,9 +266,20 @@ multiterm_barplot <- function(
     df$term <- terms_df$label[match(df$term, terms_df$original)]
   }
 
+  df$term <- gsub("_", " ", df$term)
+
   p <- ggplot(df)
-  p <- p + geom_bar(aes(x = term, y = mean), fill = hicol, stat = "identity", position=position_dodge(width=space))
-  p <- p + geom_errorbar(aes(x = term, ymin = lo95, ymax = hi95), width=.2)
+  p <- p + geom_bar(aes(x = reorder(term, -mean), y = mean), fill = hicol, stat = "identity", position=position_dodge(width=space))
+  p <- p + geom_errorbar(aes(x = reorder(term, -mean), ymin = lo95, ymax = hi95), width=.3)
+  
+  if(barlabels){
+    p <- p  + geom_text(aes(
+                x = reorder(term, -mean),
+                y = ifelse(mean >=0, hi95, lo95),
+                label = sprintf("%1.0f%%", mean * 100),
+                vjust = ifelse(mean >= 0, 0, 1)
+              ))
+  }
   p <- p + labs(
     title= title,
     x = xlab,
@@ -292,6 +309,8 @@ multiterm_spaghetti <- function(
   multiterm_list,
   interrupt = "2020-03-01",
   terms_to_use = NA,
+  terms_to_exclude = NA,
+  normalize = T,
 
   ## Plot Arguments
   beginplot = "2020-03-01", # Start date for the plot. If T, beginning of data
@@ -303,6 +322,9 @@ multiterm_spaghetti <- function(
   ylab = "Query Fraction\n(Per 10 Million Searches)", # y axis label
   lwd = 1, # Width of the line
   spaghettilwd = 0.2, #width of spaghetti
+  vlinecol = "grey72", # color of vertical line
+  vlinelwd = 1, # width of vertical line
+
   ylim = c(NA, NA), # y axis limts
 
   ## Spaghetti specific adjustments
@@ -331,14 +353,28 @@ multiterm_spaghetti <- function(
   }
 
   actual <- df %>% select(timestamp, ends_with("_actual"))
+
   if(!is.na(terms_to_use)){
-    grepstring <- paste0(terms_to_use, collapse="|")
-    actual <- actual %>% select(contains(grepstring))
+    grepstring <- paste(terms_to_use, collapse="|")
+    names_to_use <- grep(grepstring, names(actual), value = T)
+    actual <- actual %>% select("timestamp", names_to_use)
   }
+
+  if(!is.na(terms_to_exclude)){
+    grepstring <- paste(terms_to_exclude, collapse="|")
+    names_to_exclude <- grep(grepstring, names(actual), value = T)
+    actual <- actual %>% select(-grepstring)
+  }
+
+
 
   actual_long <- melt(actual, id.vars = "timestamp", variable.name = "term", value.name = "searches")
   actual_long$term <- gsub("_actual$", "", actual_long$term)
   actual_long$timestamp <- ymd(actual_long$timestamp)
+
+  if(normalize){
+    actual_long <- actual_long %>% group_by(term) %>% mutate(searches = scale(searches)) %>% ungroup()
+  }
 
   interupt <- ymd(interrupt)
   beginplot <- ymd(beginplot)
@@ -364,7 +400,7 @@ multiterm_spaghetti <- function(
     x = xlab,
     y = ylab
   )
-  p <- p + geom_vline(xintercept=ymd(interrupt), linetype="dashed", color="grey72")
+  p <- p + geom_vline(xintercept=ymd(interrupt), linetype="dashed", color=vlinecol, lwd = vlinelwd)
   p <- p + theme_classic()
 
   if(save) ggsave(p, width=width, height=height, dpi=300, filename=outfn)

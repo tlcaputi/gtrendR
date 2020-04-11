@@ -18,7 +18,8 @@ run_arima <- function(
   kalman = F,
   bootstrap = F,
   bootnum = 1000,
-  linear = F
+  linear = F,
+  rsv = F
   ){
 
 
@@ -40,6 +41,12 @@ run_arima <- function(
 
   tmpdf <- tmpdf %>% filter(timestamp %within% interval(begin, end))
 
+  if(rsv){
+    maxval <- max(tmpdf$geo, na.rm = T)
+    tmpdf$geo <- tmpdf$geo / maxval * 100
+  }
+
+
   freq <- min(as.numeric(diff.Date(tmpdf$timestamp)), na.rm = T)
 
   ## RUN ARIMA ON THE TIME SERIES
@@ -47,8 +54,8 @@ run_arima <- function(
   # ts_test <- window(time_series, start = decimal_date(interrupt))
 
   time_series <- ts(tmpdf$geo, freq = 365.25/freq, start = decimal_date(begin))
-  ts_training <- ts(tmpdf %>% filter(timestamp <= interrupt) %>% pull(geo), freq = 365.25/freq, start = decimal_date(begin))
-  ts_test <- ts(tmpdf %>% filter(timestamp > interrupt) %>% pull(geo), freq = 365.25/freq, start = decimal_date(interrupt))
+  ts_training <- ts(tmpdf %>% filter(timestamp < interrupt) %>% pull(geo), freq = 365.25/freq, start = decimal_date(begin))
+  ts_test <- ts(tmpdf %>% filter(timestamp >= interrupt) %>% pull(geo), freq = 365.25/freq, start = decimal_date(interrupt))
 
   if(kalman){
     time_series <- na_kalman(time_series, model="auto.arima")
@@ -170,6 +177,7 @@ line_plot <- function(
   xlab = "Date",
   ylab = "Query Fraction\n(Per 10 Million Searches)",
   lbreak = "1 year",
+  ylim = NULL,
   hicol = NA,
   locol = NA,
   nucol = NA,
@@ -220,6 +228,7 @@ line_plot <- function(
   p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey74")
   p <- p + geom_line(aes(x=timestamp, y=geo, group=1), color=hicol, linetype="solid", size=lwd)
   p <- p + geom_point(aes(x = maxtime, y = maxval), size=2, color=opcol)
+  p <- p + scale_y_continuous(limits = ylim)
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
                    limits = as.Date(c(beginplot, endplot)))
@@ -286,6 +295,8 @@ arima_ciplot <- function(
   ylab = "Greater Than Expected (%)",
   ylim = NULL,
   outfn = './output/fig.pdf',
+  vlinelwd = 1,
+  vlinecol = "grey74",
   beginplot,
   hline = T,
   endplot,
@@ -321,6 +332,7 @@ arima_ciplot <- function(
   maxval <- df %>% filter(timestamp >= interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(geo)
   maxtime <- df %>% filter(timestamp >= interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
 
+
   if(!extend){
     beginplot <- closest_date(data = df, date = beginplot, type = "beforeequal")
     endplot <- closest_date(data = df, date = endplot, type = "afterequal")
@@ -349,16 +361,20 @@ arima_ciplot <- function(
                   "polycolor" = nucol
                 ))
 
+  mintime <- min(ymd(tmp$timestamp), na.rm = T)
+  tmp$lo95 <- ifelse(ymd(tmp$timestamp) == mintime, tmp$pctdiff*0.99, tmp$lo95)
+  tmp$hi95 <- ifelse(ymd(tmp$timestamp) == mintime, tmp$pctdiff*1.01, tmp$hi95)
 
   ## CREATE PLOT
   poly <- with(tmp,
               data.frame(x = c(timestamp, rev(timestamp)), y = c(lo95, rev(hi95)), polycolor=nucol))
+
   p <- ggplot(tmp)
   p <- p + geom_polygon(data = poly, aes(x = x, y = y, fill=nucol), fill=nucol, alpha=polyalpha)
   p <- p + geom_line(aes(x=timestamp, y=pctdiff, group=1, color=hicol), color=hicol, linetype="solid", size=lwd)
-  p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color="grey74")
+  p <- p + geom_vline(xintercept=interrupt_line, linetype="dashed", color=vlinecol, lwd = vlinelwd)
   if(hline){
-    p <- p + geom_hline(yintercept=0, linetype="dashed", color="grey74")
+    p <- p + geom_hline(yintercept=0, linetype="dashed", color=vlinecol, lwd = vlinelwd)
   }
   p <- p + scale_x_date(date_breaks = lbreak,
                    labels=xfmt,
@@ -435,6 +451,7 @@ arima_plot <- function(
   lbreak = "1 year",
   linelabel = "Interruption",
   linelabelpos = 0.02,
+  ylim = NULL,
   hicol = NA,
   locol = NA,
   nucol = NA,
@@ -506,6 +523,7 @@ arima_plot <- function(
     x = xlab,
     y = ylab
   )
+  p <- p + scale_y_continuous(limits = ylim)
   p <- p + scale_colour_manual(name = 'Legend', values=c(hicol, locol), labels = c('Actual','Expected'))
   p <- p + scale_fill_manual(values=nucol)
   p <- p + theme_classic()

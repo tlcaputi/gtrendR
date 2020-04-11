@@ -21,7 +21,7 @@ rawcounts_df <- get_rawcounts(
 
   ## Analysis arguments
   interrupt = "2020-03-01", # Beginning of period to calculate raw counts
-  endperiod = T # Default T, estimates will be given until the last available date in the dataset
+  endperiod = T, # Default T, estimates will be given until the last available date in the dataset
   geo = "US", # the geography you're interested in
 
   ## Comscore Arguments
@@ -29,7 +29,7 @@ rawcounts_df <- get_rawcounts(
   pct_desktop = 0.35,
 
   ## Google Trends API Argument
-  qf_denominator = 10000000, # Denominator of query fractions, should be 10M, do not change
+  qf_denominator = 10000000 # Denominator of query fractions, should be 10M, do not change
 )
 
 ```

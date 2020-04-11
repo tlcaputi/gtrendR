@@ -51,20 +51,22 @@ You may be interested not just in a particular search term but in a series of re
 
 from gtrendspy import topterms
 
-
 topterms.theo_timeline_top(
-        root_terms = ['apple', 'cats'], # a list of the root terms you're interested in
-        num_terms_per_root = 3, # how many additional terms you want per root term
+        root_terms = ['commit suicide', 'how suicide', 'depression help', 'suicide help'], # a list of the root terms you're interested in
+        num_terms_per_root = 10, # how many additional terms you want per root term
         start = '2019-01-01', # the start date
-        end = '2020-01-01', # the end date
-        timeframe_list = ['month'], # the timeframe you want
-        outpath = "/path/to/ROOTPATH/output",
-        creds = "/path/to/creds",
-        region = ['US'], # the region you're interested in. ONLY CHOOSE 1 or None
-        batch_size = 2
+        end = '2020-04-10', # the end date
+        timeframe_list = ['week'], # the timeframe you want
+        outpath = "/path/to/ROOTPATH/input/individual",
+        creds = "/path/to/creds.txt",
+        geo_country_list = ['US'], # the region you're interested in. ONLY CHOOSE 1 or None
+        batch_size = 5, # how many terms you want in each batch
+        timestep_years = 1, # how many years you want to pull at once
+        get_all = True, # if True, pull a data file for all of hte terms together
+        all_path = "/path/to/ROOTPATH/input" # where you want the total file
         )
 
 ```
 
 
-This will automatically pull the top `num_terms_per_root` search queries related to each of your root terms and pull the appropriate timeline files. Right now it only works with one region at a time. This could be useful for creating a [multi-term barplot](/latest/en/arima-multi-terms/#multiterm_barplot) or [spaghetti plot](/latest/en/arima-multi-terms/#multiterm_spaghetti).  
+This will automatically pull the top `num_terms_per_root` search queries related to each of your root terms and pull the appropriate timeline files. Right now it only works with one region at a time. This could be useful for creating a [multi-term barplot](/latest/en/arima-multi-terms/#multiterm_barplot) or [spaghetti plot](/latest/en/arima-multi-terms/#multiterm_spaghetti).

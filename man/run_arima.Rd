@@ -13,7 +13,8 @@ run_arima(
   kalman = F,
   bootstrap = F,
   bootnum = 1000,
-  linear = F
+  linear = F,
+  rsv = F
 )
 }
 \arguments{

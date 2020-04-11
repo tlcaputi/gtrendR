@@ -18,6 +18,7 @@ arima_plot(
   lbreak = "1 year",
   linelabel = "Interruption",
   linelabelpos = 0.02,
+  ylim = NULL,
   hicol = NA,
   locol = NA,
   nucol = NA,

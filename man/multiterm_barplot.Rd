@@ -17,7 +17,8 @@ multiterm_barplot(
   save = T,
   outfn = "./output/panG.png",
   width = 6,
-  height = 3
+  height = 3,
+  barlabels = T
 )
 }
 \arguments{

@@ -14,6 +14,8 @@ arima_ciplot(
   ylab = "Greater Than Expected (\%)",
   ylim = NULL,
   outfn = "./output/fig.pdf",
+  vlinelwd = 1,
+  vlinecol = "grey74",
   beginplot,
   hline = T,
   endplot,

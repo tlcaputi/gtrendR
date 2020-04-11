@@ -16,6 +16,7 @@ line_plot(
   xlab = "Date",
   ylab = "Query Fraction\\n(Per 10 Million Searches)",
   lbreak = "1 year",
+  ylim = NULL,
   hicol = NA,
   locol = NA,
   nucol = NA,
