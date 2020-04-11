@@ -27,6 +27,7 @@ Imports:
     rvest,
     gsubfn,
     RCurl,
+    finalfit,
     googlesheets4,
     zoo,
     grid
@@ -46,6 +47,7 @@ Depends:
     rvest,
     gsubfn,
     RCurl,
+    finalfit,
     googlesheets4,
     zoo,
     grid
