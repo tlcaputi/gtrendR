@@ -1,8 +1,8 @@
-## Getting Raw or Absolute Counts of Searches using Comscore
+## Getting Absolute Number of Searches using Comscore
 
-You may be interested in calculating an estimate of the raw count of searches executed since your interruption or as estimate for the raw count of "excess" searches (searches above what you would expect if your interruption didn't occur). For this, we use `get_rawcounts` -- but PLEASE read the following explanation before you use it.
+You may be interested in calculating an estimate of the absolute number of searches executed since your interruption or as estimate for the absolute number of "excess" searches (searches above what you would expect if your interruption didn't occur). For this, we use `get_rawcounts` -- but PLEASE read the following explanation before you use it. The process described below is [standard in the Google search trends literature](https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2719193) but deserves some explanation because it rest on several key assumptions.
 
-This function uses the estimates of monthly Desktop search volumes from [Comscore](https://www.comscore.com/Insights/Rankings?cs_edgescape_cc=US#tab_search_query/) to extrapolate the count of volumes for your searches. This process is [standard in the literature using Google search trends](https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/2719193) but deserves some explanation. At any given time, Comscore provides estimates for the total volume of Desktop-based (i.e., not mobile) Google searches for the United States for two somewhat recent months. For example, as of April 10, 2020, they have estimates for January 2020 and February 2020. The function actively pulls these numbers from Comscore's website, so they will always be the two most current months available from Comscore. Still, Comscore gives us very limited information. We have to make several assumptions to calculate raw counts.
+This function uses the estimates of monthly Desktop search volumes from [Comscore](https://www.comscore.com/Insights/Rankings?cs_edgescape_cc=US#tab_search_query/) to extrapolate the count of volumes for your searches. Comscore data is quite limited. At any given time, Comscore provides estimates for the total volume of Desktop-based (i.e., not mobile) Google searches for the United States for two somewhat recent months. For example, as of April 10, 2020, they have estimates for January 2020 and February 2020. The function actively pulls these numbers from Comscore's website, so they will always be the two most current months available from Comscore. We make a number of assumptions to turn our query fractions from the API (searches per 10M) and the Comscore Desktop searches into estimates for absolute counts.
 
 1. We first make an assumption as to which month is most correct for your analysis. If you set `month` to 1, it will take the volume estimate for the earlier month. If you leave `month` as the default (2), it will take volume estimate for the later month. We assume that the raw count of Desktop Google searches is unchanging among months in your dataset.
 
@@ -15,7 +15,6 @@ This function prints the raw counts (the actual number of searches for your keyw
 
 ### raw_counts
 ```r
-
 rawcounts_df <- get_rawcounts(
   df = US_df, # data from run_arima
 
@@ -31,12 +30,11 @@ rawcounts_df <- get_rawcounts(
   ## Google Trends API Argument
   qf_denominator = 10000000 # Denominator of query fractions, should be 10M, do not change
 )
-
 ```
 
-The output looks like this:
+This function prints the following:
 
-```
+```text
 [1] "Using Comscore estimates for Feb-2020: 11127 Million Searches"
 [1] "Assuming 29 observations per month"
 [1] "Actual Searches from 2020-03-01 to 2020-04-05: 1405660.54909038"
