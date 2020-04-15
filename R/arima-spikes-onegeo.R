@@ -33,7 +33,11 @@ run_arima <- function(
 
   begin <- closest_date(data = tmpdf, date = begin, type = "beforeequal")
   end <- closest_date(data = tmpdf, date = end, type = "afterequal")
-  interrupt <- closest_date(data = tmpdf, date = interrupt, type = "before")
+  # interrupt <- closest_date(data = tmpdf, date = interrupt, type = "before")
+
+  interrupt <- closest_date(data = df, date = interrupt, type = "afterequal")
+  interrupt_line <- closest_date(data = df, date = interrupt, type = "before")
+
 
   begin <- ymd(begin)
   end <- ymd(end)
@@ -322,7 +326,7 @@ arima_ciplot <- function(
 
   freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
   interrupt <- ymd(interrupt)
-  interrupt_line <- interrupt
+  # interrupt_line <- interrupt
 
   if(beginplot==T) beginplot <- ymd(interrupt)
   if(endplot==T) endplot <- ymd(max(ymd(df$timestamp), na.rm = T))
@@ -337,7 +341,9 @@ arima_ciplot <- function(
     beginplot <- closest_date(data = df, date = beginplot, type = "beforeequal")
     endplot <- closest_date(data = df, date = endplot, type = "afterequal")
   }
-  interrupt <- closest_date(data = df, date = interrupt, type = "before")
+  interrupt <- closest_date(data = df, date = interrupt, type = "afterequal")
+  interrupt_line <- closest_date(data = df, date = interrupt, type = "before")
+  # interrupt <- closest_date(data = df, date = interrupt, type = "before")
 
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
@@ -476,28 +482,29 @@ arima_plot <- function(
 
   freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
   interrupt <- ymd(interrupt)
-  if(freq == 1){
-    interrupt_line <- interrupt -1
-  } else{
-    interrupt_line <- interrupt
-  }
 
+  # if(freq == 1){
+  #   interrupt_line <- interrupt -1
+  # } else{
+  #   interrupt_line <- interrupt
+  # }
 
   if(beginplot==T) beginplot <- ymd(min(ymd(df$timestamp), na.rm = T))
   if(endplot==T) endplot <- ymd(max(ymd(df$timestamp), na.rm = T))
-
 
   names(df) <- gsub(geo, "geo", names(df))
 
   maxval <- df %>% filter(timestamp >= interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(geo)
   maxtime <- df %>% filter(timestamp >= interrupt) %>% filter(geo == max(geo, na.rm = T)) %>% pull(timestamp)
 
-
   if(!extend){
     beginplot <- closest_date(data = df, date = beginplot, type = "beforeequal")
     endplot <- closest_date(data = df, date = endplot, type = "afterequal")
   }
-  interrupt <- closest_date(data = df, date = interrupt, type = "before")
+  interrupt <- closest_date(data = df, date = interrupt, type = "afterequal")
+  interrupt_line <- closest_date(data = df, date = interrupt, type = "before")
+
+
 
   beginplot <- ymd(beginplot)
   endplot <- ymd(endplot)
@@ -506,6 +513,9 @@ arima_plot <- function(
 
   df$polycolor <- nucol
 
+
+  print(df %>% filter(timestamp %within% interval(interrupt, endplot)) %>% head())
+  print(df %>% filter(timestamp %within% interval(interrupt, endplot)) %>% tail())
   ## CREATE PLOT
   poly <- with(df %>% filter(timestamp %within% interval(interrupt, endplot)),
               data.frame(x = c(timestamp, rev(timestamp)), y = c(geo, rev(fitted)), polycolor=nucol))
@@ -532,41 +542,33 @@ arima_plot <- function(
 
 
 
+
+  set.seed(1234)
+  df$timestamp <- ymd(df$timestamp)
+  interrupt <- ymd(interrupt)
+  endplot <- ymd(endplot)
+  expectedsearches <- df %>% filter(timestamp %within% interval(interrupt, endplot)) %>% pull(fitted)
+  actualsearches <- df %>%   filter(timestamp %within% interval(interrupt, endplot)) %>% pull(geo)
+
+  expectedmeans <- boot(data = expectedsearches, statistic = samplemean, R = bootnum)
+  actualmeans <- boot(data = actualsearches, statistic = samplemean, R = bootnum)
+
+  bootdf <- data.frame("expectedmeans" = expectedmeans$t, "actualmeans" = actualmeans$t)
+  bootdf <- bootdf %>% mutate(
+    pctdiff = ((actualmeans / expectedmeans) - 1)
+  )
+
+  booted_vec <- bootdf %>% pull(pctdiff)
+  mn <- sum(actualsearches, na.rm = T) / sum(expectedsearches, na.rm = T) - 1
+  hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
+  lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
+
+  lab <- sprintf("%1.0f%% Increase (95%%CI %1.0f to %1.0f)", mn*100, lo95*100, hi95*100)
+  print(lab)
+
   if(labels){
-    set.seed(1234)
-    df$timestamp <- ymd(df$timestamp)
-    interrupt <- ymd(interrupt)
-    endplot <- ymd(endplot)
-    expectedsearches <- df %>% filter(timestamp %within% interval(interrupt, endplot)) %>% pull(fitted)
-    actualsearches <- df %>%   filter(timestamp %within% interval(interrupt, endplot)) %>% pull(geo)
-
-    expectedmeans <- boot(data = expectedsearches, statistic = samplemean, R = bootnum)
-    actualmeans <- boot(data = actualsearches, statistic = samplemean, R = bootnum)
-
-    bootdf <- data.frame("expectedmeans" = expectedmeans$t, "actualmeans" = actualmeans$t)
-    bootdf <- bootdf %>% mutate(
-      pctdiff = ((actualmeans / expectedmeans) - 1)
-    )
-
-    booted_vec <- bootdf %>% pull(pctdiff)
-    mn <- sum(actualsearches, na.rm = T) / sum(expectedsearches, na.rm = T) - 1
-    hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
-    lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
-
-    lab <- sprintf("%1.0f%% Increase (95%%CI %1.0f - %1.0f)", mn*100, lo95*100, hi95*100)
     g = grobTree(textGrob(lab, x=0.5, hjust=0.5, y=1, vjust=1, gp=gpar(fontsize=labsize*12)))
     p <- p + annotation_custom(g)
-      # geom_text(data = NA, aes(label = lab, x = timestamp, y = geo), hjust = 0.5, vjust = 1)
-    # annotate(
-    #         "text",
-    #         x = as.Date(-Inf, origin = '2014-10-15'), y = Inf,
-    #         hjust = 0.5, vjust = 1,
-    #         label = sprintf("%1.0f%% Excess Searches (95%%CI %1.0f - %1.0f)",
-    #                 mn*100, lo95*100, hi95*100),
-    #         size = labsize)
-
-
-
   }
 
 

@@ -17,7 +17,8 @@ multi_term_arima(
   bootnum = 1000,
   kalman = T,
   include_data = T,
-  linear = F
+  linear = F,
+  min0 = T
 )
 }
 \arguments{

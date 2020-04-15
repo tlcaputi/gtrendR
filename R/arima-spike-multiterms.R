@@ -56,7 +56,8 @@ multi_term_arima <- function(
   bootnum = 1000,
   kalman = T,
   include_data = T,
-  linear = F
+  linear = F,
+  min0 = T
   ){
 
 
@@ -100,6 +101,7 @@ multi_term_arima <- function(
     if(kalman){
 
       if(sum(!is.na(ts_training)) < 3 | sum(!is.na(ts_test)) < 3){
+        warning("Kalman doesn't work with so few observations")
         next
       }
       time_series <- na_kalman(time_series, model="auto.arima")
@@ -158,6 +160,7 @@ multi_term_arima <- function(
     names(preds) <- gsub("^hi$", "hi95", names(preds))
 
 
+
     tmp <- data.frame(matrix(NA, nrow = length(ts_training), ncol = ncol(preds)))
     names(tmp) <- names(preds)
     tmp$actual <- as.numeric(ts_training)
@@ -166,12 +169,26 @@ multi_term_arima <- function(
     names(full) <- paste0(term, "_", names(full))
     full$timestamp <- df$timestamp
 
-    summ <- data.frame(
-      "term" = term,
-      "mean" = mean((preds$actual / preds$fitted) - 1, na.rm = T),
-      "lo95" = mean((preds$actual / preds$hi95) - 1, na.rm = T),
-      "hi95" = mean((preds$actual / preds$lo95) - 1, na.rm = T)
-    )
+    if(min0){
+      preds <- preds %>% mutate_if(is.numeric, minpos)
+      full <- full %>% mutate_if(is.numeric, minpos)
+    }
+
+
+    summ <- with(preds %>% filter(actual > 0),
+      data.frame(
+        "term" = term,
+        "mean" = (mean(actual, na.rm = T) / mean(fitted, na.rm = T)) - 1,
+        "lo95" = (mean(actual, na.rm = T) / mean(hi95, na.rm = T)) - 1,
+        "hi95" = (mean(actual, na.rm = T) / mean(lo95, na.rm = T)) - 1
+    ))
+
+    # print(term)
+    # print(preds$actual)
+    # print(preds$hi95)
+    # with(preds %>% filter(actual > 0), print(mean(actual)))
+    # with(preds %>% filter(actual > 0), print(mean(hi95)))
+    # with(preds %>% filter(actual > 0), print(mean(lo95)))
 
     summ_dat[[ct]] <- summ
     full_dat[[ct]] <- full
@@ -271,7 +288,7 @@ multiterm_barplot <- function(
   p <- ggplot(df)
   p <- p + geom_bar(aes(x = reorder(term, -mean), y = mean), fill = hicol, stat = "identity", position=position_dodge(width=space))
   p <- p + geom_errorbar(aes(x = reorder(term, -mean), ymin = lo95, ymax = hi95), width=.3)
-  
+
   if(barlabels){
     p <- p  + geom_text(aes(
                 x = reorder(term, -mean),

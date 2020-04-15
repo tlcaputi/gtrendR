@@ -106,3 +106,17 @@ colorschemer <- function(col){
 samplemean <- function(x, d) {
   return(mean(x[d]))
 }
+
+
+#' min0
+#'
+#' @param x vector
+#' @param d indices
+#' @keywords
+#' @export
+#' @examples
+
+
+minpos <- function(x) {
+  return(ifelse(x <= 0, 0.00000001, x))
+}
