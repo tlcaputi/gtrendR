@@ -23,6 +23,26 @@ run_arima <- function(
   ){
 
 
+  # For data periods larger than 1 day, Google gives data with the date equal to
+  # the first date in each period. This doesn't look good in plots. So we need to
+  # make it so that the dates in the dataset are the last date in each period. To
+  # complicate things, Google will report preliminary data for the most recent
+  # period even if that period is not complete.
+
+  # First we figure out how many dates are in each period
+  df$timestamp <- ymd(df$timestamp)
+  freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
+
+  # If the end of the last period hasn't even occurred yet, we remove it from the dataset
+  maxdate <- max(df$timestamp, na.rm = T)
+  if(Sys.Date() < maxdate + freq) df <- df %>% filter(timestamp != maxdate)
+
+  # Finally, we move the dates to be the end of the period. Note that if it
+  # is daily data, freq is 1 and so the dates do not actually move.
+  df$timestamp <- ymd(df$timestamp) + freq - 1
+
+
+
   # We take only the data that we need. This is the timestamp and the one
   # geography.
   tmpdf <- df[, c("timestamp", geo)]
@@ -921,7 +941,8 @@ get_rawcounts <- function(
   geo = "US",
   interrupt = "2020-03-01",
   qf_denominator = 10000000,
-  endperiod = T
+  endperiod = T,
+  numobspermonth = NA
   ){
 
 
@@ -975,6 +996,8 @@ get_rawcounts <- function(
       freq <- min(as.numeric(diff.Date(df$timestamp)), na.rm = T)
       num_obs_in_month <- 30 / freq
     }
+
+    if(!is.na(numobspermonth)) num_obs_in_month <- numobspermonth
 
     print(sprintf("Assuming %s observations per month", num_obs_in_month))
 
