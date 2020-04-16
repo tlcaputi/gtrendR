@@ -11,7 +11,8 @@ get_rawcounts(
   geo = "US",
   interrupt = "2020-03-01",
   qf_denominator = 1e+07,
-  endperiod = T
+  endperiod = T,
+  numobspermonth = NA
 )
 }
 \arguments{

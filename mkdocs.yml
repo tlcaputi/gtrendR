@@ -13,6 +13,8 @@ pages:
     - Get absolute search counts: absolute-counts.md
     - Compare spikes across several geographies: arima-multi-geo.md
     - Compare spikes across several terms: arima-multi-terms.md
+  - Caveats:
+    - Google Searches Vary Significantly!: google-variance.md
 markdown_extensions:
     - toc:
         baselevel: 1

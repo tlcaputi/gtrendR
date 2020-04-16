@@ -478,9 +478,10 @@ arima_ciplot <- function(
   outfn = './output/fig.pdf',
   vlinelwd = 1,
   vlinecol = "grey74",
-  beginplot,
+  beginplot = T,
+  endplot = T,
   hline = T,
-  endplot,
+  vline = T,
   lbreak = "1 month",
   hicol = NA,
   locol = NA,
@@ -493,8 +494,7 @@ arima_ciplot <- function(
   height = 3,
   lwd = 0.3,
   save = T,
-  extend = F,
-  vline = T
+  extend = F
   ){
 
   # Set a colorscheme

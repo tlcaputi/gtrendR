@@ -54,10 +54,14 @@ multi_term_arima <- function(
   interrupt = "2020-03-01",
   bootstrap = T,
   bootnum = 1000,
-  kalman = T,
+  na = "kalman",
+  kalman = F,
   include_data = T,
   linear = F,
-  min0 = T
+  min0 = F,
+  logit = T,
+  logit_a = 0,
+  logit_b = 100
   ){
 
 
@@ -124,6 +128,12 @@ multi_term_arima <- function(
     df$timestamp <- ymd(df$timestamp)
     names(df) <- gsub(geo, "geo", names(df))
 
+
+    # if(logit){
+    #   df$geo <- df$geo / max(df$geo, na.rm = T) * 100
+    #   df$geo <- log((df$geo-logit_a)/(logit_b-df$geo))
+    # }
+
     # If beginperiod/endperiod is T, then we use the min/max date from the dataset
     if(is.logical(beginperiod)) beginperiod <- min(df$timestamp, na.rm = T)
     if(is.logical(endperiod)) endperiod <- max(df$timestamp, na.rm = T)
@@ -151,11 +161,18 @@ multi_term_arima <- function(
 
     # na_kalman lets us impute missing data in the time series objects if the
     # kalman object is set to T
-    if(kalman){
-      time_series <- na_kalman(time_series, model="auto.arima")
-      ts_training <- na_kalman(ts_training, model="auto.arima")
-      ts_test <- na_kalman(ts_test, model="auto.arima")
+    if(na == "kalman" || kalman == T){
+      time_series <- na_kalman(time_series)
+      ts_training <- na_kalman(ts_training)
+      ts_test <- na_kalman(ts_test)
       df$geo <- as.numeric(time_series)
+    } else{
+      if(na == "locf"){
+        time_series <- na_locf(time_series)
+        ts_training <- na_locf(ts_training)
+        ts_test <- na_locf(ts_test)
+        df$geo <- as.numeric(time_series)
+      }
     }
 
 
@@ -164,7 +181,7 @@ multi_term_arima <- function(
     if(!linear){
 
       # We run the model
-      mod <- auto.arima(ts_training)
+      mod <- auto.arima(ts_training, lambda = 0)
 
       # We use the built-in arima.forecast function. The bootstrap option
       # lets us set the options on the forecast.
@@ -217,6 +234,19 @@ multi_term_arima <- function(
     }
 
 
+
+    # if(logit){
+    #   rev0 <- function(x, a, b) sapply(x, function(x) (b - a)*exp(x)/(1+exp(x)) + a)
+    #   fitted_values$mean <- rev0(fitted_values$mean, logit_a, logit_b)
+    #   fitted_values$lower <- rev0(fitted_values$lower, logit_a, logit_b)
+    #   fitted_values$higher <- rev0(fitted_values$higher, logit_a, logit_b)
+    #   ts_test <- rev0(as.numeric(ts_test), logit_a, logit_b)
+    #   ts_train <- rev0(as.numeric(ts_train), logit_a, logit_b)
+    #   time_series <- rev0(as.numeric(time_series), logit_a, logit_b)
+    # }
+
+
+
     # Create a data frame with the same number of rows as ts_test for the predicted values
     preds <- data.frame(
       "actual" = as.numeric(ts_test),
@@ -231,6 +261,15 @@ multi_term_arima <- function(
     names(preds) <- gsub("^hi$", "hi95", names(preds))
 
 
+    # if(logit){
+    #   print(preds %>% tail())
+    #   rev0 <- function(x, a, b) sapply(x, function(x) (b - a)*exp(x)/(1+exp(x)) + a)
+    #   preds <- preds %>% mutate_if(is.numeric, funs(rev0(., logit_a, logit_b)))
+    #   print(preds %>% tail())
+    #   cat("\n")
+    # }
+
+
     # Also create a data frame that's the same size as the original data
 
     # Create an empty data frame with rows = length(ts_train)
@@ -240,9 +279,6 @@ multi_term_arima <- function(
     # bind it
     full <- data.frame(rbind(tmp, preds))
 
-    # change column names with the term
-    names(full) <- paste0(term, "_", names(full))
-    full$timestamp <- df$timestamp
 
     # This ensures that each value in both data frame is positive. When modelling a low
     # volume term, lo95 is often negative, which doesn't make sense (can't have negative
@@ -273,6 +309,13 @@ multi_term_arima <- function(
     # with(preds %>% filter(actual > 0), print(mean(hi95)))
     # with(preds %>% filter(actual > 0), print(mean(lo95)))
 
+
+
+    # change column names with the term
+    names(full) <- paste0(term, "_", names(full))
+    full$timestamp <- df$timestamp
+
+
     # Place these data.frames in the list
     summ_dat[[ct]] <- summ
     full_dat[[ct]] <- full
@@ -282,6 +325,8 @@ multi_term_arima <- function(
 
   # bind the summ_dat together
   summary <- do.call(rbind.data.frame, summ_dat)
+
+
 
   # Merge the full data together
   full <- Reduce(function(x,y) merge(x = x, y = y, by = "timestamp"), full_dat)

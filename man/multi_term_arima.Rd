@@ -15,10 +15,14 @@ multi_term_arima(
   interrupt = "2020-03-01",
   bootstrap = T,
   bootnum = 1000,
-  kalman = T,
+  na = "kalman",
+  kalman = F,
   include_data = T,
   linear = F,
-  min0 = T
+  min0 = F,
+  logit = T,
+  logit_a = 0,
+  logit_b = 100
 )
 }
 \arguments{
