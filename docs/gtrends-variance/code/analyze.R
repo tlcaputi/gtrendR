@@ -14,7 +14,7 @@ terms <- c(
 )
 
 timeframe <- 'day'
-ROOTPATH <- "C:/Users/tcapu/Google Drive/modules/gtrendR/gtrends-variance"
+ROOTPATH <- "C:/Users/tcapu/Google Drive/modules/gtrendR/docs/gtrends-variance"
 
 
 ## Load packages
@@ -89,14 +89,42 @@ for(name in names){
 }
 
 full_data_list[[1]] %>% head() %>% kable(format = "markdown")
-
-
 lapply(summ_data_list, function(x) sprintf("%.2f%%", mean(x$range_over_mean) * 100)) %>% data.frame() %>% t() %>% kable(format = "markdown")
 lapply(summ_data_list, function(x) sprintf("%.2f%%", max(x$range_over_mean) * 100)) %>% data.frame() %>% t() %>% kable(format = "markdown")
-
 lapply(summ_data_list, function(x) sprintf("%.2f", mean(x$range))) %>% data.frame() %>% t() %>% kable(format = "markdown")
-
 lapply(summ_data_list, function(x) sprintf("%.2f", max(x$range))) %>% data.frame() %>% t() %>% kable(format = "markdown")
+
+pacman::p_load(reshape2)
+df <- full_data_list[[1]]
+long_df <- melt(df %>% sample_n(60), id = "timestamp", value.name = "searches", variable.name = "run")
+long_df$run <- gsub("run", "", long_df$run)
+long_df$timestamp <- ymd(long_df$timestamp)
+long_df <- long_df %>% arrange(timestamp)
+
+grouped_df <- long_df %>% group_by(timestamp) %>% summarise(meansearches = mean(searches, na.rm = T)) %>% ungroup()
+
+p <- ggplot(long_df)
+p <- p + geom_vline(aes(xintercept = timestamp), linetype = "dotted")
+p <- p + geom_point(aes(x = timestamp, y = searches, group = run, col = run))
+s1 <- seq.Date(min(ymd(long_df$timestamp)), max(ymd(long_df$timestamp)), by = "1 month")
+p <- p + scale_x_date(
+    lim = c(min(s1), max(s1)),
+    breaks = s1,
+    labels = function(x) format(x, format = "%b %Y")
+  )
+
+p <- p + geom_line(data = grouped_df, aes(x=timestamp, y = meansearches))
+# p <- p + geom_line(data = long_df %>% filter(run == 1), aes(x=timestamp, y = searches))
+p <- p + theme_classic()
+p <- p + theme(axis.text.x = element_text(angle = 55, hjust = 1))
+p <- p + labs(
+  x = "Date",
+  y = "Query Fraction for 'Commit Suicide'",
+  col = "Run"
+)
+p
+
+ggsave("./output/commitsuicide_dotplot.png", p, width = 10, height = 4)
 
 
 

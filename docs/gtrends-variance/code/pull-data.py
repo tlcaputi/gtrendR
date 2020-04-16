@@ -52,7 +52,7 @@ for index in range(0, numruns):
         worldwide = False,
         timestep_years = 10,
         batch_size = 5,
-        outpath = "C:/Users/tcapu/Google Drive/modules/gtrendR/gtrends-variance/input",
+        outpath = "C:/Users/tcapu/Google Drive/modules/gtrendR/docs/gtrends-variance/input",
         creds = "C:/Users/tcapu/Google Drive/modules/gtrendspy/info_theo.py"
     )
 

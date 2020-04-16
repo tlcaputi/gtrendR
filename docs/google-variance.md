@@ -2,7 +2,7 @@
 
 If you are using Google Search data, you should be aware of some basic limitations. Nobody knows the etiology of a search. Searches with the keyword "commit suicide" could be (A) people who are experiencing suicidal ideation, (B) people who want to know if a celebrity committed suicide (e.g., "did Michael Jackson commit suicide"), (C) mental health researchers wondering what comes up when you search "commit suicide", etc.
 
-But that's not all. Google Searches are *sampled* for each pull, which means that every time they are pulled, they can change. Even when searching the same terms over the same date(s), they can be vastly different.
+But that's not all. Google Searches are *sampled* for each pull, which means that every time they are pulled, they can change. Even when searching the same terms over the same date(s), they can be vastly different. With this simple test, I show the data Google returns is, in itself, highly variable -- even when you request the same data for the same terms within just a few seconds of each other.
 
 To demonstrate, I pull data for several suicide-related search terms over 10 overlapping time windows.
 
@@ -101,7 +101,7 @@ ROOTPATH <- "~/gtrends-variance"
 
 ## Load packages
 if(!require("pacman")) install.packages("pacman")
-pacman::p_load(dplyr, tidyverse, gsubfn, psych, lubridate)
+pacman::p_load(dplyr, tidyverse, gsubfn, psych, lubridate, reshape2)
 
 
 ## Build Data
@@ -281,6 +281,43 @@ lapply(summ_data_list, function(x) sprintf("%.2f", max(x$range))) %>%
 
 
 This means that for one date, the difference between the highest and lowest pull for searches with the query "suicide prevention" was 117 searches per 10M. Given that this is daily data, that is a difference of almost 11,000 searches in a single day!
+
+We can visualize how different individual runs are from the mean with a dot plot. Each vertical line is a (randomly sampled) date. The black line is the mean for all runs, and the colored dots represent a different run.
+
+```r
+
+df <- full_data_list[[1]]
+long_df <- melt(df %>% sample_n(60), id = "timestamp", value.name = "searches", variable.name = "run")
+long_df$run <- gsub("run", "", long_df$run)
+long_df$timestamp <- ymd(long_df$timestamp)
+long_df <- long_df %>% arrange(timestamp)
+
+grouped_df <- long_df %>% group_by(timestamp) %>% summarise(meansearches = mean(searches, na.rm = T)) %>% ungroup()
+
+p <- ggplot(long_df)
+p <- p + geom_vline(aes(xintercept = timestamp), linetype = "dotted")
+p <- p + geom_point(aes(x = timestamp, y = searches, group = run, col = run))
+s1 <- seq.Date(min(ymd(long_df$timestamp)), max(ymd(long_df$timestamp)), by = "1 month")
+p <- p + scale_x_date(
+    lim = c(min(s1), max(s1)),
+    breaks = s1,
+    labels = function(x) format(x, format = "%b %Y")
+  )
+
+p <- p + geom_line(data = grouped_df, aes(x=timestamp, y = meansearches))
+# p <- p + geom_line(data = long_df %>% filter(run == 1), aes(x=timestamp, y = searches))
+p <- p + theme_classic()
+p <- p + theme(axis.text.x = element_text(angle = 55, hjust = 1))
+p <- p + labs(
+  x = "Date",
+  y = "Query Fraction for 'Commit Suicide'",
+  col = "Run"
+)
+ggsave("./output/commitsuicide_dotplot.png", p, width = 10, height = 4)
+
+```
+![commitsuicide-dotplot](gtrends-variance/output/commitsuicide_dotplot.png)
+
 
 
 In summary, when you request the search volume for a given term on a given date from the Google Trends API, you need to know that this data is *sampled*. From this basic test, it seems that the data Google returns is, in itself, highly variable -- even when you request the same data for the same terms within just a few seconds of each other. Statistical analyses that assume each data point is its true value (rather than a value with randomness of its own) will underestimate standard errors.
