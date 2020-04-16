@@ -107,30 +107,24 @@ long_df <- long_df %>% arrange(timestamp)
 
 grouped_df <- long_df %>% group_by(timestamp) %>% summarise(meansearches = mean(searches, na.rm = T)) %>% ungroup()
 
-long_df%>% tail(40)
-
-
 p <- ggplot(long_df)
 p <- p + geom_vline(aes(xintercept = timestamp), linetype = "dotted")
 p <- p + geom_point(aes(x = timestamp, y = searches, col = run))
-s1 <- seq.Date(min(ymd(long_df$timestamp)), max(ymd(long_df$timestamp)) + 30, by = "1 month")
+s1 <- seq.Date(min(ymd(long_df$timestamp)), max(ymd(long_df$timestamp)) + 28, by = "1 month")
 p <- p + scale_x_date(
     lim = c(min(s1), max(s1)),
     breaks = s1,
     labels = function(x) format(x, format = "%b %Y")
   )
-
 p <- p + geom_line(data = grouped_df, aes(x=timestamp, y = meansearches))
-# p <- p + geom_line(data = long_df %>% filter(run == 1), aes(x=timestamp, y = searches))
 p <- p + theme_classic()
 p <- p + theme(axis.text.x = element_text(angle = 55, hjust = 1))
 p <- p + labs(
   x = "Date",
   y = "Query Fraction for 'Commit Suicide'",
-  col = "Run"
+  col = "API Run"
 )
 p
-
 ggsave("./output/commitsuicide_dotplot.png", p, width = 10, height = 4)
 
 range(long_df$searches)
