@@ -94,19 +94,26 @@ lapply(summ_data_list, function(x) sprintf("%.2f%%", max(x$range_over_mean) * 10
 lapply(summ_data_list, function(x) sprintf("%.2f", mean(x$range))) %>% data.frame() %>% t() %>% kable(format = "markdown")
 lapply(summ_data_list, function(x) sprintf("%.2f", max(x$range))) %>% data.frame() %>% t() %>% kable(format = "markdown")
 
+
+
+
 pacman::p_load(reshape2)
+set.seed(1234)
 df <- full_data_list[[1]]
-long_df <- melt(df %>% sample_n(60), id = "timestamp", value.name = "searches", variable.name = "run")
+long_df <- melt(df %>% filter(complete.cases(.)) %>% sample_n(60), id = "timestamp", value.name = "searches", variable.name = "run")
 long_df$run <- gsub("run", "", long_df$run)
 long_df$timestamp <- ymd(long_df$timestamp)
 long_df <- long_df %>% arrange(timestamp)
 
 grouped_df <- long_df %>% group_by(timestamp) %>% summarise(meansearches = mean(searches, na.rm = T)) %>% ungroup()
 
+long_df%>% tail(40)
+
+
 p <- ggplot(long_df)
 p <- p + geom_vline(aes(xintercept = timestamp), linetype = "dotted")
-p <- p + geom_point(aes(x = timestamp, y = searches, group = run, col = run))
-s1 <- seq.Date(min(ymd(long_df$timestamp)), max(ymd(long_df$timestamp)), by = "1 month")
+p <- p + geom_point(aes(x = timestamp, y = searches, col = run))
+s1 <- seq.Date(min(ymd(long_df$timestamp)), max(ymd(long_df$timestamp)) + 30, by = "1 month")
 p <- p + scale_x_date(
     lim = c(min(s1), max(s1)),
     breaks = s1,
@@ -126,7 +133,7 @@ p
 
 ggsave("./output/commitsuicide_dotplot.png", p, width = 10, height = 4)
 
-
+range(long_df$searches)
 
 full_data_list[[1]]
 summ_data_list[[1]]

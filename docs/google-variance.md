@@ -1,8 +1,8 @@
-### Google Trends API Returns Are Highly Variable
+### Google Trends API Returns Highly Variable Data
 
 If you are using Google Search data, you should be aware of some basic limitations. Nobody knows the etiology of a search. Searches with the keyword "commit suicide" could be (A) people who are experiencing suicidal ideation, (B) people who want to know if a celebrity committed suicide (e.g., "did Michael Jackson commit suicide"), (C) mental health researchers wondering what comes up when you search "commit suicide", etc.
 
-But that's not all. Google Searches are *sampled* for each pull, which means that every time they are pulled, they can change. Even when searching the same terms over the same date(s), they can be vastly different. With this simple test, I show the data Google returns is, in itself, highly variable -- even when you request the same data for the same terms within just a few seconds of each other.
+But that's not all. Google Searches are *sampled* for each pull, which means that every time they are pulled, they can change. Even when searching the same terms over the same date(s), they can be vastly different. With this simple test, I show the data Google returns is highly variable -- even when you request the same data for the same terms within just a few seconds of each other.
 
 To demonstrate, I pull data for several suicide-related search terms over 10 overlapping time windows.
 
@@ -285,9 +285,9 @@ This means that for one date, the difference between the highest and lowest pull
 We can visualize how different individual runs are from the mean with a dot plot. Each vertical line is a (randomly sampled) date. The black line is the mean for all runs, and the colored dots represent a different run.
 
 ```r
-
+set.seed(1234)
 df <- full_data_list[[1]]
-long_df <- melt(df %>% sample_n(60), id = "timestamp", value.name = "searches", variable.name = "run")
+long_df <- melt(df %>% filter(complete.cases(.)) %>% sample_n(60), id = "timestamp", value.name = "searches", variable.name = "run")
 long_df$run <- gsub("run", "", long_df$run)
 long_df$timestamp <- ymd(long_df$timestamp)
 long_df <- long_df %>% arrange(timestamp)
@@ -296,23 +296,22 @@ grouped_df <- long_df %>% group_by(timestamp) %>% summarise(meansearches = mean(
 
 p <- ggplot(long_df)
 p <- p + geom_vline(aes(xintercept = timestamp), linetype = "dotted")
-p <- p + geom_point(aes(x = timestamp, y = searches, group = run, col = run))
-s1 <- seq.Date(min(ymd(long_df$timestamp)), max(ymd(long_df$timestamp)), by = "1 month")
+p <- p + geom_point(aes(x = timestamp, y = searches, col = run))
+s1 <- seq.Date(min(ymd(long_df$timestamp)), max(ymd(long_df$timestamp)) + 28, by = "1 month")
 p <- p + scale_x_date(
     lim = c(min(s1), max(s1)),
     breaks = s1,
     labels = function(x) format(x, format = "%b %Y")
   )
-
 p <- p + geom_line(data = grouped_df, aes(x=timestamp, y = meansearches))
-# p <- p + geom_line(data = long_df %>% filter(run == 1), aes(x=timestamp, y = searches))
 p <- p + theme_classic()
 p <- p + theme(axis.text.x = element_text(angle = 55, hjust = 1))
 p <- p + labs(
   x = "Date",
   y = "Query Fraction for 'Commit Suicide'",
-  col = "Run"
+  col = "API Run"
 )
+
 ggsave("./output/commitsuicide_dotplot.png", p, width = 10, height = 4)
 
 ```
