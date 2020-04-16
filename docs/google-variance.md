@@ -96,7 +96,7 @@ terms <- c(
 )
 
 timeframe <- 'day'
-ROOTPATH <- "C:/Users/tcapu/Google Drive/PublicHealthStudies/gtrends-variance"
+ROOTPATH <- "~/gtrends-variance"
 
 
 ## Load packages
@@ -190,15 +190,14 @@ Each data frame in `summ_data_list` corresponds to a summary of a different term
 
 
 
-We can summarize these date-level statistics to get a better sense for how much variance we can expect at a single time point. For example, it appears that the range between the highest and lowest observation on any given date is typically a meaningful percentage of the
+We can summarize these date-level statistics to get a better sense for how much variance we can expect at a single time point. For example, it appears that the range between the highest and lowest observation on any given date is typically a meaningful percentage of the query fraction.
+
 ```r
 lapply(summ_data_list, function(x) sprintf("%.2f%%", mean(x$range_over_mean) * 100)) %>%
   data.frame() %>% t() %>% kable(format = "markdown")
 
 ```
 
-Warning message in kable_markdown(x = structure(c("commit_suicide", "suicide_statistics", :
-"The table should have a header (column names)"
 
 
 |                               |        |
@@ -215,7 +214,7 @@ Warning message in kable_markdown(x = structure(c("commit_suicide", "suicide_sta
 |suicide_song_suicide_songs     |77.63%  |
 
 
-This means, for example, the range in search volumes over 10 API runs for the keyword "commit suicide" is, on average, 101% of its mean. That is, if you were to request this data 10 different times for the same date, you would expect that the maximum value you got would be over 2x larger than the minimum value you got. In fact, we can see how large this range could be:
+This means, for example, the range in search volumes over 10 API runs for the keyword "commit suicide" is, on average, 101% of its mean. That is, if you were to request this data 10 different times for the same date, you would expect that the maximum value you got would be over twice the minimum value you got. In fact, we can see how large this range could be:
 
 ```r
 lapply(summ_data_list, function(x) sprintf("%.2f%%", max(x$range_over_mean) * 100)) %>%
@@ -259,7 +258,7 @@ lapply(summ_data_list, function(x) sprintf("%.2f", mean(x$range))) %>%
 |teen_suicide                   |24.46 |
 |suicide_song_suicide_songs     |25.11 |
 
-This means that, if you chose the run with the highest search volume for any particular date, you'd expect to be able to say `suicide statistics` was 20.34 (searches per 10M) higher than if you were to choose the run with the lowest search volume. We can also see how large this range can be:
+This means that, if you chose the run with the highest search volume for any particular date, you'd expect to be able to say "suicide statistics" was 20.35 (searches per 10M) higher than if you were to choose the run with the lowest search volume. We can also see how large this range can be:
 
 ```r
 lapply(summ_data_list, function(x) sprintf("%.2f", max(x$range))) %>%
@@ -281,7 +280,7 @@ lapply(summ_data_list, function(x) sprintf("%.2f", max(x$range))) %>%
 
 
 
-This means that for one date, the difference between the highest and lowest pull for searches with the query `suicide prevention` was 117 searches per 10M. Given that this is daily data, that is a difference of almost 11,000 searches!
+This means that for one date, the difference between the highest and lowest pull for searches with the query "suicide prevention" was 117 searches per 10M. Given that this is daily data, that is a difference of almost 11,000 searches!
 
 
 In summary, when you request the search volume for a given term on a given date from the Google Trends API, you need to know that this data is *sampled*. From this basic test, it seems that the data Google returns is, in itself, highly variable -- even when you request the same data for the same terms within just a few seconds of each other. Statistical analyses that assume each data point is its true value (rather than a value with randomness of its own) will underestimate standard errors.
