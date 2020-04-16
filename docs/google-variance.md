@@ -1,4 +1,4 @@
-### Caveats: Google Search Data isn't perfect
+### Google Trends API Returns Are Highly Variable
 
 If you are using Google Search data, you should be aware of some basic limitations. Nobody knows the etiology of a search. Searches with the keyword "commit suicide" could be (A) people who are experiencing suicidal ideation, (B) people who want to know if a celebrity committed suicide (e.g., "did Michael Jackson commit suicide"), (C) mental health researchers wondering what comes up when you search "commit suicide", etc.
 
@@ -280,7 +280,7 @@ lapply(summ_data_list, function(x) sprintf("%.2f", max(x$range))) %>%
 
 
 
-This means that for one date, the difference between the highest and lowest pull for searches with the query "suicide prevention" was 117 searches per 10M. Given that this is daily data, that is a difference of almost 11,000 searches!
+This means that for one date, the difference between the highest and lowest pull for searches with the query "suicide prevention" was 117 searches per 10M. Given that this is daily data, that is a difference of almost 11,000 searches in a single day!
 
 
 In summary, when you request the search volume for a given term on a given date from the Google Trends API, you need to know that this data is *sampled*. From this basic test, it seems that the data Google returns is, in itself, highly variable -- even when you request the same data for the same terms within just a few seconds of each other. Statistical analyses that assume each data point is its true value (rather than a value with randomness of its own) will underestimate standard errors.

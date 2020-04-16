@@ -30,7 +30,8 @@ Imports:
     finalfit,
     googlesheets4,
     zoo,
-    grid
+    grid,
+    gtools
 Depends:
     lubridate,
     dplyr,
@@ -50,5 +51,6 @@ Depends:
     finalfit,
     googlesheets4,
     zoo,
-    grid
+    grid,
+    gtools
 RoxygenNote: 7.1.0.9000

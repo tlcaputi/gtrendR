@@ -124,6 +124,19 @@ colorschemer <- function(col){
     if(is.null(lowcol) || is.na(lowcol)) assign("lowcol",   "white",      pos=parent.frame())
     if(is.null(midcol) || is.na(midcol)) assign("midcol",   "#C3D6DE", pos=parent.frame())
   }
+
+  if(col == "13rw"){
+    if(is.null(hicol) || is.na(hicol)) assign("hicol",    "#1A4653", pos=parent.frame())
+    if(is.null(locol) || is.na(locol)) assign("locol",    "#7796A2", pos=parent.frame())
+    if(is.null(nucol) || is.na(nucol)) assign("nucol",    "#EEF3F5", pos=parent.frame())
+    if(is.null(opcol) || is.na(opcol)) assign("opcol",    "#AA6C39", pos=parent.frame())
+    if(is.null(highcol) || is.na(highcol)) assign("highcol",  "#1A4653", pos=parent.frame())
+    if(is.null(lowcol) || is.na(lowcol)) assign("lowcol",   "white",      pos=parent.frame())
+    if(is.null(midcol) || is.na(midcol)) assign("midcol",   "#AA6C39", pos=parent.frame())
+  }
+
+
+
 }
 
 

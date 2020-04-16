@@ -60,8 +60,7 @@ multi_term_arima <- function(
   linear = F,
   min0 = F,
   logit = T,
-  logit_a = 0,
-  logit_b = 100
+  scale = T
   ){
 
 
@@ -128,12 +127,6 @@ multi_term_arima <- function(
     df$timestamp <- ymd(df$timestamp)
     names(df) <- gsub(geo, "geo", names(df))
 
-
-    # if(logit){
-    #   df$geo <- df$geo / max(df$geo, na.rm = T) * 100
-    #   df$geo <- log((df$geo-logit_a)/(logit_b-df$geo))
-    # }
-
     # If beginperiod/endperiod is T, then we use the min/max date from the dataset
     if(is.logical(beginperiod)) beginperiod <- min(df$timestamp, na.rm = T)
     if(is.logical(endperiod)) endperiod <- max(df$timestamp, na.rm = T)
@@ -141,6 +134,15 @@ multi_term_arima <- function(
 
     # We restrict the dataset using the beginperiod/endperiod
     df <- df %>% filter(timestamp %within% interval(beginperiod, endperiod))
+
+
+    if(scale | logit) df$geo <- df$geo / (max(df$geo, na.rm = T) * 1.1)
+
+    if(logit){
+      df$geo <- gtools::logit(df$geo)
+    }
+
+
 
     # We need to know what kind of data this is. We infer with diff.date.
     # If the minimum difference is 1 day, its daily. If it's 7, it's weekly. Etc.
@@ -161,32 +163,36 @@ multi_term_arima <- function(
 
     # na_kalman lets us impute missing data in the time series objects if the
     # kalman object is set to T
+
     if(na == "kalman" || kalman == T){
-      time_series <- na_kalman(time_series)
-      ts_training <- na_kalman(ts_training)
-      ts_test <- na_kalman(ts_test)
-      df$geo <- as.numeric(time_series)
+      ts_training <-  na_kalman(ts_training, model = "auto.arima")
+      # time_series <-  na_kalman(time_series, model = "auto.arima")
+      # ts_test <-      na_kalman(ts_test, model = "auto.arima")
+      # df$geo <- as.numeric(time_series)
     } else{
       if(na == "locf"){
-        time_series <- na_locf(time_series)
         ts_training <- na_locf(ts_training)
-        ts_test <- na_locf(ts_test)
-        df$geo <- as.numeric(time_series)
+        # time_series <- na_locf(time_series)
+        # ts_test <- na_locf(ts_test)
+        # df$geo <- as.numeric(time_series)
       }
     }
 
 
 
+    set.seed(1234)
     # If linear is True, then we use a linear model. If not...
     if(!linear){
 
       # We run the model
-      mod <- auto.arima(ts_training, lambda = 0)
+      # print(ts_training)
+      # ts_training <- ifelse(is.finite(ts_training), ts_training, NA)
+      # mod <- auto.arima(ts_training, lambda = 0)
+      mod <- auto.arima(ts_training)
 
       # We use the built-in arima.forecast function. The bootstrap option
       # lets us set the options on the forecast.
       if(bootstrap){
-        set.seed(1234)
         # h (horizon) should be equal to the length of the after-period
         # bootnum is the number of paths it's allowed to take
         fitted_values <- forecast(mod, h = length(ts_test), bootstrap = TRUE, npaths = bootnum)
@@ -219,7 +225,6 @@ multi_term_arima <- function(
         names(conf95)[3:5] <- c("fit", "lwr", "upr")
         fitted_values <- data.frame("mean" = conf95$fit, "lower" = conf95$lwr, "upper" = conf95$upr)
 
-
       } else{
 
         # If not bootstrap, we use predict.lm to forecast the values for the test data
@@ -232,18 +237,6 @@ multi_term_arima <- function(
 
 
     }
-
-
-
-    # if(logit){
-    #   rev0 <- function(x, a, b) sapply(x, function(x) (b - a)*exp(x)/(1+exp(x)) + a)
-    #   fitted_values$mean <- rev0(fitted_values$mean, logit_a, logit_b)
-    #   fitted_values$lower <- rev0(fitted_values$lower, logit_a, logit_b)
-    #   fitted_values$higher <- rev0(fitted_values$higher, logit_a, logit_b)
-    #   ts_test <- rev0(as.numeric(ts_test), logit_a, logit_b)
-    #   ts_train <- rev0(as.numeric(ts_train), logit_a, logit_b)
-    #   time_series <- rev0(as.numeric(time_series), logit_a, logit_b)
-    # }
 
 
 
@@ -261,14 +254,18 @@ multi_term_arima <- function(
     names(preds) <- gsub("^hi$", "hi95", names(preds))
 
 
-    # if(logit){
-    #   print(preds %>% tail())
-    #   rev0 <- function(x, a, b) sapply(x, function(x) (b - a)*exp(x)/(1+exp(x)) + a)
-    #   preds <- preds %>% mutate_if(is.numeric, funs(rev0(., logit_a, logit_b)))
-    #   print(preds %>% tail())
-    #   cat("\n")
-    # }
 
+    preds$actual  <-     as.numeric(preds$actual)
+    preds$fitted  <-     as.numeric(preds$fitted)
+    preds$lo95    <-     as.numeric(preds$lo95)
+    preds$hi95    <-     as.numeric(preds$hi95)
+
+    if(logit){
+      preds$actual <- gtools::inv.logit(preds$actual)
+      preds$fitted <- gtools::inv.logit(preds$fitted)
+      preds$lo95   <- gtools::inv.logit(preds$lo95)
+      preds$hi95   <- gtools::inv.logit(preds$hi95)
+    }
 
     # Also create a data frame that's the same size as the original data
 
@@ -289,9 +286,6 @@ multi_term_arima <- function(
       full <- full %>% mutate_if(is.numeric, minpos)
     }
 
-
-
-
     # Summarizes the ratio of actual to fitted searches using only those
     # observations where the actual value is not 0
     summ <- with(preds %>% filter(actual > 0),
@@ -301,14 +295,6 @@ multi_term_arima <- function(
         "lo95" = (mean(actual, na.rm = T) / mean(hi95, na.rm = T)) - 1,
         "hi95" = (mean(actual, na.rm = T) / mean(lo95, na.rm = T)) - 1
     ))
-
-    # print(term)
-    # print(preds$actual)
-    # print(preds$hi95)
-    # with(preds %>% filter(actual > 0), print(mean(actual)))
-    # with(preds %>% filter(actual > 0), print(mean(hi95)))
-    # with(preds %>% filter(actual > 0), print(mean(lo95)))
-
 
 
     # change column names with the term

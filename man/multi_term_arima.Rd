@@ -21,8 +21,7 @@ multi_term_arima(
   linear = F,
   min0 = F,
   logit = T,
-  logit_a = 0,
-  logit_b = 100
+  scale = T
 )
 }
 \arguments{
