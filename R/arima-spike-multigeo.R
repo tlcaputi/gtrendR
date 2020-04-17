@@ -111,18 +111,42 @@ state_pct_change = function(
     statedf$lo95 <- NA
     locs <- statedf$abbr
     for(loc in locs){
-      beforesearches <- tmp %>% filter(before == 1) %>% pull(loc)
-      aftersearches <- tmp %>% filter(before == 0) %>% pull(loc)
+      # beforesearches <- tmp %>% filter(before == 1) %>% pull(loc)
+      # aftersearches <- tmp %>% filter(before == 0) %>% pull(loc)
+      #
+      # beforemeans <- boot(data = beforesearches, statistic = samplemean, R = bootnum)
+      # aftermeans <- boot(data = aftersearches, statistic = samplemean, R = bootnum)
+      #
+      # bootdf <- data.frame("beforemeans" = beforemeans$t, "aftermeans" = aftermeans$t)
+      # bootdf <- bootdf %>% mutate(
+      #   pctdiff = ((aftermeans / beforemeans) - 1)
+      # )
+      #
+      # booted_vec <- bootdf %>% pull(pctdiff)
+      # hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
+      # lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
 
-      beforemeans <- boot(data = beforesearches, statistic = samplemean, R = bootnum)
-      aftermeans <- boot(data = aftersearches, statistic = samplemean, R = bootnum)
+      # Get a vector of the expected and actual searches
+      expectedsearches <- tmp %>% filter(timestamp %within% interval(interrupt, endplot)) %>% pull(fitted)
+      actualsearches <-   tmp %>% filter(timestamp %within% interval(interrupt, endplot)) %>% pull(geo)
 
-      bootdf <- data.frame("beforemeans" = beforemeans$t, "aftermeans" = aftermeans$t)
-      bootdf <- bootdf %>% mutate(
-        pctdiff = ((aftermeans / beforemeans) - 1)
-      )
+      # Use the boot package to create vectors of bootstrapped means from these
+      ratiomeans <- boot(data = na.omit(actualsearches / expectedsearches - 1), statistic = samplemean, R = bootnum)
+      # expectedmeans <- boot(data = expectedsearches, statistic = samplemean, R = bootnum)
+      # actualmeans <- boot(data = actualsearches, statistic = samplemean, R = bootnum)
 
-      booted_vec <- bootdf %>% pull(pctdiff)
+      # Put these bootstrapped vectors together and calculate percent diff
+      # bootdf <- data.frame("expectedmeans" = expectedmeans$t, "actualmeans" = actualmeans$t)
+      # bootdf <- bootdf %>% mutate(
+      #   pctdiff = ((actualmeans / expectedmeans) - 1)
+      # )
+
+      # Extract the bootstrapped percent difference as a vector
+      # booted_vec <- bootdf %>% pull(pctdiff)
+      booted_vec <- ratiomeans$t
+
+      # Report the mean and CI of this vector
+      mn <- mean(actualsearches / expectedsearches - 1, na.rm = T)
       hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
       lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
 

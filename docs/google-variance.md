@@ -2,7 +2,7 @@
 
 If you are using Google Search data, you should be aware of some basic limitations. Nobody knows the etiology of a search. Searches with the keyword "commit suicide" could be (A) people who are experiencing suicidal ideation, (B) people who want to know if a celebrity committed suicide (e.g., "did Michael Jackson commit suicide"), (C) mental health researchers wondering what comes up when you search "commit suicide", etc.
 
-But that's not all. Google Searches are *sampled* for each pull, which means that every time they are pulled, they can change. Even when searching the same terms over the same date(s), they can be vastly different. With this simple test, I show the data Google returns is highly variable -- even when you request the same data for the same terms within just a few seconds of each other.
+But that's not all. Google Searches are *sampled* for each pull, which means that every time they are pulled from the API, they can change. Even when searching the same terms over the same date(s), they can be vastly different. With a simple test, I show the data Google returns is highly variable -- even when you request the same data for the same terms within just a few seconds of each other.
 
 To demonstrate, I pull data for several suicide-related search terms over 10 overlapping time windows.
 
@@ -173,7 +173,7 @@ for(name in names){
 
 ```
 
-Each data frame in `full_data_list` corresponds to the raw data for a different term by timestamp. I am unable to share this data because it is raw data, but the first column is timestamp, the second is run1, then run2, etc. Under each run column is the search volume for the date. If you run this code on your own, you will see that the search values are different among runs -- even though are for the same query on the same date using the same API executed just seconds apart.
+Each data frame in `full_data_list` corresponds to the raw data for a different term by timestamp. I am unable to share this data because it is raw data, but the first column is `timestamp`, the second is `run1`, then `run2`, up to `run10`. Under each `run` column is the search volume for the date. If you run this code on your own, you will see that the search values are different among runs -- even though are for the same query on the same date using the same API executed just seconds apart.
 
 Each data frame in `summ_data_list` corresponds to a summary of a different term by timestamp. The rows are different dates, and there are statistics related to the variance of the rows in the columns. Here is the raw data table for the search term `commit suicide`.
 
@@ -190,7 +190,7 @@ Each data frame in `summ_data_list` corresponds to a summary of a different term
 
 
 
-We can summarize these date-level statistics to get a better sense for how much variance we can expect at a single time point. For example, it appears that the range between the highest and lowest observation on any given date is typically a meaningful percentage of the query fraction.
+We can summarize these date-level statistics to get a better sense for how much variance we can expect for the average observation. For example, it appears that the range between the highest and lowest observation on any given date is typically a meaningful percentage of the query fraction.
 
 ```r
 lapply(summ_data_list, function(x) sprintf("%.2f%%", mean(x$range_over_mean) * 100)) %>%
@@ -214,7 +214,7 @@ lapply(summ_data_list, function(x) sprintf("%.2f%%", mean(x$range_over_mean) * 1
 |suicide_song_suicide_songs     |77.63%  |
 
 
-This means, for example, the range in search volumes over 10 API runs for the keyword "commit suicide" is, on average, 101% of its mean. That is, if you were to request this data 10 different times for the same date, you would expect that the maximum value you got would be over twice the minimum value you got. In fact, we can see how large this range could be:
+This means, for example, the range in search volumes over 10 API runs for the keyword "commit suicide" is, on average, 101% of its mean. That is, if you were to request this data 10 different times for the same date, you would expect that the maximum value you got would be more than twice the minimum value you got. In fact, we can see how large this range could be:
 
 ```r
 lapply(summ_data_list, function(x) sprintf("%.2f%%", max(x$range_over_mean) * 100)) %>%
@@ -237,7 +237,7 @@ lapply(summ_data_list, function(x) sprintf("%.2f%%", max(x$range_over_mean) * 10
 
 This means that the range between the minimum and maximum value you got could be as high as 230% of the mean!
 
-You can also see the size of the range between minimum and maximum values.
+You can also see the size of the average range between minimum and maximum values for each time point.
 
 ```r
 lapply(summ_data_list, function(x) sprintf("%.2f", mean(x$range))) %>%
@@ -280,9 +280,9 @@ lapply(summ_data_list, function(x) sprintf("%.2f", max(x$range))) %>%
 
 
 
-This means that for one date, the difference between the highest and lowest pull for searches with the query "suicide prevention" was 117 searches per 10M. Given that this is daily data, that is a difference of almost 11,000 searches in a single day!
+This means that for one date, the difference between the highest and lowest pull for searches with the query "suicide prevention" was 118 searches per 10M. Given that this is daily data, that is a difference of approximately 11,000 searches in a single day!
 
-We can visualize how different individual runs are from the mean with a dot plot. Each vertical line is a (randomly sampled) date. The black line is the mean for all runs, and the colored dots represent a different run.
+We can visualize how different individual runs are from the mean with a dot plot. We use searches for "commit suicide" as an example. Each vertical line is a (randomly sampled) date. The black line is the mean for all runs, and the colored dots represent a different run.
 
 ```r
 set.seed(1234)
@@ -319,4 +319,4 @@ ggsave("./output/commitsuicide_dotplot.png", p, width = 10, height = 4)
 
 
 
-In summary, when you request the search volume for a given term on a given date from the Google Trends API, you need to know that this data is *sampled*. From this basic test, it seems that the data Google returns is, in itself, highly variable -- even when you request the same data for the same terms within just a few seconds of each other. Statistical analyses that assume each data point is its true value (rather than a value with randomness of its own) will underestimate standard errors.
+In summary, when you request the search volume for a given term on a given date from the Google Trends API, you need to know that this data is *sampled*. From this basic test, it seems that the data Google returns is, in itself, highly variable -- even when you request the same data for the same terms within just a few seconds of each other. Standard statistical analyses that assume each data point is its true value (rather than a value with randomness of its own) will underestimate standard errors.

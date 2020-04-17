@@ -4,6 +4,7 @@ import re
 from random import randint
 from time import sleep
 
+
 terms = [
         # 'suicide chat',
         # 'suicide is painless',

@@ -60,7 +60,8 @@ multi_term_arima <- function(
   linear = F,
   min0 = F,
   logit = T,
-  scale = T
+  scale = T,
+  alpha = 0.05
   ){
 
 
@@ -253,7 +254,7 @@ multi_term_arima <- function(
     names(preds) <- gsub("^lo$", "lo95", names(preds))
     names(preds) <- gsub("^hi$", "hi95", names(preds))
 
-
+    preds <- preds %>% select(actual, fitted, lo95, hi95)
 
     preds$actual  <-     as.numeric(preds$actual)
     preds$fitted  <-     as.numeric(preds$fitted)
@@ -288,13 +289,68 @@ multi_term_arima <- function(
 
     # Summarizes the ratio of actual to fitted searches using only those
     # observations where the actual value is not 0
-    summ <- with(preds %>% filter(actual > 0),
-      data.frame(
+
+    # Get a vector of the expected and actual searches
+    expectedsearches <- preds %>% pull(fitted)
+    actualsearches <-   preds %>% pull(actual)
+
+    # Use the boot package to create vectors of bootstrapped means from these
+    ratiomeans <- boot(data = na.omit(actualsearches / expectedsearches - 1), statistic = samplemean, R = bootnum)
+    # expectedmeans <- boot(data = expectedsearches, statistic = samplemean, R = bootnum)
+    # actualmeans <- boot(data = actualsearches, statistic = samplemean, R = bootnum)
+
+    # Put these bootstrapped vectors together and calculate percent diff
+    # bootdf <- data.frame("expectedmeans" = expectedmeans$t, "actualmeans" = actualmeans$t)
+    # bootdf <- bootdf %>% mutate(
+    #   pctdiff = ((actualmeans / expectedmeans) - 1)
+    # )
+
+    # Extract the bootstrapped percent difference as a vector
+    # booted_vec <- bootdf %>% pull(pctdiff)
+    booted_vec <- ratiomeans$t
+
+    # Report the mean and CI of this vector
+    mn <- mean(actualsearches / expectedsearches - 1, na.rm = T)
+    hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
+    lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
+
+    summ <- data.frame(
         "term" = term,
-        "mean" = (mean(actual, na.rm = T) / mean(fitted, na.rm = T)) - 1,
-        "lo95" = (mean(actual, na.rm = T) / mean(hi95, na.rm = T)) - 1,
-        "hi95" = (mean(actual, na.rm = T) / mean(lo95, na.rm = T)) - 1
-    ))
+        "mean" = mn,
+        "lo95" = lo95,
+        "hi95" = hi95
+    )
+
+
+
+    # if(!bootstrap_13rw){
+    #   summ <- with(preds %>% filter(actual > 0),
+    #     data.frame(
+    #       "term" = term,
+    #       "mean" = (mean(actual / fitted, na.rm = T) - 1),
+    #       "lo95" = (mean(actual / hi95, na.rm = T) - 1),
+    #       "hi95" = (mean(actual / lo95, na.rm = T) - 1)
+    #   ))
+    # } else {
+    #   summ <- with(preds %>% filter(actual > 0),
+    #     data.frame(
+    #       "term" = term,
+    #       "mean" = (mean(actual / fitted, na.rm = T) - 1),
+    #       "lo95" = NA,
+    #       "hi95" = NA
+    #   ))
+    #
+    #   B <- replicate(1000, expr={
+    #   			ix <- sample(1:nrow(preds), nrow(preds), replace=T)
+    #   			mean(preds$actual[ix] / preds$fitted[ix] - 1, na.rm = T)
+    #   		})
+    #
+    #   summ$lo95 <- quantile(B, 0.025)
+    #   summ$hi95 <- quantile(B, 0.975)
+    #
+    # }
+
+
 
 
     # change column names with the term
@@ -311,7 +367,6 @@ multi_term_arima <- function(
 
   # bind the summ_dat together
   summary <- do.call(rbind.data.frame, summ_dat)
-
 
 
   # Merge the full data together

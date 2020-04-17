@@ -398,8 +398,6 @@ line_plot <- function(
   p <- p + geom_point(aes(x = maxtime, y = maxval), size=2, color=opcol)
 
 
-  print(beginplot)
-  print(endplot)
   # We pass options along to the axes
   p <- p + scale_y_continuous(limits = ylim)
   p <- p + scale_x_date(date_breaks = lbreak,
@@ -867,23 +865,25 @@ arima_plot <- function(
 
   # Get a vector of the expected and actual searches
   expectedsearches <- df %>% filter(timestamp %within% interval(interrupt, endplot)) %>% pull(fitted)
-  actualsearches <- df %>%   filter(timestamp %within% interval(interrupt, endplot)) %>% pull(geo)
+  actualsearches <-   df %>% filter(timestamp %within% interval(interrupt, endplot)) %>% pull(geo)
 
   # Use the boot package to create vectors of bootstrapped means from these
-  expectedmeans <- boot(data = expectedsearches, statistic = samplemean, R = bootnum)
-  actualmeans <- boot(data = actualsearches, statistic = samplemean, R = bootnum)
+  ratiomeans <- boot(data = na.omit(actualsearches / expectedsearches - 1), statistic = samplemean, R = bootnum)
+  # expectedmeans <- boot(data = expectedsearches, statistic = samplemean, R = bootnum)
+  # actualmeans <- boot(data = actualsearches, statistic = samplemean, R = bootnum)
 
   # Put these bootstrapped vectors together and calculate percent diff
-  bootdf <- data.frame("expectedmeans" = expectedmeans$t, "actualmeans" = actualmeans$t)
-  bootdf <- bootdf %>% mutate(
-    pctdiff = ((actualmeans / expectedmeans) - 1)
-  )
+  # bootdf <- data.frame("expectedmeans" = expectedmeans$t, "actualmeans" = actualmeans$t)
+  # bootdf <- bootdf %>% mutate(
+  #   pctdiff = ((actualmeans / expectedmeans) - 1)
+  # )
 
   # Extract the bootstrapped percent difference as a vector
-  booted_vec <- bootdf %>% pull(pctdiff)
+  # booted_vec <- bootdf %>% pull(pctdiff)
+  booted_vec <- ratiomeans$t
 
   # Report the mean and CI of this vector
-  mn <- sum(actualsearches, na.rm = T) / sum(expectedsearches, na.rm = T) - 1
+  mn <- mean(actualsearches / expectedsearches - 1, na.rm = T)
   hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
   lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
   lab <- sprintf("%1.0f%% Increase (95%%CI %1.0f to %1.0f)", mn*100, lo95*100, hi95*100)
