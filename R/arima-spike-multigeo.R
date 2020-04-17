@@ -127,11 +127,11 @@ state_pct_change = function(
       # lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
 
       # Get a vector of the expected and actual searches
-      expectedsearches <- tmp %>% filter(timestamp %within% interval(interrupt, endplot)) %>% pull(fitted)
-      actualsearches <-   tmp %>% filter(timestamp %within% interval(interrupt, endplot)) %>% pull(geo)
+      beforesearches <- tmp %>% filter(before == 0) %>% pull(loc)
+      aftersearches <-   tmp %>% filter(before == 1) %>% pull(loc)
 
       # Use the boot package to create vectors of bootstrapped means from these
-      ratiomeans <- boot(data = na.omit(actualsearches / expectedsearches - 1), statistic = samplemean, R = bootnum)
+      ratiomeans <- boot(data = na.omit(aftersearches / beforesearches - 1), statistic = samplemean, R = bootnum)
       # expectedmeans <- boot(data = expectedsearches, statistic = samplemean, R = bootnum)
       # actualmeans <- boot(data = actualsearches, statistic = samplemean, R = bootnum)
 
@@ -146,7 +146,7 @@ state_pct_change = function(
       booted_vec <- ratiomeans$t
 
       # Report the mean and CI of this vector
-      mn <- mean(actualsearches / expectedsearches - 1, na.rm = T)
+      mn <- mean(aftersearches / beforesearches - 1, na.rm = T)
       hi95 <- as.numeric(quantile(booted_vec, 1-(alpha/2), na.rm = T))
       lo95 <- as.numeric(quantile(booted_vec, (alpha/2), na.rm = T))
 
