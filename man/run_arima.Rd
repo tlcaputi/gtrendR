@@ -14,7 +14,9 @@ run_arima(
   bootstrap = F,
   bootnum = 1000,
   linear = F,
-  rsv = F
+  rsv = F,
+  periods = NA,
+  maxK = 5
 )
 }
 \arguments{

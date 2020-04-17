@@ -61,7 +61,8 @@ multi_term_arima <- function(
   min0 = F,
   logit = T,
   scale = T,
-  alpha = 0.05
+  alpha = 0.05,
+  arima.approx = T
   ){
 
 
@@ -152,6 +153,8 @@ multi_term_arima <- function(
 
     # Here we put the searches into time series objects.
 
+    df$timestamp <- ymd(df$timestamp)
+    print(df$geo)
     # time_series is the entire timeline
     time_series <- ts(df$geo, freq = 365.25/freq, start = decimal_date(beginperiod))
 
@@ -189,7 +192,7 @@ multi_term_arima <- function(
       # print(ts_training)
       # ts_training <- ifelse(is.finite(ts_training), ts_training, NA)
       # mod <- auto.arima(ts_training, lambda = 0)
-      mod <- auto.arima(ts_training, approximation = F)
+      mod <- auto.arima(ts_training, approximation = arima.approx)
 
       # We use the built-in arima.forecast function. The bootstrap option
       # lets us set the options on the forecast.
@@ -294,8 +297,19 @@ multi_term_arima <- function(
     expectedsearches <- preds %>% pull(fitted)
     actualsearches <-   preds %>% pull(actual)
 
+    pctdiffs <- actualsearches / expectedsearches - 1
+
+    print(ts_training)
+    print(ts_test)
+    print(expectedsearches)
+    print(pctdiffs)
+    print(mean(actualsearches, na.rm = T) / mean(expectedsearches, na.rm = T) - 1)
+    print(head(preds))
+    print(tail(preds))
+
+
     # Use the boot package to create vectors of bootstrapped means from these
-    ratiomeans <- boot(data = na.omit(actualsearches / expectedsearches - 1), statistic = samplemean, R = bootnum)
+    ratiomeans <- boot(data = na.omit(pctdiffs), statistic = samplemean, R = bootnum)
     # expectedmeans <- boot(data = expectedsearches, statistic = samplemean, R = bootnum)
     # actualmeans <- boot(data = actualsearches, statistic = samplemean, R = bootnum)
 

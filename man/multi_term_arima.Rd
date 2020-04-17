@@ -22,7 +22,8 @@ multi_term_arima(
   min0 = F,
   logit = T,
   scale = T,
-  alpha = 0.05
+  alpha = 0.05,
+  arima.approx = T
 )
 }
 \arguments{

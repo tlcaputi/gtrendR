@@ -19,7 +19,9 @@ run_arima <- function(
   bootstrap = F,
   bootnum = 1000,
   linear = F,
-  rsv = F
+  rsv = F,
+  periods = NA,
+  maxK = 5
   ){
 
 
@@ -114,48 +116,118 @@ run_arima <- function(
   freq <- min(as.numeric(diff.Date(tmpdf$timestamp)), na.rm = T)
 
 
-  # Here we put the searches into time series objects.
+  if(!linear){
 
-  # time_series is the entire timeline
-  time_series <- ts(tmpdf$geo, freq = 365.25/freq, start = decimal_date(begin))
+    period_values <- 365.25/freq
 
-  # ts_training is just the pre-period
-  ts_training <- ts(tmpdf %>% filter(timestamp < interrupt) %>% pull(geo), freq = 365.25/freq, start = decimal_date(begin))
+    # Here we put the searches into time series objects.
+    # time_series is the entire timeline
+    time_series <- ts(tmpdf$geo, freq = period_values, start = decimal_date(begin))
 
-  # ts_test is just the post-period
-  ts_test <- ts(tmpdf %>% filter(timestamp >= interrupt) %>% pull(geo), freq = 365.25/freq, start = decimal_date(interrupt))
+    # ts_training is just the pre-period
+    ts_training <- ts(tmpdf %>% filter(timestamp < interrupt) %>% pull(geo), freq = period_values, start = decimal_date(begin))
+
+    # ts_test is just the post-period
+    ts_test <- ts(tmpdf %>% filter(timestamp >= interrupt) %>% pull(geo), freq = period_values, start = decimal_date(interrupt))
 
 
-  # na_kalman lets us impute missing data in the time series objects if the
-  # kalman object is set to T
-  if(kalman){
-    time_series <- na_kalman(time_series, model="auto.arima")
-    ts_training <- na_kalman(ts_training, model="auto.arima")
-    ts_test <- na_kalman(ts_test, model="auto.arima")
-    tmpdf$geo <- as.numeric(time_series)
+    if(all(is.na(periods))){
+
+      # na_kalman lets us impute missing data in the time series objects if the
+      # kalman object is set to T
+      if(kalman){
+        time_series <- na_kalman(time_series, model="auto.arima")
+        ts_training <- na_kalman(ts_training, model="auto.arima")
+        ts_test <- na_kalman(ts_test, model="auto.arima")
+        tmpdf$geo <- as.numeric(time_series)
+      }
+
+      mod <- auto.arima(ts_training, approximation  = F)
+
+      if(bootstrap){
+        set.seed(1234)
+        # h (horizon) should be equal to the length of the after-period
+        # bootnum is the number of paths it's allowed to take
+        fitted_values <- forecast(mod, h = length(ts_test), bootstrap = TRUE, npaths = bootnum)
+      } else{
+        fitted_values <- forecast(mod, h = length(ts_test))
+      }
+
+
+    } else {
+
+
+      period_values <- c()
+      if("all" %in% periods) periods <- c("year", "month", "week")
+
+      yearval <- 365.25/freq
+      monthval <- (365.25/12)/freq
+      weekval <- 7/freq
+
+      if("year" %in% periods & length(ts_training) > yearval * 2) period_values <- c(yearval, period_values)
+      if("month" %in% periods & length(ts_training) > monthval * 2) period_values <- c(monthval, period_values)
+      if("week" %in% periods & length(ts_training) > weekval * 2) period_values <- c(weekval, period_values)
+
+
+
+
+      # Here we put the searches into time series objects.
+      # time_series is the entire timeline
+      time_series <- msts(tmpdf$geo, period_values, start = decimal_date(begin))
+
+      # ts_training is just the pre-period
+      ts_training <- msts(tmpdf %>% filter(timestamp < interrupt) %>% pull(geo), period_values, start = decimal_date(begin))
+
+      # ts_test is just the post-period
+      ts_test <- msts(tmpdf %>% filter(timestamp >= interrupt) %>% pull(geo), period_values, start = decimal_date(interrupt))
+
+
+      # na_kalman lets us impute missing data in the time series objects if the
+      # kalman object is set to T
+      if(kalman){
+        time_series <- na_kalman(time_series, model="auto.arima")
+        ts_training <- na_kalman(ts_training, model="auto.arima")
+        ts_test <- na_kalman(ts_test, model="auto.arima")
+        tmpdf$geo <- as.numeric(time_series)
+      }
+
+      K <- floor(c(period_values / 2) - 1e-5)
+      K <- sapply(K, function(x) min(c(x, maxK)))
+
+      print(sprintf("[%s] Using multiple periods in the ARIMA... this may take a while", Sys.time()))
+      print(sprintf("[%s] Max K value is %s (larger maxK -> longer processing time)", Sys.time(), maxK))
+      print(sprintf("[%s] Periods: %s", Sys.time(), paste(period_values, collapse = ", ")))
+      print(sprintf("[%s] Maximum orders of Fourier: %s", Sys.time(), paste(K, collapse = ", ")))
+      print(sprintf("[%s] Estimating model...", Sys.time()))
+      flush.console()
+
+      mod <- auto.arima(ts_training, approximation  = F, seasonal = F, xreg = fourier(ts_training, K=K, length(ts_training)))
+
+      print(sprintf("[%s] Model Estimation Complete! Calculating forecasts...", Sys.time()))
+      flush.console()
+
+      if(bootstrap){
+        set.seed(1234)
+        # h (horizon) should be equal to the length of the after-period
+        # bootnum is the number of paths it's allowed to take
+        # fitted_values <- forecast(mod, h = length(ts_test), bootstrap = TRUE, npaths = bootnum)
+        fitted_values <- forecast(mod, bootstrap = T, npaths = 1000, h = length(ts_test), xreg = fourier(ts_test, K=K, length(ts_test)))
+
+      } else{
+        fitted_values <- forecast(mod, h = length(ts_test), xreg = fourier(ts_test, K=K, length(ts_test)))
+      }
+
+      print(sprintf("[%s] Forecasts Estimation Complete!", Sys.time()))
+      flush.console()
+
+
+
+
+    }
   }
 
 
-
-  # If linear is True, then we use a linear model. If not...
-  if(!linear){
-
-    # We run the model
-    mod <- auto.arima(ts_training, approximation = F)
-
-    # We use the built-in arima.forecast function. The bootstrap option
-    # lets us set the options on the forecast.
-    if(bootstrap){
-      set.seed(1234)
-      # h (horizon) should be equal to the length of the after-period
-      # bootnum is the number of paths it's allowed to take
-      fitted_values <- forecast(mod, h = length(ts_test), bootstrap = TRUE, npaths = bootnum)
-    } else{
-      fitted_values <- forecast(mod, h = length(ts_test))
-    }
-
-  } else{
-
+  if(linear){
 
     # If linear is True, we have to create that model.
 
@@ -195,7 +267,6 @@ run_arima <- function(
 
 
   # Now we need to add the fitted data to the data.frame.
-
   # tmp2 is a data frame of forecasts on the test data
   tmp2 <- data.frame(fitted=fitted_values$mean, lo=fitted_values$lower, hi=fitted_values$upper)
 
