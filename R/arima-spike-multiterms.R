@@ -189,7 +189,7 @@ multi_term_arima <- function(
       # print(ts_training)
       # ts_training <- ifelse(is.finite(ts_training), ts_training, NA)
       # mod <- auto.arima(ts_training, lambda = 0)
-      mod <- auto.arima(ts_training)
+      mod <- auto.arima(ts_training, approximation = F)
 
       # We use the built-in arima.forecast function. The bootstrap option
       # lets us set the options on the forecast.

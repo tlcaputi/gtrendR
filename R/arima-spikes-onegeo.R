@@ -141,7 +141,7 @@ run_arima <- function(
   if(!linear){
 
     # We run the model
-    mod <- auto.arima(ts_training)
+    mod <- auto.arima(ts_training, approximation = F)
 
     # We use the built-in arima.forecast function. The bootstrap option
     # lets us set the options on the forecast.

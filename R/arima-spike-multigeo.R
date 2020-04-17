@@ -269,7 +269,7 @@ state_arima = function(
 
     if(!all(is.na(ts_train)) & !all(is.na(ts_test))){
 
-      mod <- auto.arima(ts_train)
+      mod <- auto.arima(ts_train, approximation = F)
 
       fitted_values <- forecast(mod, length(ts_test))
       fitted_values$mean <- ifelse(fitted_values$mean<0, NA, fitted_values$mean)
