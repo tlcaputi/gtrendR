@@ -154,7 +154,7 @@ multi_term_arima <- function(
     # Here we put the searches into time series objects.
 
     df$timestamp <- ymd(df$timestamp)
-    print(df$geo)
+
     # time_series is the entire timeline
     time_series <- ts(df$geo, freq = 365.25/freq, start = decimal_date(beginperiod))
 
@@ -294,19 +294,22 @@ multi_term_arima <- function(
     # observations where the actual value is not 0
 
     # Get a vector of the expected and actual searches
-    expectedsearches <- preds %>% pull(fitted)
-    actualsearches <-   preds %>% pull(actual)
+    expectedsearches  <- preds %>% pull(fitted)
+    actualsearches    <- preds %>% pull(actual)
 
     pctdiffs <- actualsearches / expectedsearches - 1
 
-    print(ts_training)
-    print(ts_test)
-    print(expectedsearches)
-    print(pctdiffs)
-    print(mean(actualsearches, na.rm = T) / mean(expectedsearches, na.rm = T) - 1)
-    print(head(preds))
-    print(tail(preds))
+    # print(ts_training)
+    # print(ts_test)
+    # print(expectedsearches)
+    # print(pctdiffs)
+    # print(mean(actualsearches, na.rm = T) / mean(expectedsearches, na.rm = T) - 1)
+    # print(head(preds))
+    # print(tail(preds))
 
+
+    # If you don't use this method of na.omit then you can get big differences in
+    # main effect sizes
 
     # Use the boot package to create vectors of bootstrapped means from these
     ratiomeans <- boot(data = na.omit(pctdiffs), statistic = samplemean, R = bootnum)
@@ -575,7 +578,9 @@ multiterm_barplot <- function(
   p <- ggplot(df)
 
   # Barplot, ordering the terms from highest mean to lowest mean
-  p <- p + geom_bar(aes(x = reorder(term, -mean), y = mean), fill = hicol, stat = "identity", position=position_dodge(width=space))
+  p <- p + geom_bar(aes(x = reorder(term, -mean), y = mean), fill = locol,
+                    col = hicol, size = 0.5,
+                    stat = "identity", position=position_dodge(width=space))
   # Add errorbars from lo95 and hi95
   p <- p + geom_errorbar(aes(x = reorder(term, -mean), ymin = lo95, ymax = hi95), width=.3)
 

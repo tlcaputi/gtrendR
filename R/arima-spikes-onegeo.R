@@ -21,7 +21,9 @@ run_arima <- function(
   linear = F,
   rsv = F,
   periods = NA,
-  maxK = 5
+  maxK = 5,
+  first_differencing = NA,
+  seasonal_differencing = NA
   ){
 
 
@@ -130,7 +132,6 @@ run_arima <- function(
     # ts_test is just the post-period
     ts_test <- ts(tmpdf %>% filter(timestamp >= interrupt) %>% pull(geo), freq = period_values, start = decimal_date(interrupt))
 
-
     if(all(is.na(periods))){
 
       # na_kalman lets us impute missing data in the time series objects if the
@@ -142,7 +143,7 @@ run_arima <- function(
         tmpdf$geo <- as.numeric(time_series)
       }
 
-      mod <- auto.arima(ts_training, approximation  = F)
+      mod <- auto.arima(ts_training, approximation  = F, d = first_differencing, D = seasonal_differencing, trace = T)
 
       if(bootstrap){
         set.seed(1234)
@@ -157,21 +158,37 @@ run_arima <- function(
     } else {
 
 
+      # periods is an argument to use multi-season time series and a Fourier model
+      # in your ARIMA
+
+      # Create an empty vector
       period_values <- c()
+      # If you set periods to "all", it will make it year, month, and week
       if("all" %in% periods) periods <- c("year", "month", "week")
 
+
+      # This is how many observations you have per...
+
+      #year
       yearval <- 365.25/freq
+      #month
       monthval <- (365.25/12)/freq
+      # week
       weekval <- 7/freq
 
+      # If year, month, or week is one of your periods it will make sure you have enough data
+      # and then add the appropriate value to the empty vector
       if("year" %in% periods & length(ts_training) > yearval * 2) period_values <- c(yearval, period_values)
       if("month" %in% periods & length(ts_training) > monthval * 2) period_values <- c(monthval, period_values)
       if("week" %in% periods & length(ts_training) > weekval * 2) period_values <- c(weekval, period_values)
 
+      # We can only use periods that occur over multiple observations. Periods of each intervention
+      # makes no sense.
+      period_values <- period_values[period_values > 1]
+      # assert("You used your own periods, but none of your periods are valid.", {length(period_values) > 0})
+      stopifnot(length(period_values) > 0)
 
-
-
-      # Here we put the searches into time series objects.
+      # Here we put the searches into multi-season time series objects.
       # time_series is the entire timeline
       time_series <- msts(tmpdf$geo, period_values, start = decimal_date(begin))
 
@@ -191,9 +208,14 @@ run_arima <- function(
         tmpdf$geo <- as.numeric(time_series)
       }
 
+      # This is the order of the Fourier. It needs to be less than 1/2 the period.
       K <- floor(c(period_values / 2) - 1e-5)
+      # The higher the K, the longer it takes to process. Therefore, we have a maxK
+      # option so you can control the maximum order for your Fourier
       K <- sapply(K, function(x) min(c(x, maxK)))
 
+      # Give you some info and remind you that multi-seasonality takes a long time.
+      # We don't use multi-seasons for multigeo and multiterms bc it would take too long.
       print(sprintf("[%s] Using multiple periods in the ARIMA... this may take a while", Sys.time()))
       print(sprintf("[%s] Max K value is %s (larger maxK -> longer processing time)", Sys.time(), maxK))
       print(sprintf("[%s] Periods: %s", Sys.time(), paste(period_values, collapse = ", ")))
@@ -201,6 +223,8 @@ run_arima <- function(
       print(sprintf("[%s] Estimating model...", Sys.time()))
       flush.console()
 
+
+      # We set the model using a Fourier series as an explanatory variable
       mod <- auto.arima(ts_training, approximation  = F, seasonal = F, xreg = fourier(ts_training, K=K, length(ts_training)))
 
       print(sprintf("[%s] Model Estimation Complete! Calculating forecasts...", Sys.time()))
@@ -211,9 +235,13 @@ run_arima <- function(
         # h (horizon) should be equal to the length of the after-period
         # bootnum is the number of paths it's allowed to take
         # fitted_values <- forecast(mod, h = length(ts_test), bootstrap = TRUE, npaths = bootnum)
+
+        # We use the Fourier in the forecast, as well.
         fitted_values <- forecast(mod, bootstrap = T, npaths = 1000, h = length(ts_test), xreg = fourier(ts_test, K=K, length(ts_test)))
 
       } else{
+
+        # Same as above but not bootstrapped
         fitted_values <- forecast(mod, h = length(ts_test), xreg = fourier(ts_test, K=K, length(ts_test)))
       }
 
@@ -227,9 +255,9 @@ run_arima <- function(
   }
 
 
+  # If linear is True, we have to create that model.
   if(linear){
 
-    # If linear is True, we have to create that model.
 
     # First, we create a dataframe of train data and fit the model.
     x_train <- 1:length(ts_training)
@@ -250,7 +278,6 @@ run_arima <- function(
       conf95 <- data.frame(conf95)
       names(conf95)[3:5] <- c("fit", "lwr", "upr")
       fitted_values <- data.frame("mean" = conf95$fit, "lower" = conf95$lwr, "upper" = conf95$upr)
-
 
     } else{
 
@@ -972,6 +999,7 @@ arima_plot <- function(
 
   # Change geo name back to geography
   names(df) <- gsub("geo", geo, names(df))
+  print(sprintf("beginplot is %s", beginplot))
 
   # Return plot
   return(p)
