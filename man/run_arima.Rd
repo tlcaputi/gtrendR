@@ -16,7 +16,9 @@ run_arima(
   linear = F,
   rsv = F,
   periods = NA,
-  maxK = 5
+  maxK = 5,
+  first_differencing = NA,
+  seasonal_differencing = NA
 )
 }
 \arguments{
