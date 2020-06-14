@@ -1,5 +1,10 @@
 # gtrendR: An R Complement to the gtrend package for Python
 
+[![Documentation Status](https://readthedocs.org/projects/gtrendr/badge/?version=latest)](https://gtrendr.readthedocs.io/en/latest/?badge=latest)
+
+For updated documentation, please see the [Read the Docs](https://readthedocs.org/projects/gtrendr/badge/?version=latest).
+
+<!--
 ## Disclaimer
 This project is a work-in-progress. It works in some cases but may not work in many others (and may not be flexible enough for some users), and some extra code exists for functions that are not yet operational. Most things are not properly documented, and you may need to refer to the source code. This program has only been tested in Windows 10.
 
@@ -487,4 +492,4 @@ panG <- multiterm_barplot(
 
 
 
-![arima-spike-multiterms](READMEcode/output/panG.png)
+![arima-spike-multiterms](READMEcode/output/panG.png) -->

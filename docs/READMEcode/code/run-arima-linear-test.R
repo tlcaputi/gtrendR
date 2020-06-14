@@ -42,8 +42,6 @@ run_arima <- function(
   freq <- min(as.numeric(diff.Date(tmpdf$timestamp)), na.rm = T)
 
   ## RUN ARIMA ON THE TIME SERIES
-  # ts_training <- window(time_series, end = decimal_date(interrupt) - 0.5/365)
-  # ts_test <- window(time_series, start = decimal_date(interrupt))
 
   time_series <- ts(tmpdf$geo, freq = 365.25/freq, start = decimal_date(begin))
   ts_training <- ts(tmpdf %>% filter(timestamp <= interrupt) %>% pull(geo), freq = 365.25/freq, start = decimal_date(begin))
