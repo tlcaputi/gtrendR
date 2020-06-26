@@ -1,4 +1,4 @@
-[![gtrendR](docs/logos/gtrendR-01.png)]
+[![gtrendR](docs/logos/gtrendR-01.png)](https://gtrendr.readthedocs.io/en/latest/)
 
 # gtrendR: An R Complement to the gtrend package for Python
 
