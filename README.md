@@ -1,3 +1,5 @@
+[![gtrendR](docs/logos/gtrendR-01.png)]
+
 # gtrendR: An R Complement to the gtrend package for Python
 
 [![Documentation Status](https://readthedocs.org/projects/gtrendr/badge/?version=latest)](https://gtrendr.readthedocs.io/en/latest/?badge=latest)

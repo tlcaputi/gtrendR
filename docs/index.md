@@ -1,3 +1,5 @@
+[![gtrendR](logos/gtrendR-01.png)]
+
 # gtrendR: Analyze and Visualize data from the Google Trends API with R
 
 ## Features
