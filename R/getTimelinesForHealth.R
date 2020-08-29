@@ -52,7 +52,7 @@ getTimelinesForHealth <- function(
         "month"
     ),
     terms = c(
-        # "summer + winter + fall + spring", 
+        "summer + winter + fall + spring", 
         "cat + cat food + dog + dog food"
     ),
     names = c(
