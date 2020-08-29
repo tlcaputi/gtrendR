@@ -6,8 +6,8 @@ theme: readthedocs
 pages:
   - About gtrendR: index.md
   - Getting Started:
-    - Pull data from gtrendspy: gtrendspy.md
     - Install the gtrendR package: installation.md
+    - Pull data (R or Python): gtrendspy.md
   - Features:
     - Analyze a spike in searches: arima-one-geo.md
     - Get absolute search counts: absolute-counts.md

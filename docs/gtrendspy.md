@@ -18,13 +18,16 @@ getTimelinesForHealth(
     timelineResolutions = c(
         "month" # can be month, year, week, or day
     ),
-    terms = c( # The terms you want to pull
-        "summer + winter + fall + spring", 
-        "cat + cat food + dog + dog food"
+    terms = c( 
+        # The terms you want to pull
+        'hand washing + hand soap', 
+        'social isolation'
     ),
-    names = c( # The aliases for those pulls (what you want the CSV files to be named)
-        "seasons",
-        "pets"
+    names = c( 
+        # The aliases for those pulls (what you want the CSV files 
+        # to be named, in the same order as the terms)
+        "handwashing",
+        "socialisolation"
     ),
     geoRestriction.regions = c( # Which regional geographies you want
         "US-NY", 
