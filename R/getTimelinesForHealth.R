@@ -250,6 +250,9 @@ getTimelinesForHealth <- function(
         dplyr::group_walk(
             ~write.csv(
                 .x %>% 
+                    dplyr::mutate(
+                        region = gsub("-", "_", region)
+                    )
                     select(date, region, value) %>% 
                     tidyr::spread(region, value) %>% 
                     rename(timestamp = date) 
