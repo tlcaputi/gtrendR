@@ -95,8 +95,10 @@ getTimelinesForHealth <- function(
     )
 
 
+
     # Make sure we're doing a valid request
     if(length(terms) != length(names)) stop("terms and names must be the same length")
+    # timelineResolutions
     if(!(timelineResolutions %in% c("year", "month", "week", "day"))) stop("Invalid timelineResolution argument")
     if(!dir.exists(output_directory)) stop("output_directory does not exist")
     if(batch_size >= 30) stop("batch_size must be less than 30")
