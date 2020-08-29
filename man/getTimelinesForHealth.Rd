@@ -7,10 +7,10 @@
 getTimelinesForHealth(
   batch_size = 1,
   year_batch = "1 year",
-  time.startDate = "2018-06-15",
+  time.startDate = "2019-06-15",
   time.endDate = "2020-01-01",
-  timelineResolutions = c("day"),
-  terms = c("summer + winter + fall + spring", "cat + cat food + dog + dog food"),
+  timelineResolutions = c("month"),
+  terms = c("cat + cat food + dog + dog food"),
   names = c("seasons", "pets"),
   geoRestriction.regions = c("US-NY", "US-CA"),
   geoRestriction.countries = c("GB", "US"),

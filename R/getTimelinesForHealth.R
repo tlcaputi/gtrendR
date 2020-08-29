@@ -42,16 +42,17 @@ create_time_batches <- function(start, end, year_batch){
 #' @examples
 #' getTimelinesForHealth()
 
+
 getTimelinesForHealth <- function(
     batch_size = 1,
     year_batch = "1 year",
-    time.startDate = "2018-06-15",
+    time.startDate = "2019-06-15",
     time.endDate = "2020-01-01",
     timelineResolutions = c(
-        "day"
+        "month"
     ),
     terms = c(
-        "summer + winter + fall + spring", 
+        # "summer + winter + fall + spring", 
         "cat + cat food + dog + dog food"
     ),
     names = c(
@@ -115,8 +116,11 @@ getTimelinesForHealth <- function(
                     q <- list()
 
                     region <- geoRestrictions[geo_idx]
-                    q[[geoRestriction.types[geo_idx]]] <- region
+                    region_type <- geoRestriction.types[geo_idx]
 
+                    # print(region)
+                    # print(region_type)
+                    
                     for(term_idx in 1:length(term_batch)){
                         q[[term_idx]] <- term_batch[term_idx]
                         names(q)[term_idx] <- "terms"
@@ -127,6 +131,10 @@ getTimelinesForHealth <- function(
                     q[["timelineResolution"]] <- timelineResolution
                     q[["key"]] <- key 
                     q[["alt"]] <- alt
+                    q[[region_type]] <- region
+
+                    # print(q)
+
 
                     prms <- paste(sapply(1:length(q), function(idx) {
                         return(sprintf("%s=%s", names(q)[idx], URLencode(q[[idx]])))
@@ -147,6 +155,7 @@ getTimelinesForHealth <- function(
                         out.name <- match_names$name[match(out.term, match_names$term)]
                         for(out.point in out.line$points){
 
+
                             if (timelineResolution %in% c("day", "week")){
                                 out.date <- as.Date(out.point$date, format="%b %d %Y")
                             } else if (timelineResolution %in% c("month")){
@@ -160,20 +169,29 @@ getTimelinesForHealth <- function(
                                 stop("Unrecognized timelineResolution argument")
                             }
 
+                            out.value <- out.point$value
+
+                            # print(out.date)
+                            # print(out.value)
+
                             out.dat[[out.ct]] <- rbind(c(
                                 "timelineResolution" = timelineResolution, 
                                 "region" = region, 
                                 "term" = out.term, 
                                 "date" = as.character(as.Date(out.date, origin="1970-01-01")), 
-                                "value" = out.point$value,
+                                "value" = out.value,
                                 "name_" = out.name
                                 ))
+
                             out.ct <- out.ct + 1
                         }
                     }
 
                     out.df <- do.call(rbind.data.frame, out.dat)
                     dat[[ct]] <- out.df; ct <- ct + 1
+
+                    # print(out.df)
+                    # exit(0)
 
                 }
 
@@ -184,7 +202,11 @@ getTimelinesForHealth <- function(
     }
 
     df <- do.call(rbind.data.frame, dat)
-    df$name_ <- as.character(df$name_)
+    df <- df %>% mutate_all(as.character) %>% mutate(value = as.numeric(value))
+    # df$name_ <- as.character(df$name_)
+    # df$date <- as.character(df$date)
+
+    # print(df %>% head())
 
     mean0_ <- function(x){
         x <- as.numeric(as.character(x))
@@ -206,6 +228,9 @@ getTimelinesForHealth <- function(
             ) %>% 
             dplyr::ungroup()
 
+    # print(df %>% arrange(date) %>% head(10) )
+    # print(df %>% filter(grepl("2019-08", date), as.character(name_) == "pets"))
+
     df %>% 
         dplyr::group_by(
             timelineResolution, 
@@ -225,4 +250,5 @@ getTimelinesForHealth <- function(
         )
 
 }
+
 
