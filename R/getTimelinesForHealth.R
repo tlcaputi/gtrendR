@@ -186,8 +186,6 @@ getTimelinesForHealth <- function(
     df <- do.call(rbind.data.frame, dat)
     df$name_ <- as.character(df$name_)
 
-    print(df %>% head())
-
     mean0_ <- function(x){
         x <- as.numeric(as.character(x))
         x <- na.omit(x)
@@ -207,8 +205,6 @@ getTimelinesForHealth <- function(
                 value = mean0_(value)
             ) %>% 
             dplyr::ungroup()
-
-    print(df %>% head())
 
     df %>% 
         dplyr::group_by(
