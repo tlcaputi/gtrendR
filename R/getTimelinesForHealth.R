@@ -74,7 +74,7 @@ getTimelinesForHealth <- function(
 
     ## ANALYSIS
     key <- Sys.getenv("GOOGLE_TRENDS_KEY")
-    match_names <- data.frame(terms=terms, names=names)
+    match_names <- data.frame(terms=terms, names=names, stringsAsFactors = F)
     alt <- "json"
 
     time_batches <- create_time_batches(time.startDate, time.endDate, year_batch)
