@@ -1,6 +1,6 @@
 [![gtrendR](docs/logos/gtrendR-01.png)](https://gtrendr.readthedocs.io/en/latest/)
 
-# gtrendR: An R Complement to the gtrend package for Python
+# gtrendR: Analyze and Visualize data from the Google Trends for Health API with R
 
 [![Documentation Status](https://readthedocs.org/projects/gtrendr/badge/?version=latest)](https://gtrendr.readthedocs.io/en/latest/?badge=latest)
 

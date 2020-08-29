@@ -1,6 +1,6 @@
 [![gtrendR](logos/gtrendR-01.png)](https://gtrendr.readthedocs.io/en/latest/)
 
-# gtrendR: Analyze and Visualize data from the Google Trends API with R
+# gtrendR: Analyze and Visualize data from the Google Trends for Health API with R
 
 ## Features
 

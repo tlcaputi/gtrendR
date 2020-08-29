@@ -1,0 +1,226 @@
+#' seqlast
+#'
+#' @param df A dataframe including time as \code{timestamp} and searches for your given geography in one column.
+#' @keywords
+#' @export
+#' @examples
+#' getTimelinesForHealth()
+
+seqlast <- function (from, to, by) {
+  vec <- do.call(what = seq.Date, args = list(from, to, by))
+  if ( tail(vec, 1) != to ) {
+    return(c(vec, to))
+  } else {
+    return(vec)
+  }
+}
+
+
+#' create_time_batches
+#'
+#' @param df A dataframe including time as \code{timestamp} and searches for your given geography in one column.
+#' @keywords
+#' @export
+#' @examples
+#' getTimelinesForHealth()
+
+create_time_batches <- function(start, end, year_batch){
+    s <- seqlast(from=ymd(start), to=ymd(end), by=year_batch)
+    l <- list(); ct <- 1
+    for(i in 1:(length(s)-1)){
+        l[[ct]] <- c(s[i], s[i+1]); ct <- ct + 1
+    }
+    return(l)
+}
+
+
+#' getTimelineForHealth
+#'
+#' @param df A dataframe including time as \code{timestamp} and searches for your given geography in one column.
+#' @keywords
+#' @export
+#' @examples
+#' getTimelinesForHealth()
+
+getTimelinesForHealth <- function(
+    batch_size = 1,
+    year_batch = "1 year",
+    time.startDate = "2018-06-15",
+    time.endDate = "2020-01-01",
+    timelineResolutions = c(
+        "day"
+    ),
+    terms = c(
+        "summer + winter + fall + spring", 
+        "cat + cat food + dog + dog food"
+    ),
+    names = c(
+        "seasons",
+        "pets"
+    ),
+    geoRestriction.regions = c(
+        "US-NY", 
+        "US-CA"
+    ),
+    geoRestriction.countries = c(
+        "GB",
+        "US"
+    ),
+    geoRestriction.dmas = c(
+    ),
+    output_directory = "../output"
+    ){
+
+
+    ## ANALYSIS
+    key <- Sys.getenv("GOOGLE_TRENDS_KEY")
+    match_names <- data.frame(terms=terms, names=names)
+    alt <- "json"
+
+    time_batches <- create_time_batches(time.startDate, time.endDate, year_batch)
+    term_batches <- split(terms, ceiling(seq_along(terms)/batch_size))
+    name_batches <- split(names, ceiling(seq_along(terms)/batch_size))
+
+    geoRestrictions <- c(
+        geoRestriction.regions,
+        geoRestriction.countries,
+        geoRestriction.dmas
+    )
+
+    geoRestriction.types <- c(
+        rep("geoRestriction.region", times=length(geoRestriction.regions)),
+        rep("geoRestriction.country", times=length(geoRestriction.countries)),
+        rep("geoRestriction.dma", times=length(geoRestriction.dmas))
+    )
+
+
+    dat <- list(); ct <- 1
+
+    for(timelineResolution in timelineResolutions){
+
+        for(time_batch in time_batches){
+
+            batch.startDate <- format(time_batch[1], "%Y-%m-%d")
+            batch.endDate <- format(time_batch[2], "%Y-%m-%d")
+                
+            for(term_batch_idx in 1:length(term_batches)){
+
+                term_batch <- term_batches[[term_batch_idx]]
+                # name_batch <- name_batches[[term_batch_idx]]
+
+                print(sprintf("[%s] Retrieving TERMS [%s] over PERIOD [%s to %s]", Sys.time(), paste(term_batch, collapse=", "), batch.startDate, batch.endDate))
+
+                for (geo_idx in 1:length(geoRestriction.types)){
+
+                    q <- list()
+
+                    region <- geoRestrictions[geo_idx]
+                    q[[geoRestriction.types[geo_idx]]] <- region
+
+                    for(term_idx in 1:length(term_batch)){
+                        q[[term_idx]] <- term_batch[term_idx]
+                        names(q)[term_idx] <- "terms"
+                    }
+
+                    q[["time.startDate"]] <- batch.startDate
+                    q[["time.endDate"]] <- batch.endDate
+                    q[["timelineResolution"]] <- timelineResolution
+                    q[["key"]] <- key 
+                    q[["alt"]] <- alt
+
+                    prms <- paste(sapply(1:length(q), function(idx) {
+                        return(sprintf("%s=%s", names(q)[idx], URLencode(q[[idx]])))
+                    }), collapse="&")
+
+                    req <- request_build(
+                        method = "GET",
+                        path = sprintf("trends/v1beta/timelinesForHealth?%s", prms),
+                        base_url = "https://www.googleapis.com"
+                    )
+
+                    resp <- request_make(req)
+                    out <- response_process(resp)
+                    
+                    out.dat <- list(); out.ct <- 1
+                    for(out.line in out$lines){
+                        out.term <- out.line$term
+                        out.name <- match_names$name[match(out.term, match_names$term)]
+                        for(out.point in out.line$points){
+
+                            if (timelineResolution %in% c("day", "week")){
+                                out.date <- as.Date(out.point$date, format="%b %d %Y")
+                            } else if (timelineResolution %in% c("month")){
+                                d <- out.point$date
+                                d <- gsub(" ", " 01 ", trimws(d))
+                                out.date <- as.Date(d, format="%b %d %Y")
+                            } else if (timelineResolution %in% c("year")){
+                                d <- sprintf("Jan 01 %s", out.point$date)
+                                out.date <- as.Date(d, format="%b %d %Y")
+                            } else {
+                                stop("Unrecognized timelineResolution argument")
+                            }
+
+                            out.dat[[out.ct]] <- rbind(c(
+                                "timelineResolution" = timelineResolution, 
+                                "region" = region, 
+                                "term" = out.term, 
+                                "date" = as.character(as.Date(out.date, origin="1970-01-01")), 
+                                "value" = out.point$value,
+                                "name" = out.name
+                                ))
+                            out.ct <- out.ct + 1
+                        }
+                    }
+
+                    out.df <- do.call(rbind.data.frame, out.dat)
+                    dat[[ct]] <- out.df; ct <- ct + 1
+
+                }
+
+            }
+
+        }
+
+    }
+
+    df <- do.call(rbind.data.frame, dat)
+
+    mean0 <- function(x){
+        x <- as.numeric(x)
+        x <- na.omit(x)
+        x <- x[x!=0]
+        return(mean(x, na.rm = T))
+    }
+
+    df <- df %>% 
+            group_by(
+                timelineResolution, 
+                region, 
+                term, 
+                name,
+                date
+            ) %>% 
+            summarise(
+                value = mean0(value)
+            ) %>% 
+            ungroup()
+
+    df %>% 
+        group_by(
+            timelineResolution, 
+            name
+        ) %>% 
+        group_walk(
+            ~write.csv(
+                .x %>% 
+                    select(date, region, value) %>% 
+                    spread(region, value) %>% 
+                    rename(timestamp = date) 
+                    # %>% mutate(timestamp = as.Date(timestamp, format="%b %d %Y"))
+                    , 
+                file=sprintf("%s/%s_%s.csv", output_directory, .y$name, .y$timelineResolution), 
+                row.names = F
+            )
+        )
+
+}

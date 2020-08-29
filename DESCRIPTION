@@ -12,6 +12,10 @@ License: No license. Unauthorized use is strictly prohibited.
 Encoding: UTF-8
 LazyData: true
 Imports:
+    tidyr,
+    gargle,
+    tibble,
+    jsonlite,
     lubridate,
     dplyr,
     ggplot2,
@@ -33,6 +37,10 @@ Imports:
     grid,
     gtools
 Depends:
+    tidyr,
+    gargle,
+    tibble,
+    jsonlite,
     lubridate,
     dplyr,
     ggplot2,
