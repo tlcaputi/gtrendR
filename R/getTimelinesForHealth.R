@@ -132,14 +132,14 @@ getTimelinesForHealth <- function(
                         return(sprintf("%s=%s", names(q)[idx], URLencode(q[[idx]])))
                     }), collapse="&")
 
-                    req <- request_build(
+                    req <- gargle::request_build(
                         method = "GET",
                         path = sprintf("trends/v1beta/timelinesForHealth?%s", prms),
                         base_url = "https://www.googleapis.com"
                     )
 
-                    resp <- request_make(req)
-                    out <- response_process(resp)
+                    resp <- gargle::request_make(req)
+                    out <- gargle::response_process(resp)
                     
                     out.dat <- list(); out.ct <- 1
                     for(out.line in out$lines){
@@ -185,7 +185,7 @@ getTimelinesForHealth <- function(
 
     df <- do.call(rbind.data.frame, dat)
 
-    mean0 <- function(x){
+    mean0_ <- function(x){
         x <- as.numeric(x)
         x <- na.omit(x)
         x <- x[x!=0]
@@ -193,28 +193,28 @@ getTimelinesForHealth <- function(
     }
 
     df <- df %>% 
-            group_by(
+            dplyr::group_by(
                 timelineResolution, 
                 region, 
                 term, 
                 name,
                 date
             ) %>% 
-            summarise(
-                value = mean0(value)
+            dplyr::summarise(
+                value = mean0_(value)
             ) %>% 
-            ungroup()
+            dplyr::ungroup()
 
     df %>% 
-        group_by(
+        dplyr::group_by(
             timelineResolution, 
             name
         ) %>% 
-        group_walk(
+        dplyr::group_walk(
             ~write.csv(
                 .x %>% 
                     select(date, region, value) %>% 
-                    spread(region, value) %>% 
+                    tidyr::spread(region, value) %>% 
                     rename(timestamp = date) 
                     # %>% mutate(timestamp = as.Date(timestamp, format="%b %d %Y"))
                     , 
