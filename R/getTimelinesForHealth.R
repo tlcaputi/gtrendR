@@ -72,6 +72,12 @@ getTimelinesForHealth <- function(
     output_directory = "../output"
     ){
 
+    # Make sure we're doing a valid request
+    if(length(terms) != length(names)) stop("terms and names must be the same length")
+    if(!(timelineResolution %in% c("year", "month", "week", "day"))) stop("Invalid timelineResolution argument")
+    if(!dir.exists(output_directory)) stop("output_directory does not exist")
+    if(batch_size >= 30) stop("batch_size must be less than 30")
+
 
     ## ANALYSIS
     key <- Sys.getenv("GOOGLE_TRENDS_KEY")
