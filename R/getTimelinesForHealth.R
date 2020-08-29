@@ -74,7 +74,7 @@ getTimelinesForHealth <- function(
 
     ## ANALYSIS
     key <- Sys.getenv("GOOGLE_TRENDS_KEY")
-    match_names <- data.frame(terms=terms, names=names, stringsAsFactors = F)
+    match_names <- data.frame(terms=terms, names=names, stringsAsFactors=F)
     alt <- "json"
 
     time_batches <- create_time_batches(time.startDate, time.endDate, year_batch)
@@ -166,7 +166,7 @@ getTimelinesForHealth <- function(
                                 "term" = out.term, 
                                 "date" = as.character(as.Date(out.date, origin="1970-01-01")), 
                                 "value" = out.point$value,
-                                "name" = out.name
+                                "name_" = out.name
                                 ))
                             out.ct <- out.ct + 1
                         }
@@ -184,9 +184,12 @@ getTimelinesForHealth <- function(
     }
 
     df <- do.call(rbind.data.frame, dat)
+    df$name_ <- as.character(df$name_)
+
+    print(df %>% head())
 
     mean0_ <- function(x){
-        x <- as.numeric(x)
+        x <- as.numeric(as.character(x))
         x <- na.omit(x)
         x <- x[x!=0]
         return(mean(x, na.rm = T))
@@ -197,7 +200,7 @@ getTimelinesForHealth <- function(
                 timelineResolution, 
                 region, 
                 term, 
-                name,
+                name_,
                 date
             ) %>% 
             dplyr::summarise(
@@ -205,10 +208,12 @@ getTimelinesForHealth <- function(
             ) %>% 
             dplyr::ungroup()
 
+    print(df %>% head())
+
     df %>% 
         dplyr::group_by(
             timelineResolution, 
-            name
+            name_
         ) %>% 
         dplyr::group_walk(
             ~write.csv(
@@ -218,9 +223,10 @@ getTimelinesForHealth <- function(
                     rename(timestamp = date) 
                     # %>% mutate(timestamp = as.Date(timestamp, format="%b %d %Y"))
                     , 
-                file=sprintf("%s/%s_%s.csv", output_directory, .y$name, .y$timelineResolution), 
+                file=sprintf("%s/%s_%s.csv", output_directory, .y$name_, .y$timelineResolution), 
                 row.names = F
             )
         )
 
 }
+
