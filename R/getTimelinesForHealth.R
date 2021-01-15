@@ -252,7 +252,7 @@ getTimelinesForHealth <- function(
                 .x %>% 
                     dplyr::mutate(
                         region = gsub("-", "_", region)
-                    )
+                    ) %>%
                     dplyr::select(date, region, value) %>% 
                     tidyr::spread(region, value) %>% 
                     rename(timestamp = date) 
