@@ -40,7 +40,6 @@ getTimelinesForHealth(
     geoRestriction.dmas = c( # What dmas you want
     ),
     output_directory = "../output" # Where you want the output data saved
-    )
 )
 
 ```

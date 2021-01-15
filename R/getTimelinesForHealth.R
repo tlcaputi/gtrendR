@@ -212,6 +212,8 @@ getTimelinesForHealth <- function(
 
     }
 
+    print("CP1")
+
     df <- do.call(rbind.data.frame, dat)
     df <- df %>% mutate_all(as.character) %>% mutate(value = as.numeric(value))
     # df$name_ <- as.character(df$name_)
@@ -225,6 +227,9 @@ getTimelinesForHealth <- function(
         x <- x[x!=0]
         return(mean(x, na.rm = T))
     }
+
+    print("CP2")
+
 
     df <- df %>% 
             dplyr::group_by(
@@ -241,6 +246,9 @@ getTimelinesForHealth <- function(
 
     # print(df %>% arrange(date) %>% head(10) )
     # print(df %>% filter(grepl("2019-08", date), as.character(name_) == "pets"))
+
+    print("CP3")
+
 
     df %>% 
         dplyr::group_by(
