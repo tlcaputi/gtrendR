@@ -129,9 +129,6 @@ getTimelinesForHealth <- function(
                     region <- geoRestrictions[geo_idx]
                     region_type <- geoRestriction.types[geo_idx]
 
-                    # print(region)
-                    # print(region_type)
-                    
                     for(term_idx in 1:length(term_batch)){
                         q[[term_idx]] <- term_batch[term_idx]
                         names(q)[term_idx] <- "terms"
@@ -144,21 +141,26 @@ getTimelinesForHealth <- function(
                     q[["alt"]] <- alt
                     q[[region_type]] <- region
 
-                    # print(q)
-
-
                     prms <- paste(sapply(1:length(q), function(idx) {
                         return(sprintf("%s=%s", names(q)[idx], URLencode(q[[idx]])))
                     }), collapse="&")
 
-                    req <- gargle::request_build(
-                        method = "GET",
-                        path = sprintf("trends/v1beta/timelinesForHealth?%s", prms),
-                        base_url = "https://www.googleapis.com"
-                    )
+                    while(T){
+                        try(
+                            {
+                                req <- gargle::request_build(
+                                    method = "GET",
+                                    path = sprintf("trends/v1beta/timelinesForHealth?%s", prms),
+                                    base_url = "https://www.googleapis.com"
+                                )
 
-                    resp <- gargle::request_make(req)
-                    out <- gargle::response_process(resp)
+                                resp <- gargle::request_make(req)
+                                out <- gargle::response_process(resp)
+                                break
+                            }
+                        )
+                        Sys.sleep(1+runif(1))
+                    }
                     
                     out.dat <- list(); out.ct <- 1
                     for(out.line in out$lines){
@@ -182,9 +184,6 @@ getTimelinesForHealth <- function(
 
                             out.value <- out.point$value
 
-                            # print(out.date)
-                            # print(out.value)
-
                             out.dat[[out.ct]] <- rbind(c(
                                 "timelineResolution" = timelineResolution, 
                                 "region" = region, 
@@ -201,9 +200,6 @@ getTimelinesForHealth <- function(
                     out.df <- do.call(rbind.data.frame, out.dat)
                     dat[[ct]] <- out.df; ct <- ct + 1
 
-                    # print(out.df)
-                    # exit(0)
-
                 }
 
             }
@@ -214,11 +210,7 @@ getTimelinesForHealth <- function(
 
     df <- do.call(rbind.data.frame, dat)
     df <- df %>% mutate_all(as.character) %>% mutate(value = as.numeric(value))
-    # df$name_ <- as.character(df$name_)
-    # df$date <- as.character(df$date)
-
-    # print(df %>% head())
-
+    
     mean0_ <- function(x){
         x <- as.numeric(as.character(x))
         x <- na.omit(x)
